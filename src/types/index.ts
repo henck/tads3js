@@ -1,0 +1,13 @@
+export { DataFactory } from './DataFactory'
+export { VmData } from './VmData'
+export { VmNil } from './VmNil'
+export { VmTrue } from './VmTrue'
+export { VmInt } from './VmInt'
+export { VmSstring } from './VmSstring'
+export { VmDstring } from './VmDstring'
+export { VmList } from './VmList'
+export { VmCodeOffset } from './VmCodeOffset'
+export { VmObject } from './VmObject'
+export { VmProp } from './VmProp'
+export { VmFuncPtr } from './VmFuncPtr'
+

@@ -1,0 +1,4 @@
+build
+obj
+node_modules
+*.t3

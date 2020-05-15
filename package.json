@@ -1,0 +1,21 @@
+{
+  "name": "t3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "vm.js",
+  "scripts": {
+    "test": "tsc && node build/Test.js",
+    "run": "tsc && node build/Interpreter.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/node": "^13.13.4",
+    "colors": "^1.4.0",
+    "crypto-js": "^4.0.0",
+    "systemjs": "^6.3.1"
+  }
+}
