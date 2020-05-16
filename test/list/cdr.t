@@ -4,7 +4,7 @@
     
 _main(args)
 {
-    return [1,2,3,3,4,5].cdr() == 5 && [].cdr() == nil;
+    return [1,2,3,4,5].cdr() == [2,3,4,5] && [].cdr() == nil;
 }
 
 
