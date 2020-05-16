@@ -123,17 +123,27 @@ export class Vector extends ListBase {
    * directly by other code, only when a property is evaluated.
    */
 
+  /**
+   * Append vmValue to end of vector. Mutates self.
+   * List-like values are appended as single elements.
+   * @param vmValue Value to append.
+   * @returns self
+   */
   private append(vmValue: VmData): VmObject {
     this.value.push(vmValue);
     return new VmObject(this);
   }
 
+  /**
+   * Append vmValue to end of vector. Mutates self.
+   * List-like values are appended as separate elements (non-recursively).
+   * @param vmValue Value to append
+   * @returns self
+   */
   private appendAll(vmValue: VmData): VmObject {
     if(vmValue instanceof VmList) {
       this.value.push(...vmValue.value);
-    } else if((vmValue instanceof VmObject) && vmValue.getInstance() instanceof List) {
-      this.value.push(...vmValue.getInstance().getValue());
-    } else if((vmValue instanceof VmObject) && vmValue.getInstance() instanceof Vector) {
+    } else if((vmValue instanceof VmObject) && vmValue.getInstance() instanceof ListBase) {
       this.value.push(...vmValue.getInstance().getValue());
     } else {
       this.value.push(vmValue);
@@ -141,6 +151,12 @@ export class Vector extends ListBase {
     return new VmObject(this);
   }
 
+  /**
+   * Append elements of list or vector to self. Result
+   * consists only of unique elements. Mutates self.
+   * @param vmList List/vector
+   * @returns self
+   */
   private appendUnique(vmList: VmData): VmObject {
     let lst = vmList.unwrap();
     let values = (lst instanceof ListBase) ? lst.getValue() : lst; 
@@ -148,30 +164,35 @@ export class Vector extends ListBase {
     return new VmObject(this);    
   }
 
-  private toList(vmStartIdx?: VmInt, vmCount?: VmInt): VmObject {
-    let startIdx = vmStartIdx ? vmStartIdx.unwrap() : null;
-    if(startIdx == null) startIdx = 1;
-    startIdx--;
-    let count = vmCount ? vmCount.unwrap() : null;
-    let lst = new List(this.value.slice(startIdx, count ? (startIdx + count) : undefined));
-    return new VmObject(lst);
-  }
-
+  /**
+   * Modifies all elements of this vector with a modifier function that
+   * takes a single argument.
+   * @param vmFunc Modifier function
+   * @returns self
+   */
   private applyAll(vmFunc: VmData) {
-    let func = vmFunc.unwrap();
     this.value = this.value.map((x) => vmFunc.invoke(x));
     return new VmObject(this);
   }
 
+  /**
+   * Copies values from another list/vector into self. Mutates self.
+   * @param vmSource Source list/vector
+   * @param vmSourceStart Source index
+   * @param vmDestStart Destination index
+   * @param vmCount Number of elements to copy
+   * @returns self
+   */
   private copyFrom(vmSource: VmData, vmSourceStart: VmInt, vmDestStart: VmInt, vmCount: VmInt): VmObject {
     let sourceStart = this.unwrapIndex(vmSourceStart);
     let destStart = this.unwrapIndex(vmDestStart);
-    let other = undefined;
-    if(vmSource instanceof VmList) other = vmSource.value;
-    if(vmSource instanceof VmObject) other = vmSource.getInstance().getValue();
-    if(!other) throw('LIST OR VECTOR REQD');
     let count = vmCount.unwrap();
 
+    let other = undefined;
+    if(vmSource instanceof VmList) other = vmSource.value;
+    if(vmSource instanceof VmObject && vmSource.getInstance() instanceof ListBase) other = vmSource.getInstance().getValue();
+    if(!other) throw('LIST OR VECTOR REQD');
+    
     for(let i = 0; i < count; i++) {
       this.value[destStart + i] = other[sourceStart + i];
     }
@@ -179,6 +200,13 @@ export class Vector extends ListBase {
     return new VmObject(this);
   }
 
+  /**
+   * Fills elements of vector with value. Mutates self.
+   * @param vmVal Value to fill with
+   * @param vmStart Start index
+   * @param vmCount Number of elements
+   * @returns self
+   */
   private fillValue(vmVal: VmData, vmStart?: VmInt, vmCount?: VmInt): VmObject {
     let start = this.unwrapIndex(vmStart);
     let count = vmCount 
@@ -192,6 +220,12 @@ export class Vector extends ListBase {
     return new VmObject(this);
   }
 
+  /**
+   * Creates a new Vector containing n elements by invoking the callback function 
+   * once for each element, and using the return value as the element value. 
+   * @param vmFunc Callback function
+   * @param vmN Number of elements to create
+   */
   private generate(vmFunc: VmData, vmN: VmData): VmObject {
     let n = vmN.unwrap();
     if(n <= 0) n = 0;
@@ -203,28 +237,62 @@ export class Vector extends ListBase {
 
     return new VmObject(new Vector(arr));
   }
-  
+
+  /**
+   * Returns a new vector consisting of the unique elements of the original vector.
+   * @returns New vector
+   */
   private getUnique(): VmObject {
     let value = this.makeUnique(this.value);
     return new VmObject(new Vector(value));
   }
 
+  /**
+   * Inserts one or more values into the vector at the given starting index.
+   * @param vmIndex Index
+   * @param args One or more values
+   */
   private insertAt(vmIndex: VmInt, ...args: VmData[]): VmObject {
     let idx = this.unwrapIndex(vmIndex);
     this.value.splice(idx, 0, ...args);
     return new VmObject(this);
   }
 
+  /**
+   * Creates a new vector consisting of the results of applying the callback function 
+   * to each element of the original vector.
+   * @param vmFunc Callback function
+   * @returns New vector
+   */
+  private mapAll(vmFunc: VmData): VmObject {
+    return new VmObject(new Vector(this.value.map((x) => vmFunc.invoke(x))));
+  }
+
+  /**
+   * Inserts a value before the first element of the vector. Mutates the vector.
+   * @param vmVal Value to prepend.
+   * @returns self
+   */
   private prepend(vmVal: VmData): VmObject {
     this.value.unshift(vmVal);
     return new VmObject(this);
   }
 
+  /**
+   * Remove each vector element whose value equals `val` from the vector. Mutates vector.
+   * @param vmVal Value to compare to
+   * @returns self
+   */
   private removeElement(vmVal: VmData): VmObject {
     this.value = this.value.filter((x) => !x.eq(vmVal));
     return new VmObject(this);
   }
 
+  /**
+   * Deletes one element from the vector at the given index. Mutates vector.
+   * @param vmIdx Index of element to delete.
+   * @returns self
+   */
   private removeElementAt(vmIdx: VmInt): VmObject {
     let idx = this.unwrapIndex(vmIdx);
     if(idx < 0 || idx > this.value.length-1) throw('index out of range');
@@ -232,6 +300,13 @@ export class Vector extends ListBase {
     return new VmObject(this);
   }
 
+  /**
+   * Deletes elements from the vector from startingIndex through and including endingIndex.
+   * Mutates vector.
+   * @param vmStartIndex Start index
+   * @param vmEndIndex End index (inclusive)
+   * @returns self
+   */
   private removeRange(vmStartIndex: VmInt, vmEndIndex: VmInt): VmObject {
     let startIdx = this.unwrapIndex(vmStartIndex);
     let endIdx = this.unwrapIndex(vmEndIndex);
@@ -243,6 +318,11 @@ export class Vector extends ListBase {
     return new VmObject(this);
   }
 
+  /**
+   * Sets the number of elements of the vector to newLength. Mutates vector.
+   * @param vmLength New length
+   * @returns self
+   */
   private setLength(vmLength: VmInt): VmObject {
     let length = vmLength.unwrap();
     // Add nil values if shorter than requested length.
@@ -252,6 +332,12 @@ export class Vector extends ListBase {
     return new VmObject(this);
   }
 
+  /**
+   * Re-orders the elements of the vector into sorted order. Mutates vector.
+   * @param vmDescending `true` if descending, `nil` (or omit) if ascending
+   * @param vmFunc Comparison function
+   * @returns self
+   */
   private sort(vmDescending?: VmData, vmFunc?: VmData): VmObject {
     // Descending is false if unspecified, or VmNil, or VmInt=0
     let descending = (!vmDescending || vmDescending.isFalsy()) ? false : true;
@@ -272,6 +358,14 @@ export class Vector extends ListBase {
     return new VmObject(this);
   }
 
+  /**
+   * Splices elements into the vector, by replacing a given range of elements 
+   * with a set of new elements. Mutates vector.
+   * @param vmStartIndex Start index
+   * @param vmDeleteCount Number of elements to delete
+   * @param args Values to insert
+   * @returns self
+   */
   private splice(vmStartIndex: VmInt, vmDeleteCount: VmInt, ...args: VmData[]): VmObject {
     let idx = this.unwrapIndex(vmStartIndex);
     let deleteCount = vmDeleteCount.unwrap();
@@ -279,18 +373,31 @@ export class Vector extends ListBase {
     return new VmObject(this);
   }
 
+  /**
+   * Creates and returns a new vector containing the elements of this vector 
+   * for which the callback function returns a non-false value. Mutates vector.
+   * @param vmFunc Callback function
+   * @returns self
+   */
   private subset(vmFunc: VmData): VmObject {
-    this.value = this.value.filter((x) => {
-      let r0 = vmFunc.invoke(x);
-      return r0.isTruthy();
-    });
+    this.value = this.value.filter((x) => vmFunc.invoke(x).isTruthy());
     return new VmObject(this);
-  }
+  } 
 
-  private mapAll(vmFunc: VmData): VmObject {
-    return new VmObject(new Vector(this.value.map((x) => vmFunc.invoke(x))));
+  /**
+   * Creates and returns a new list value based on the vector.
+   * @param vmStartIdx Start index
+   * @param vmCount Number of elements
+   * @returns New List
+   */
+  private toList(vmStartIdx?: VmInt, vmCount?: VmInt): VmObject {
+    let startIdx = vmStartIdx ? vmStartIdx.unwrap() : null;
+    if(startIdx == null) startIdx = 1;
+    startIdx--;
+    let count = vmCount ? vmCount.unwrap() : null;
+    let lst = new List(this.value.slice(startIdx, count ? (startIdx + count) : undefined));
+    return new VmObject(lst);
   }
-
 }
 
 MetaclassRegistry.register('vector/030005', Vector);
