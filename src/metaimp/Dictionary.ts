@@ -5,9 +5,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { VmObject, VmData, VmProp, VmNil, VmTrue, VmList, VmSstring } from '../types';
 import { List } from './List';
-import { Vm } from '../Vm';
 import { MetaString } from './MetaString';
-import { ListBase } from './ListBase';
 
 class DictionaryEntry {
   public str: string;
@@ -120,7 +118,14 @@ export class Dictionary extends Metaclass {
     return null;
   }
 
-   findWord(vmStr: VmData, vocabProp?: VmProp): VmObject {
+  /**
+   * Search the dictionary for the given string and property ID. 
+   * Returns a list giving all of the matching objects.
+   * @param vmStr String to look for
+   * @param vocabProp Propery to look for
+   * @returns List of matching objects
+   */
+  findWord(vmStr: VmData, vocabProp?: VmProp): VmObject {
     let str = vmStr.unwrap();
     let propID = vocabProp ? vocabProp.unwrap() : null;
     let matches: (VmObject|VmTrue)[] = [];
@@ -128,7 +133,6 @@ export class Dictionary extends Metaclass {
     this.value.forEach((entry: DictionaryEntry) => {
       // Does string match?
       if(entry.compare(str, propID)) {
-        console.log("COMPARED MATCH");
         entry.objects.forEach((obj) => {
           console.log(obj);
           // Do not include object if already in matches
@@ -179,15 +183,30 @@ export class Dictionary extends Metaclass {
     return null;
   }
 
+  /**
+   * Searches the dictionary for the given string and determines if it's associated 
+   * with any objects.
+   * @param vmStr String to look for
+   * @returns true or nil
+   */
   isWordDefined(vmStr: VmData): VmData {
-    let str = vmStr.unwrap();
+    let str = vmStr.unpack();
     return !!this.value.find((entry: DictionaryEntry) => entry.compare(str)) ? new VmTrue() : new VmNil();
   }
 
+  /**
+   * Set the comparator object.
+   * @param compObj Comparator object
+   */
   setComparator(compObj: VmObject): VmData {
+    throw 'NOT IMPLEMENTED';
     return null;
   }
 
+  /**
+   * Invokes the callback function on each word association in the dictionary.
+   * @param vmFunc Callback function
+   */
   forEachWord(vmFunc: VmData): VmData {
     this.value.forEach((entry:DictionaryEntry) => {
       entry.objects.forEach((obj) => {
