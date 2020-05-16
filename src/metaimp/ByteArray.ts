@@ -41,8 +41,8 @@ export class ByteArray extends Metaclass {
     // If an array (another ByteArray), then make a copy
     // of a segment of it.
     else if(Array.isArray(arg0)) {
-      let start = args[1].unpack();
-      let len = args[2].unpack();
+      let start = args.length >= 2 ? args[1].unpack() : 0;
+      let len = args.length >= 3 ? args[2].unpack() : args[0].length;
       for(let i = 0; i < len; i++) {
         this.value.push(arg0[start+i]);
       }
@@ -88,11 +88,13 @@ export class ByteArray extends Metaclass {
    * @param vmLen Number of bytes to copy.
    */
   private copyFrom(vmSourceArray: VmData, vmSourceIndex: VmInt, vmDestIndex: VmInt, vmLen: VmInt): VmData {
-    let sourceArray = vmSourceArray.unpack();
+    // We slice the source array so that you can copy self to self, as well.
+    let sourceArray = vmSourceArray.unpack().slice();
     let sourceIndex = vmSourceIndex.unpack() - 1;
     let destIndex = vmDestIndex.unpack() - 1;
     let len = vmLen.unpack();
 
+    // There is no out-of-bounds protection.
     for(let i = 0; i < len; i++) {
       this.value[i + destIndex] = sourceArray[i + sourceIndex];
     }
