@@ -83,6 +83,24 @@ export class List extends ListBase {
     return new VmObject(new List(newLst));    
   }
 
+  /**
+   * Returns the first element of the list.
+   * @returns Element, or nil for empty list.
+   */
+  private car(): VmData {
+    if(this.value.length == 0) return new VmNil();
+    return this.value[0];
+  }
+
+  /**
+   * Returns the "tail" of the list; that is, the rest of the list after removing the first element.
+   * @returns Tail of list, or nil for empty list.
+   */
+  private cdr(): VmData {
+    if(this.value.length == 0) return new VmNil();
+    return new VmObject(new List(this.value.slice(1)));
+  }
+
   private prepend(data: VmData): VmObject {
     let lst = new List([data, ...this.value]);
     return new VmObject(lst);
@@ -91,16 +109,6 @@ export class List extends ListBase {
   private getUnique(): VmObject {
     let value = this.makeUnique(this.value);
     return new VmObject(new List(value));    
-  }
-
-  private car(): VmData {
-    if(this.value.length == 0) return new VmNil();
-    return this.value[0];
-  }
-
-  private cdr(): VmData {
-    if(this.value.length == 0) return new VmNil();
-    return this.value[this.value.length-1];
   }
 
   private splice(vmStartIndex: VmInt, vmDeleteCount: VmInt, ...args: VmData[]): VmObject {
