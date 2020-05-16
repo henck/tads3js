@@ -31,7 +31,6 @@ export class ByteArray extends Metaclass {
     }
 
     let arg0 = args[0].unpack();
-    console.log('arg0', arg0);
     // If a number, then create an empty ByteArray with _n_ 
     // elements of value 0.
     if(typeof(arg0) == 'number') {
@@ -81,7 +80,20 @@ export class ByteArray extends Metaclass {
    * Virtual methods implementation
    */
   
-   
+  public getindex(vmIndex: VmData): VmData {
+    if(!(vmIndex instanceof VmInt)) throw('NUM_VAL_REQD');
+    let idx = vmIndex.unwrap();
+    if(idx < 1 || idx > this.value.length) throw('INDEX_OUT_OF_RANGE');
+    return new VmInt(this.value[idx-1]);
+  }     
+
+  public setindex(vmIndex: VmData, data: VmData): VmObject {
+    if(!(vmIndex instanceof VmInt)) throw('NUM_VAL_REQD');
+    let idx = vmIndex.unwrap();
+    if(idx < 1 || idx > this.value.length) throw('INDEX_OUT_OF_RANGE');
+    this.value[idx - 1] = (data.unpack() & 0xff);
+    return new VmObject(this);
+  }
 
   /*
    * Meta methods - all private as they should not be called
