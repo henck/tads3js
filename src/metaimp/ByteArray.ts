@@ -1,3 +1,6 @@
+const MD5 = require("crypto-js/md5");
+const SHA256 = require("crypto-js/sha256");
+
 import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
@@ -28,6 +31,7 @@ export class ByteArray extends Metaclass {
     }
 
     let arg0 = args[0].unpack();
+    console.log('arg0', arg0);
     // If a number, then create an empty ByteArray with _n_ 
     // elements of value 0.
     if(typeof(arg0) == 'number') {
@@ -41,11 +45,10 @@ export class ByteArray extends Metaclass {
     // If an array (another ByteArray), then make a copy
     // of a segment of it.
     else if(Array.isArray(arg0)) {
-      let start = args.length >= 2 ? args[1].unpack() : 0;
-      let len = args.length >= 3 ? args[2].unpack() : args[0].length;
-      for(let i = 0; i < len; i++) {
-        this.value.push(arg0[start+i]);
-      }
+      let start = args.length >= 2 ? args[1].unpack() - 1 : 0;
+      let len = args.length >= 3 ? args[2].unpack() : arg0.length;
+      let end = Math.min(start + len, arg0.length);
+      this.value = arg0.slice(start, end);
     }
   }
 
@@ -64,7 +67,11 @@ export class ByteArray extends Metaclass {
   getMethodByIndex(idx: number): TPropFunc {
     switch(idx) {
       case 0: return this.length;
+      case 1: return this.subarray;
       case 2: return this.copyFrom;
+      case 3: return this.fillValue;
+      case 9: return this.sha256;
+      case 10: return this.digestMD5;
     }
     return null;
   }  
@@ -101,7 +108,35 @@ export class ByteArray extends Metaclass {
     
     return null;
   }
-  
+
+  /**
+   * Calculates the 128-bit RSA MD5 message digest of the string.
+   * @returns hash string
+   */
+  private digestMD5(): VmObject {
+    let hash = MD5(this.value).toString();
+    return new VmObject(new MetaString(hash));
+  }  
+
+  /**
+   * Stores the value val in each element of the array, starting 
+   * at index startIndex and filling the next length bytes.
+   * @param vmVal Value to store
+   * @param vmStartIndex Optional start index
+   * @param vmLength Optional length
+   */
+  private fillValue(vmVal: VmData, vmStartIndex?: VmData, vmLength?: VmData): VmData {
+    let val = vmVal.unpack();
+    let startIndex = vmStartIndex ? Math.max(0, vmStartIndex.unpack() - 1) : 0;
+    let length = vmLength ? vmLength.unpack() : this.value.length;
+
+    for(let i = startIndex; i < Math.min(startIndex + length, this.value.length); i++) {
+      this.value[i] = (val & 0xff);
+    }
+
+    return null;
+  }
+
   /**
    * Returns the number of bytes in the ByteArray. This is the 
    * same as the size specified when the object was created. 
@@ -109,6 +144,26 @@ export class ByteArray extends Metaclass {
    */
   private length(): VmData {
     return new VmInt(this.value.length);
+  }
+
+  /**
+   * Calculates the 256-bit SHA-2 (Secure Hash Algorithm 2) hash of the string.
+   * @returns hash string
+   */
+  private sha256(): VmObject {
+    let hash = SHA256(this.value).toString();
+    return new VmObject(new MetaString(hash));
+  }      
+
+  /**
+   * Returns a new ByteArray consisting of a region of this array.
+   * @param vmStartIndex Start index
+   * @param vmLength Optional length
+   * @returns new ByteArray
+   */
+  private subarray(vmStartIndex: VmInt, vmLength?: VmInt): VmObject {
+    vmLength = vmLength ?? new VmInt(this.value.length);
+    return new VmObject(new ByteArray(new VmObject(this), vmStartIndex, vmLength));
   }
 }
 
