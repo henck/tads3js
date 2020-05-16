@@ -70,6 +70,7 @@ export class ByteArray extends Metaclass {
       case 1: return this.subarray;
       case 2: return this.copyFrom;
       case 3: return this.fillValue;
+      case 4: return this.mapToString;
       case 9: return this.sha256;
       case 10: return this.digestMD5;
     }
@@ -147,6 +148,27 @@ export class ByteArray extends Metaclass {
   }
 
   /**
+   * Maps the bytes in the array to a string.
+   * @param vmCharset Optional harset object to use (currently ignored)
+   * @param vmStartIndex Optional start index
+   * @param vmLength Optional length
+   * @returns New MetaString
+   */
+  private mapToString(vmCharset?: VmObject, vmStartIndex?: VmInt, vmLength?: VmInt): VmObject {
+    // Charset is ignored.
+    let start = vmStartIndex ? vmStartIndex.unpack() - 1 : 0;
+    let len = vmLength ? vmLength.unpack() : this.value.length;
+    let end = Math.min(start + len, this.value.length);
+
+    let str = '';
+    for(let i = start; i < end; i++) {
+      str = str + String.fromCharCode(this.value[i]);
+    }
+
+    return new VmObject(new MetaString(str));
+  }
+
+  /**
    * Calculates the 256-bit SHA-2 (Secure Hash Algorithm 2) hash of the string.
    * @returns hash string
    */
@@ -163,6 +185,7 @@ export class ByteArray extends Metaclass {
    */
   private subarray(vmStartIndex: VmInt, vmLength?: VmInt): VmObject {
     vmLength = vmLength ?? new VmInt(this.value.length);
+    // Uses ByteArray constructor:
     return new VmObject(new ByteArray(new VmObject(this), vmStartIndex, vmLength));
   }
 }
