@@ -164,7 +164,7 @@ export class Dictionary extends Metaclass {
     let words = vmStr.unpack(); // should be native string or array if list-like
     if (!Array.isArray(words)) words = [vmStr]; // if not list-like, make array
 
-    // Add the words, one by one:
+    // Remove the words, one by one:
     words.forEach((vmWord: VmData): void => {
       let word = vmWord.unpack();
       if(typeof(word) === 'string') {
