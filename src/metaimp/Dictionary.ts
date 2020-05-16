@@ -3,9 +3,10 @@ import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
-import { VmObject, VmData, VmProp, VmNil, VmTrue, VmList, VmSstring } from '../types';
+import { VmObject, VmData, VmProp, VmNil, VmTrue, VmList, VmSstring, VmInt } from '../types';
 import { List } from './List';
 import { MetaString } from './MetaString';
+import { levenshtein } from '../util/Levenshtein';
 
 class DictionaryEntry {
   public str: string;
@@ -61,6 +62,7 @@ export class Dictionary extends Metaclass {
       case 3: return this.removeWord;
       case 4: return this.isWordDefined;
       case 5: return this.forEachWord;
+      case 6: return this.correctSpelling;
     }
     return null;
   }  
@@ -205,7 +207,7 @@ export class Dictionary extends Metaclass {
 
   /**
    * Invokes the callback function on each word association in the dictionary.
-   * @param vmFunc Callback function
+   * @param vmFunc Callback function (obj, string, prop)
    */
   forEachWord(vmFunc: VmData): VmData {
     this.value.forEach((entry:DictionaryEntry) => {
@@ -215,6 +217,39 @@ export class Dictionary extends Metaclass {
     });
     return null;
   }
+
+  /**
+   * Returns a list of words in the dictionary that are
+   * possible spelling corrections for the given string. 
+   * @param vmStr string
+   * @param vmMaxEditDistance max Levenshtein distance
+   * @returns List of lists, with each item [word, dist, repl],
+   * where dist = Levenshtein distance, and repl 
+   * should be replacements (but it currently also Levenshtein
+   * distance).
+   */
+  correctSpelling(vmStr: VmData, vmMaxEditDistance: VmInt): VmObject {
+    let str = vmStr.unpack();
+    let maxDist = vmMaxEditDistance.unpack();
+
+    // Get all words in dictionary (removing duplicates):
+    let words = [...new Set(this.value.map((entry: DictionaryEntry) => entry.str))];
+
+    // Calculate distances:
+    let distances = words.map((word: string) => {
+      let dist = levenshtein(word, str);
+      return [word, dist, dist];
+    })
+
+    // Remove words with distance > maxdist
+    .filter((d) => d[1] <= maxDist)
+
+    // Turn all distances into List objects
+    .map((d) => new VmObject(new List(d)));
+
+    return new VmObject(new List(distances));
+  }
 }
+
 
 MetaclassRegistry.register('dictionary2/030001', Dictionary);
