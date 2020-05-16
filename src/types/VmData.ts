@@ -34,6 +34,10 @@ export abstract class VmData {
     return this.value;
   }
 
+  unpack(): any {
+    return this.value;
+  }
+
   //
   // Operations
   //

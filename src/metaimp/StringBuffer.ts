@@ -21,6 +21,10 @@ export class StringBuffer extends Metaclass {
     this.incrementalSize = vmIncrementalSize ? vmIncrementalSize.value : 0;
   }
 
+  unpack(): string { 
+    return this.value.join('');
+  }
+
   getMethodByIndex(idx: number): TPropFunc {
     switch(idx) {
       case 0: return this.length;

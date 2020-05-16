@@ -28,6 +28,10 @@ class Metaclass {
     throw('Cannot load meta object from image.');
   }
 
+  unpack(): any {
+    return null;
+  }
+
   getMethodByIndex(idx: number): TPropFunc {
     return null;
   }

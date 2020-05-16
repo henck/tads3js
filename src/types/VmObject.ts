@@ -23,6 +23,11 @@ export class VmObject extends VmData {
     return obj;
   }  
 
+  unpack(): any {
+    let obj = this.getInstance();
+    return obj.unpack();
+  }
+
   getInstance(): Metaclass {
     // If this VmObject  stores a reference to a Metaclass
     // instance, just return it.

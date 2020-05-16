@@ -3,10 +3,11 @@ import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
-import { VmObject, VmData, VmProp, VmNil, VmTrue } from '../types';
+import { VmObject, VmData, VmProp, VmNil, VmTrue, VmList, VmSstring } from '../types';
 import { List } from './List';
 import { Vm } from '../Vm';
 import { MetaString } from './MetaString';
+import { ListBase } from './ListBase';
 
 class DictionaryEntry {
   public str: string;
@@ -86,23 +87,38 @@ export class Dictionary extends Metaclass {
    * directly by other code, only when a property is evaluated.
    */
 
-   addWord(vmObj: VmObject, vmStr: VmData, vocabProp: VmProp): VmData {
-     let str = vmStr.unwrap();
-     let propID = vocabProp.unwrap();
+  /**
+  * Add an object to the dictionary with the given string and property key.
+  * @param vmObj Object
+  * @param vmStr String, or list-like collection of strings
+  * @param vocabProp Property
+  * @returns null
+  */
+  addWord(vmObj: VmObject, vmStr: VmData, vocabProp: VmProp): VmData {
+    let propID = vocabProp.unpack();
+    let words = vmStr.unpack(); // should be native string or array if list-like
+    if (!Array.isArray(words)) words = [vmStr]; // if not list-like, make array
 
-     // See if a string-prop-object combination already exists in the
-     // Dictionary. If so, ignore the new word.
-     let entry = this.get(str, propID);
-     if(entry && entry.hasObject(vmObj)) return null;
+    // Add the words, one by one:
+    words.forEach((vmWord: VmData): void => {
+      let word = vmWord.unpack();
+      if(typeof(word) === 'string') {
+        // See if a string-prop-object combination already exists in the
+        // Dictionary. If so, ignore the new word.
+        let entry = this.get(word, propID);
+        if(entry && entry.hasObject(vmObj)) return null;
 
-     // Add or update the key in the Dictionary.
-     if(!entry) {
-       entry = new DictionaryEntry(str, propID, []);
-       this.value.push(entry);
-     }
-     entry.addObject(vmObj);
-     return null;
-   }
+        // Add or update the key in the Dictionary. 
+        if(!entry) {
+          entry = new DictionaryEntry(word, propID, []);
+          this.value.push(entry);
+        }
+        entry.addObject(vmObj);
+      }
+    });
+
+    return null;
+  }
 
    findWord(vmStr: VmData, vocabProp?: VmProp): VmObject {
     let str = vmStr.unwrap();
@@ -130,14 +146,30 @@ export class Dictionary extends Metaclass {
     return new VmObject(new List(matches));
   }
 
+  /**
+   * Removes from the dictionary the object's association with the given 
+   * string and property ID key.
+   * @param vmObj Object
+   * @param vmStr String, or list of strings
+   * @param vocabProp Property
+   * @returns null
+   */
   removeWord(vmObj: VmObject, vmStr: VmData, vocabProp: VmProp): VmData {
-    let str = vmStr.unwrap();
     let propID = vocabProp ? vocabProp.unwrap() : null;
 
-    // Remove object from all entries
-    this.value.forEach((entry: DictionaryEntry) => {
-      if(entry.compare(str, propID)) {
-        entry.removeObject(vmObj);
+    let words = vmStr.unpack(); // should be native string or array if list-like
+    if (!Array.isArray(words)) words = [vmStr]; // if not list-like, make array
+
+    // Add the words, one by one:
+    words.forEach((vmWord: VmData): void => {
+      let word = vmWord.unpack();
+      if(typeof(word) === 'string') {
+        // Remove object from all entries
+        this.value.forEach((entry: DictionaryEntry) => {
+          if(entry.compare(word, propID)) {
+            entry.removeObject(vmObj);
+          }
+        });
       }
     });
 

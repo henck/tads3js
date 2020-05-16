@@ -19,6 +19,10 @@ export class MetaString extends Metaclass {
     this.value = val;
   }
 
+  unpack(): string {
+    return this.value;
+  }
+
   getMethodByIndex(idx: number): TPropFunc {
     switch(idx) {
       case 0: return this.length;

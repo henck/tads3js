@@ -16,6 +16,10 @@ export abstract class ListBase extends Collection {
     this.value = value; 
   }
 
+  unpack() {
+    return this.value;
+  }
+
   protected makeUnique(value: VmData[]): VmData[] {
     // Filter the elements:
     value = value.filter((x:VmData, idx: number) => {
