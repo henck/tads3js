@@ -13,9 +13,13 @@ export class VmMap {
     return new VmMap(this._keys.slice(), this._values.slice());
   }
 
+  public indexOf(key: VmData) {
+    return this._keys.findIndex((k) => k.eq(key));
+  }
+
   public set(key: VmData, value: VmData) {
     // See if key already exist.
-    let index = this._keys.findIndex((k) => k.eq(key));
+    let index = this.indexOf(key);
     // If it exists, replace it.
     if(index >= 0) {
       this._keys[index] = key;
@@ -29,17 +33,17 @@ export class VmMap {
   }
 
   public has(key: VmData) {
-    let index = this._keys.findIndex((k) => k.eq(key));
+    let index = this.indexOf(key);
     return index >= 0;
   }
 
   public get(key: VmData): VmData {
-    let index = this._keys.findIndex((k) => k.eq(key));
+    let index = this.indexOf(key);
     return index >= 0 ? this._values[index] : null;
   }
 
   public delete(key: VmData): VmData {
-    let index = this._keys.findIndex((k) => k.eq(key));
+    let index = this.indexOf(key);
     if (index >= 0) {
       let value = this._values[index];
       this._keys.splice(index, 1);
