@@ -2,7 +2,6 @@ import { Metaclass, TPropFunc } from '../metaclass/Metaclass'
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { VmData, VmInt, VmObject, VmNil, VmTrue, VmList } from "../types"
-import { Vm } from "../Vm"
 import { Collection } from "./Collection"
 import { Iterator } from "./Iterator"
 import { ListBase } from "./ListBase"
@@ -77,53 +76,13 @@ export class LookupTable extends Collection  {
    * directly by other code, only when a property is evaluated.
    */
 
-  private getBucketCount(): VmInt {
-    return new VmInt(1);
-  }
-
-  private getEntryCount(): VmInt {
-    return new VmInt(this.value.size());
-  }
-
-  private keysToList(): VmObject {
-    return new VmObject(new List(this.value.keys()));
-  }
-
-  private valsToList(): VmObject {
-    return new VmObject(new List(this.value.values()));
-  }
-
-  private getDefaultValue(): VmData {
-    return this.default;
-  }
-
-  private setDefaultValue(value: VmData): VmData {
-    this.default = value;
-    return new VmNil();
-  }
-
-  private removeElement(key: VmData): VmData {
-    return this.value.delete(key);
-  }
-
-  private isKeyPresent(key: VmData): VmNil | VmTrue {
-    return this.value.has(key) ? new VmTrue() : new VmNil();
-  }
-
-  private nthKey(vmN: VmInt): VmData {
-    let n = vmN.unwrap(); n--;
-    if(n < 0 || n >= this.value.size()) throw('Out of bounds');
-    return this.value.keys()[n];
-  }
-
-  private nthVal(vmN: VmInt): VmData {
-    let n = vmN.unwrap(); n--;
-    if(n < 0 || n >= this.value.size()) throw('Out of bounds');
-    return this.value.values()[n];
-  }
-
-  private applyAll(vmFunc: VmData): VmData {
-    let func = vmFunc.unwrap();
+  /**
+   * For each element in the table, this method invokes the callback function, 
+   * and then changes the element's value to the return value of the function.
+   * @param vmFunc Callback function
+   * @returns VmNil
+   */
+  private applyAll(vmFunc: VmData): VmNil {
     this.value.keys().map((k) => {
       let val = this.value.get(k);
       let newVal = vmFunc.invoke(val);
@@ -132,8 +91,13 @@ export class LookupTable extends Collection  {
     return new VmNil();
   }
 
-  private forEach(vmFunc: VmData): VmData {
-    let func = vmFunc.unwrap();
+
+  /**
+   * For each element in the table, invokes the callback function with value.
+   * @param vmFunc Callback function
+   * @returns VmNil
+   */
+  private forEach(vmFunc: VmData): VmNil {
     this.value.keys().map((k) => {
       let val = this.value.get(k);
       vmFunc.invoke(val);
@@ -141,14 +105,112 @@ export class LookupTable extends Collection  {
     return new VmNil();
   }
 
-  private forEachAssoc(vmFunc: VmData): VmData {
-    let func = vmFunc.unwrap();
+  /**
+   * For each element in the table, invokes the callback function with 
+   * index and value.
+   * @param vmFunc Callback function
+   * @returns VmNil
+   */
+  private forEachAssoc(vmFunc: VmData): VmNil {
     this.value.keys().map((k) => {
       let val = this.value.get(k);
       vmFunc.invoke(k, val);
     });
     return new VmNil();
   }  
+
+  /**
+   * Returns the number of "hash buckets" in the table.
+   * @returns Number of buckets
+   */
+  private getBucketCount(): VmInt {
+    return new VmInt(1);
+  }
+
+  /**
+   * Returns the table's default value.
+   * @returns Default value
+   */
+  private getDefaultValue(): VmData {
+    return this.default;
+  }
+
+  /**
+   * Returns the number of key/value entries in the table.
+   * @returns Number of entries
+   */
+  private getEntryCount(): VmInt {
+    return new VmInt(this.value.size());
+  }
+
+  /**
+   * Checks to see if an entry with the given key is present in the table.
+   * @param key Key
+   * @returns True is key is present, nil if not.
+   */
+  private isKeyPresent(key: VmData): VmNil | VmTrue {
+    return this.value.has(key) ? new VmTrue() : new VmNil();
+  }
+
+  /**
+   * Returns a list consisting of all of the keys in the table. 
+   * @returns List of keys
+   */
+  private keysToList(): VmObject {
+    return new VmObject(new List(this.value.keys()));
+  }
+
+  /**
+   * Returns the key at the given index in the table. 
+   * @param vmN Index
+   * @returns Key
+   */
+  private nthKey(vmN: VmInt): VmData {
+    let n = vmN.unwrap(); n--;
+    if(n < 0 || n >= this.value.size()) throw('Out of bounds');
+    return this.value.keys()[n];
+  }
+
+  /**
+   * Returns the value at the given index in the table. 
+   * @param vmN Index
+   * @returns Value
+   */
+  private nthVal(vmN: VmInt): VmData {
+    let n = vmN.unwrap(); n--;
+    if(n < 0 || n >= this.value.size()) throw('Out of bounds');
+    return this.value.values()[n];
+  }
+
+  /**
+   * Removes the element with the given key, if any, returning the value.
+   * @param key 
+   * @returns Deleted value, or VmNil
+   */
+  private removeElement(key: VmData): VmData {
+    return this.value.delete(key);
+  }
+
+  /**
+   * Sets the default value for the table.
+   * @param value Value
+   */
+  private setDefaultValue(value: VmData): VmNil {
+    this.default = value;
+    return new VmNil();
+  }
+
+  /**
+   * Returns a list consisting of all of the values in the table. 
+   * @returns List of values
+   */
+  private valsToList(): VmObject {
+    return new VmObject(new List(this.value.values()));
+  }
+
+
+
+
 }
 
 MetaclassRegistry.register('lookuptable/030003', LookupTable);
