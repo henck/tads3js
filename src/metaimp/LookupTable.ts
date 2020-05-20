@@ -72,6 +72,22 @@ export class LookupTable extends Collection  {
   }
 
   /*
+   * Virtual methods
+   */
+
+  public getindex(vmIndex: VmData): VmData {
+    let val = this.value.get(vmIndex);
+    return val ?? this.default;
+  }     
+
+  public setindex(vmIndex: VmData, data: VmData): VmObject {
+    // If vector isn't big enough, add nil elements to the end:
+    this.value.set(vmIndex, data);
+    return new VmObject(this);
+  }
+
+
+  /*
    * Meta methods - all private as they should not be called
    * directly by other code, only when a property is evaluated.
    */
