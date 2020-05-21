@@ -1,4 +1,3 @@
-import { Stack } from "./Stack";
 import { VmData } from "./types";
 import * as B from "./builtin/";
 import { Vm } from "./Vm";
@@ -25,8 +24,8 @@ export class Builtin {
       /* 15 */ null,
       /* 16 */ null,
       /* 17 */ null,
-      /* 18 */ null,
-      /* 19 */ null,
+      /* 18 */ B.builtin_max,
+      /* 19 */ B.builtin_min,
       /* 20 */ null,
       /* 21 */ null,
       /* 22 */ null,
