@@ -13,7 +13,7 @@ export class Builtin {
       /* 04 */ null,
       /* 05 */ null,
       /* 06 */ B.builtin_toString,
-      /* 07 */ null,
+      /* 07 */ B.builtin_toInteger,
       /* 08 */ null,
       /* 09 */ null,
       /* 10 */ null,
