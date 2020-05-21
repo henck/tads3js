@@ -125,4 +125,8 @@ export abstract class VmData {
   invoke(...args: VmData[]): VmData {
     throw('CANNOT_INVOKE');
   }
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    throw("No string conversion");
+  }
 }

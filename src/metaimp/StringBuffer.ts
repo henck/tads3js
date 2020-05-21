@@ -55,6 +55,8 @@ export class StringBuffer extends Metaclass {
    * Virtual methods implementation
    */
 
+  // TODO: Operators?
+
   public equals(data: VmData): boolean {
     let str = data.unwrap();
     return this.toString() == str.toString();
@@ -64,6 +66,10 @@ export class StringBuffer extends Metaclass {
     let str = data.unwrap();
     return this.toString() < str.toString();
   }
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return this.value.join('');
+  }     
 
   /*
    * Meta methods - all private as they should not be called

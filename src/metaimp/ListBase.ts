@@ -89,6 +89,10 @@ export abstract class ListBase extends Collection {
     return this.value[idx-1];    
   }  
 
+  toStr(radix?: number, isSigned?: boolean): string {
+    return this.value.map((x: VmData) => x.toStr(radix, isSigned)).join(',');
+  }     
+
   /*
    * Meta methods - all protected as they should not be called
    * directly by other code, only when a property is evaluated.

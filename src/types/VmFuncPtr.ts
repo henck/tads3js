@@ -13,4 +13,8 @@ export class VmFuncPtr extends VmData {
   invoke(...args: VmData[]): VmData {
     return Vm.getInstance().runContext(this.value, null, ...args);
   }  
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return `funcptr#${this.value}`;
+  }   
 }

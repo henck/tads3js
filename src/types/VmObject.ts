@@ -81,4 +81,11 @@ export class VmObject extends VmData {
     let obj: Metaclass = this.getInstance();
     return obj.invoke(...args);
   }
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    let obj: Metaclass = this.getInstance();
+    // Does class implement toStr? Then use it.
+    if((obj as any).toStr) return (obj as any).toStr(radix, isSigned);
+    return `object#${this.value}`;
+  }
 }

@@ -46,4 +46,8 @@ export class VmSstring extends VmData {
     // Anything else:
     throw('INVALID_COMPARISON');
   }    
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return this.value;
+  }
 }

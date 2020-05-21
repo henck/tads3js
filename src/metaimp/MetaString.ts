@@ -91,6 +91,10 @@ export class MetaString extends Metaclass {
     return this.value < str.toString();
   }
 
+  toStr(radix?: number, isSigned?: boolean): string {
+    return this.value;
+  }
+
   /*
    * Meta methods - all private as they should not be called
    * directly by other code, only when a property is evaluated.

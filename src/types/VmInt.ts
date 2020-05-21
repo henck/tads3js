@@ -96,4 +96,9 @@ export class VmInt extends VmData {
     if(!(data instanceof VmInt)) throw('INVALID_COMPARISON');
     return this.value < data.value; 
   }  
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    radix = radix ?? 10;
+    return this.value.toString(radix);
+  }
 }

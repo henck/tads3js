@@ -1,5 +1,4 @@
 import { VmData } from "./VmData";
-import { VmNil } from "./VmNil";
 
 export class VmProp extends VmData {
   constructor(value: number) {
@@ -9,4 +8,8 @@ export class VmProp extends VmData {
   getName() {
     return 'prop';
   }
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return `prop#${this.value}`;
+  }  
 }

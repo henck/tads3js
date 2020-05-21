@@ -95,6 +95,14 @@ export class ByteArray extends Metaclass {
     return new VmObject(this);
   }
 
+  toStr(radix?: number, isSigned?: boolean): string {
+    let str = '';
+    for(let i = 0; i < this.value.length; i++) {
+      str = str + String.fromCharCode(this.value[i]);
+    }
+    return str;
+  }     
+
   /*
    * Meta methods - all private as they should not be called
    * directly by other code, only when a property is evaluated.
@@ -161,7 +169,7 @@ export class ByteArray extends Metaclass {
 
   /**
    * Maps the bytes in the array to a string.
-   * @param vmCharset Optional harset object to use (currently ignored)
+   * @param vmCharset Optional charset object to use (currently ignored)
    * @param vmStartIndex Optional start index
    * @param vmLength Optional length
    * @returns New MetaString

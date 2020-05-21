@@ -59,4 +59,8 @@ export class VmList extends VmData {
     newvalues[idx-1] = data;
     return new VmObject(new List(newvalues));
   }  
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return this.value.map((x: VmData) => x.toStr(radix, isSigned)).join(',');
+  }   
 }

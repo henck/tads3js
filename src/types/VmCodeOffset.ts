@@ -8,4 +8,8 @@ export class VmCodeOffset extends VmData {
   getName() {
     return 'codeofs';
   }
+
+  toStr(): string {
+    return `codeoffsetp#${this.value}`;
+  }   
 }

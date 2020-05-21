@@ -21,4 +21,8 @@ export class VmTrue extends VmData {
   eq(data: VmData): boolean {
     return (data instanceof VmTrue);
   }
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return 'true';
+  } 
 }

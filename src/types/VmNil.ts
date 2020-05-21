@@ -25,4 +25,8 @@ export class VmNil extends VmData {
   eq(data: VmData): boolean {
     return data instanceof VmNil;
   }
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return 'nil';
+  }
 }
