@@ -10,11 +10,11 @@ export class Builtin {
       /* 01 */ B.builtin_getArg,
       /* 02 */ null,
       /* 03 */ null,
-      /* 04 */ null,
+      /* 04 */ B.builtin_randomize,
       /* 05 */ null,
       /* 06 */ B.builtin_toString,
       /* 07 */ B.builtin_toInteger,
-      /* 08 */ null,
+      /* 08 */ B.builtin_getTime,
       /* 09 */ null,
       /* 10 */ null,
       /* 11 */ null,
@@ -31,7 +31,9 @@ export class Builtin {
       /* 22 */ null,
       /* 23 */ null,
       /* 24 */ B.builtin_makeList,
-      /* 25 */ B.builtin_abs
+      /* 25 */ B.builtin_abs,
+      /* 26 */ B.builtin_sgn,
+      /* 27 */ B.builtin_concat
     ]
   ]
 
