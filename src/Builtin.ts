@@ -26,7 +26,7 @@ export class Builtin {
       /* 17 */ null,
       /* 18 */ B.builtin_max,
       /* 19 */ B.builtin_min,
-      /* 20 */ null,
+      /* 20 */ B.builtin_makeString,
       /* 21 */ null,
       /* 22 */ null,
       /* 23 */ null,
