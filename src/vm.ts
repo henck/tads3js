@@ -9,7 +9,7 @@ import { Metaclass } from './metaclass/Metaclass'
 import { MetaclassRegistry } from './metaclass/MetaclassRegistry'
 import { MetaclassFactory } from './metaclass/MetaclassFactory'
 import { Heap } from './Heap'
-import { MetaString, List, Iterator } from './metaimp'
+import { MetaString, List, Iterator, IntrinsicClass } from './metaimp'
 import { OPCODES } from './Opcodes'
 
 const fs = require('fs');
@@ -172,6 +172,16 @@ export class Vm {
     // "data" can be an object, a constant string or a constant list.
     if(!(data instanceof VmObject) && !(data instanceof VmSstring) && !(data instanceof VmList)) 
       throw('CALLPROP: OBJ_VAL_REQD');
+
+    // IntrinsicClass is a special case. It actually references another metaclass
+    // ID. Find the implementation of that meteclass, instantiate it, and then
+    // call the required prop on it by calling `callProp` again.
+    if(data instanceof VmObject && data.getInstance() instanceof IntrinsicClass) {
+      let obj = data.getInstance() as IntrinsicClass;
+      let klass = MetaclassRegistry.getClass(obj.modifierObjID);
+      this.callprop(new VmObject(new klass()), vmProp, argc);
+      return;
+    }
     
     // For an object, get value of the property from the object.
     if(data instanceof VmObject) {

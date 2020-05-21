@@ -8,11 +8,19 @@ export class IntrinsicClass extends Metaclass {
   public metaclassDependencyTableIndex: number;
   public modifierObjID: number;
 
-  constructor(metacmetaclassDependencyTableIndexassIndex: number, modifierObjID: number) {
+  constructor(metaclassDependencyTableIndex: number, modifierObjID: number) {
     super();
-    // console.log("Intrinsic class", "metaclass index", metacmetaclassDependencyTableIndexassIndex, "modifier object ID", modifierObjID);
-    this.metaclassDependencyTableIndex = metacmetaclassDependencyTableIndexassIndex;
+    console.log("Intrinsic class", 
+      "metaclass index", metaclassDependencyTableIndex, 
+      "modifier object ID", modifierObjID);
+    this.metaclassDependencyTableIndex = metaclassDependencyTableIndex;
     this.modifierObjID = modifierObjID;
+    // Modifier object ID is not the object's ID, because other objects are loaded
+    // by the VM which overlap some of these IDs. It could very well be the 
+    // metaclass index, though, because there are exactly 0..22 of them (same
+    // as metaclasses, it seems).
+
+    // The value 8 is metaclass root-object.
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {

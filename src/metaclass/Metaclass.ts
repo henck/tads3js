@@ -68,7 +68,6 @@ class Metaclass {
     do {
       // Get the prototype of the current class. 
       prototype = Object.getPrototypeOf(prototype);
-      console.log("prototype", prototype);
       if(prototype != null) {
         // Get the prototype's metaclassID, if any. Some base classes
         // may not have a metaclassID and must be ignored.

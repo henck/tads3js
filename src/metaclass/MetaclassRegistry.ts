@@ -40,6 +40,7 @@ class MetaclassRegistry {
       let reg: IRegister = MetaclassRegistry.registration.find((x) => x.name == metaclass.name);
       // If registered, store the metaclass ID on the implementation,
       // and keep a reference to the implementation.
+      // Debug.info("Register metaclass", "metaclassID", i, "name", metaclass.name);
       if(reg) {
         reg.klass.metaclassID = i;
         metaclass.implementationClass = reg.klass;
@@ -87,6 +88,15 @@ class MetaclassRegistry {
     let index = MetaclassRegistry.classes[metaclassID].props.indexOf(propID);
     return index == -1 ? null : index;
   }  
+
+  /**
+   * Return a reference to the implementation class of a metaclass ID.
+   * @param metaclassID Metaclass ID
+   * @returns Class reference
+   */
+  public static getClass(metaclassID: number): any {
+    return MetaclassRegistry.classes[metaclassID].implementationClass;
+  }
 
   //
   // Get the method vector index for a metaclass,
