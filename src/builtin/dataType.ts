@@ -1,4 +1,3 @@
-import { Stack } from "../Stack";
 import { VmData, VmInt } from "../types";
 
 /**
@@ -7,7 +6,7 @@ import { VmData, VmInt } from "../types";
  * @param val Value to convert
  * @returns Datatype value (TypeXXX)
  */
-export function builtin_dataType(stack: Stack, val: VmData): VmInt {
+export function builtin_dataType(val: VmData): VmInt {
   throw('dataType: not implemented');
 }
 

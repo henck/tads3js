@@ -1,9 +1,10 @@
 import { Stack } from "./Stack";
 import { VmData } from "./types";
 import * as B from "./builtin/";
+import { Vm } from "./Vm";
 
 export class Builtin {
-  private static funcs: ((stack: Stack, ...args: any[]) => any)[][] = [
+  private static funcs: ((...args: any[]) => any)[][] = [
     [ ],
     [
       /* 00 */ B.builtin_dataType,
@@ -35,11 +36,11 @@ export class Builtin {
     ]
   ]
 
-  static call(set: number, index: number, stack: Stack, argc: number): VmData {
+  static call(set: number, index: number, argc: number): VmData {
     let args = [];
-    while(argc-- > 0) args.push(stack.pop());
+    while(argc-- > 0) args.push(Vm.getInstance().stack.pop());
     let f = Builtin.funcs[set][index];
     if(!f) throw(`Builtin function set ${set} index ${index} does not exist.`);
-    return f(stack, ...args);
+    return f(...args);
   }
 }

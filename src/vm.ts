@@ -1142,7 +1142,7 @@ export class Vm {
   }
 
   imp_builtin(argc: number, func_index: number, set_index: number) {
-    this.r0 = Builtin.call(set_index, func_index, this.stack, argc);
+    this.r0 = Builtin.call(set_index, func_index, argc);
   }
 
   op_index() { // 0xba

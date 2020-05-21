@@ -1,15 +1,13 @@
-import { Stack } from "../Stack";
 import { VmData, VmInt, VmNil, VmTrue, VmObject, VmSstring } from "../types";
 import { MetaString, BigNumber } from "../metaimp";
 
 /**
  * Convert the value given by val to an integer.
- * @param stack 
  * @param val Value to convert
  * @param radix Optional radix. Defaults to 10.
  * @returns VmInt instance
  */
-export function builtin_toInteger(stack: Stack, val: VmData, radix?: VmInt): VmInt {
+export function builtin_toInteger(val: VmData, radix?: VmInt): VmInt {
   if(val instanceof VmInt) return val;
   if(val instanceof VmNil) return new VmInt(0);
   if(val instanceof VmTrue) return new VmInt(1);
