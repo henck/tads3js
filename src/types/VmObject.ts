@@ -29,11 +29,11 @@ export class VmObject extends VmData {
   }
 
   getInstance(): Metaclass {
-    // If this VmObject  stores a reference to a Metaclass
+    // If this VmObject stores a reference to a Metaclass
     // instance, just return it.
     if(this.value instanceof Metaclass) return this.value;
 
-    // Otherwise, this VmObject stores the ID of and object on
+    // Otherwise, this VmObject stores the ID of an object on
     // the heap. Look it up and return it.
     return Heap.getObj(this.value);
   }
