@@ -66,14 +66,17 @@ class Metaclass {
     let index = null;
     let prototype:any = this;
     do {
-      // Get the protoype of the current class. 
+      // Get the prototype of the current class. 
       prototype = Object.getPrototypeOf(prototype);
-      // Get the prototype's metaclassID, if any. Some base classes
-      // may not have a metaclassID and must be ignored.
-      let metaclassID = (prototype.constructor as any).metaclassID;
-      if(!metaclassID) continue;
-      // Get a prop index from the registry for the current metaclassID.
-      index = MetaclassRegistry.getMetaIndex(metaclassID, propID);
+      console.log("prototype", prototype);
+      if(prototype != null) {
+        // Get the prototype's metaclassID, if any. Some base classes
+        // may not have a metaclassID and must be ignored.
+        let metaclassID = (prototype.constructor as any).metaclassID;
+        if(!metaclassID) continue;
+        // Get a prop index from the registry for the current metaclassID.
+        index = MetaclassRegistry.getMetaIndex(metaclassID, propID);
+      }
     } while(prototype != null && index == null);
 
     //console.log("FOUND prop ", propID, "as index", index, " on" , prototype);
