@@ -38,6 +38,8 @@ export class Builtin {
   static call(set: number, index: number, stack: Stack, argc: number): VmData {
     let args = [];
     while(argc-- > 0) args.push(stack.pop());
-    return Builtin.funcs[set][index](stack, ...args);
+    let f = Builtin.funcs[set][index];
+    if(!f) throw(`Builtin function set ${set} index ${index} does not exist.`);
+    return f(stack, ...args);
   }
 }
