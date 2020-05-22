@@ -11,6 +11,7 @@ import { MetaclassFactory } from './metaclass/MetaclassFactory'
 import { Heap } from './Heap'
 import { MetaString, List, Iterator, IntrinsicClass } from './metaimp'
 import { OPCODES } from './Opcodes'
+import { IFuncInfo } from './IFuncInfo'
 
 const fs = require('fs');
 
@@ -97,16 +98,9 @@ export class Vm {
 
     // Create stack.
     this.stack = new Stack();
-
-    // Call start of code according to entry point block:
-    /* this.ip = -1;
-    let codeStart = (this.blocks.find((b) => b instanceof ENTP) as ENTP).codePoolOffset;
-    this.ep = this.ip;
-    this.stack.push(new VmSstring('args')); // Push single argument for _main function
-    this.call(codeStart, 1, null, null, null, null); */
   }
 
-  call(offset: number, argc: number, prop: VmProp, targetObj: VmObject, definingObj: VmObject, selfObject: VmObject, invokee: VmData) {
+  getFuncInfo(offset: number): IFuncInfo {
     // Get number of parameters
     let methodParamCount = this.codePool.getByte(offset);
     // If high bit is set, then a varying parameter list is accepted.
@@ -117,6 +111,18 @@ export class Vm {
     let methodOptParamCount = this.codePool.getByte(offset + 1);
     let methodLocalCount = this.codePool.getUint2(offset + 2);
     let methodStackSlots = this.codePool.getUint2(offset + 4);
+
+    return {
+      params: methodParamCount,
+      optParams: methodOptParamCount,
+      varargs: methodVaryingArguments,
+      locals: methodLocalCount,
+      slots: methodStackSlots
+    };
+  }
+
+  call(offset: number, argc: number, prop: VmProp, targetObj: VmObject, definingObj: VmObject, selfObject: VmObject, invokee: VmData) {
+    let funcInfo = this.getFuncInfo(offset);
 
     // Arguments should be already on the stack.
     this.stack.push(prop ?? new VmNil()); // Target property
@@ -140,17 +146,16 @@ export class Vm {
     this.ep = offset;
     // check arg_count to ensure that it matches the conditions required in the new method header; 
     let argerror = false;
-    if(methodVaryingArguments) {
-      if(argc < methodParamCount) argerror = true;
+    if(funcInfo.varargs) {
+      if(argc < funcInfo.params) argerror = true;
     } else {
-      if(argc < methodParamCount || argc > methodParamCount + methodOptParamCount) argerror = true;
+      if(argc < funcInfo.params || argc > funcInfo.params + funcInfo.optParams) argerror = true;
     }
     if(argerror) {
-      Debug.info('CALL: WRONG_NUM_OF_ARGS', 'argc=', argc, 'methodParamCount=', methodParamCount);
-      throw('CALL: WRONG_NUM_OF_ARGS');
+      throw(`CALL: WRONG_NUM_OF_ARGS argc=${argc} methodParamCount=${funcInfo.params} methodOptParamCount=${funcInfo.optParams}`);
     }
     // get the count of local variables from the new method header, and push nil for each local. 
-    for(let i = 0; i < methodLocalCount; i++) this.stack.push(new VmNil());
+    for(let i = 0; i < funcInfo.locals; i++) this.stack.push(new VmNil());
     // Finally, load the program counter with the first byte of the new function's executable code,
     // which starts immediately after the function's header.     
     this.ip = offset + 10;
