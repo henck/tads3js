@@ -184,8 +184,8 @@ export class Vector extends ListBase {
    * @returns self
    */
   private copyFrom(vmSource: VmData, vmSourceStart: VmInt, vmDestStart: VmInt, vmCount: VmInt): VmObject {
-    let sourceStart = this.unwrapIndex(vmSourceStart);
-    let destStart = this.unwrapIndex(vmDestStart);
+    let sourceStart = this.unpackIndex(vmSourceStart);
+    let destStart = this.unpackIndex(vmDestStart);
     let count = vmCount.unpack();
 
     let other = undefined;
@@ -208,7 +208,7 @@ export class Vector extends ListBase {
    * @returns self
    */
   private fillValue(vmVal: VmData, vmStart?: VmInt, vmCount?: VmInt): VmObject {
-    let start = this.unwrapIndex(vmStart);
+    let start = this.unpackIndex(vmStart);
     let count = vmCount 
       ? vmCount.unpack() 
       : Math.max(this.value.length - start, 0);
@@ -256,7 +256,7 @@ export class Vector extends ListBase {
    * @param args One or more values
    */
   private insertAt(vmIndex: VmInt, ...args: VmData[]): VmObject {
-    let idx = this.unwrapIndex(vmIndex);
+    let idx = this.unpackIndex(vmIndex);
     this.value.splice(idx, 0, ...args);
     return new VmObject(this);
   }
@@ -297,7 +297,7 @@ export class Vector extends ListBase {
    * @returns self
    */
   private removeElementAt(vmIdx: VmInt): VmObject {
-    let idx = this.unwrapIndex(vmIdx);
+    let idx = this.unpackIndex(vmIdx);
     if(idx < 0 || idx > this.value.length-1) throw('index out of range');
     this.value.splice(idx, 1);
     return new VmObject(this);
@@ -311,8 +311,8 @@ export class Vector extends ListBase {
    * @returns self
    */
   private removeRange(vmStartIndex: VmInt, vmEndIndex: VmInt): VmObject {
-    let startIdx = this.unwrapIndex(vmStartIndex);
-    let endIdx = this.unwrapIndex(vmEndIndex);
+    let startIdx = this.unpackIndex(vmStartIndex);
+    let endIdx = this.unpackIndex(vmEndIndex);
     if(startIdx < 0 || startIdx > this.value.length-1) throw('index out of range');
     if(endIdx < 0 || endIdx > this.value.length-1) throw('index out of range');
     if(endIdx < startIdx) throw('End index must be greater than or equal to start index');
@@ -370,7 +370,7 @@ export class Vector extends ListBase {
    * @returns self
    */
   private splice(vmStartIndex: VmInt, vmDeleteCount: VmInt, ...args: VmData[]): VmObject {
-    let idx = this.unwrapIndex(vmStartIndex);
+    let idx = this.unpackIndex(vmStartIndex);
     let deleteCount = vmDeleteCount.unpack();
     this.value.splice(idx, deleteCount, ...args);
     return new VmObject(this);

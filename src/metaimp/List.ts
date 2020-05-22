@@ -150,7 +150,7 @@ export class List extends ListBase {
    * @param args Values
    */
   private insertAt(vmIndex: VmInt, ...args: VmData[]) : VmObject {
-    let idx = this.unwrapIndex(vmIndex);
+    let idx = this.unpackIndex(vmIndex);
     let newValue = this.value.slice(0);
     newValue.splice(idx, 0, ...args);
     return new VmObject(new List(newValue));
@@ -211,7 +211,7 @@ export class List extends ListBase {
    * @returns New List
    */
   private removeElementAt(vmIdx: VmInt): VmObject {
-    let idx = this.unwrapIndex(vmIdx);
+    let idx = this.unpackIndex(vmIdx);
     if(idx < 0 || idx > this.value.length-1) throw('index out of range');
     let newValue = this.value.slice();
     newValue.splice(idx, 1);
@@ -225,8 +225,8 @@ export class List extends ListBase {
    * @returns New List
    */
   private removeRange(vmStartIndex: VmInt, vmEndIndex: VmInt): VmObject {
-    let startIdx = this.unwrapIndex(vmStartIndex);
-    let endIdx = this.unwrapIndex(vmEndIndex);
+    let startIdx = this.unpackIndex(vmStartIndex);
+    let endIdx = this.unpackIndex(vmEndIndex);
     if(startIdx < 0 || startIdx > this.value.length-1) throw('index out of range');
     if(endIdx < 0 || endIdx > this.value.length-1) throw('index out of range');
     if(endIdx < startIdx) throw('End index must be greater than or equal to start index');
@@ -276,7 +276,7 @@ export class List extends ListBase {
    * @returns New List
    */
   private splice(vmStartIndex: VmInt, vmDeleteCount: VmInt, ...args: VmData[]): VmObject {
-    let idx = this.unwrapIndex(vmStartIndex);
+    let idx = this.unpackIndex(vmStartIndex);
     let deleteCount = vmDeleteCount.unpack();
     let values = this.value.concat([]);
     values.splice(idx, deleteCount, ...args);

@@ -8,41 +8,25 @@ import { List } from "./List";
 export abstract class ListBase extends Collection {
   protected value: VmData[];
 
-  getValue() {
+  public getValue() {
     return this.value;
   }  
 
-  setValue(value: VmData[]) {
+  public setValue(value: VmData[]) {
     this.value = value; 
   }
 
-  unpack() {
+  public unpack() {
     return this.value;
   }
 
-  protected makeUnique(value: VmData[]): VmData[] {
-    // Filter the elements:
-    value = value.filter((x:VmData, idx: number) => {
-      // For each element, compare it to earlier elements in the list.
-      // If it is equal to an earlier element, do not include it.
-      return !value.slice(0, idx).find((y:VmData) => {
-        // VmObjects are compared using their object's equals method
-        // (if there is one)
-        if(x instanceof VmObject) {
-          let obj = x.getInstance();
-          if((obj as any).equals) return (obj as any).equals(y);
-          return false; 
-        }
-        // Other VmData is compared using eq:
-        else return x.eq(y);
-      });
-    });
-
-    return value;
-  }
-
-  // Helper method
-  protected unwrapIndex(vmIndex: VmInt): number {
+  /**
+   * Helper method. Unpacks a list-like index. If the index is negative,
+   * it wraps around from the end of the list.
+   * @param vmIndex Index
+   * @returns Clamped index
+   */
+  protected unpackIndex(vmIndex: VmInt): number {
     let idx = vmIndex.unpack();
     idx = idx <= 0 ? this.value.length + idx : idx - 1;
     return idx;
@@ -97,6 +81,30 @@ export abstract class ListBase extends Collection {
    * Meta methods - all protected as they should not be called
    * directly by other code, only when a property is evaluated.
    */
+
+  //
+  // makeUnique is a helper method called by other meta methods.
+  //
+  protected makeUnique(value: VmData[]): VmData[] {
+    // Filter the elements:
+    value = value.filter((x:VmData, idx: number) => {
+      // For each element, compare it to earlier elements in the list.
+      // If it is equal to an earlier element, do not include it.
+      return !value.slice(0, idx).find((y:VmData) => {
+        // VmObjects are compared using their object's equals method
+        // (if there is one)
+        if(x instanceof VmObject) {
+          let obj = x.getInstance();
+          if((obj as any).equals) return (obj as any).equals(y);
+          return false; 
+        }
+        // Other VmData is compared using eq:
+        else return x.eq(y);
+      });
+    });
+
+    return value;
+  }
 
   /**
    * Returns number of occurrences of value in self.
