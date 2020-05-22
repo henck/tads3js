@@ -70,24 +70,24 @@ export class MetaString extends Metaclass {
 
   // Helper method
   private unwrapIndex(vmIndex: VmInt): number {
-    let idx = vmIndex ? vmIndex.unwrap() : undefined;
+    let idx = vmIndex ? vmIndex.unpack() : undefined;
     if(idx == undefined) return undefined;
     idx = idx <= 0 ? this.value.length + idx : idx - 1;
     return idx;
   }   
 
   equals(data: VmData): boolean {
-    let str = data.unwrap();
+    let str = data.unpack();
     return this.value == str.toString();
   }
 
   add(data: VmData): VmObject {
-    let str = data.unwrap();
+    let str = data.unpack();
     return new VmObject(new MetaString(this.value + str.toString()));
   }
 
   compare(data: VmData): boolean {
-    let str = data.unwrap();
+    let str = data.unpack();
     return this.value < str.toString();
   }
 
@@ -101,7 +101,7 @@ export class MetaString extends Metaclass {
    */
 
   private compareTo(vmStr: VmData) : VmInt {
-    let str = vmStr.unwrap();
+    let str = vmStr.unpack();
     let res = 0;
     if(this.value < str) res = -1;
     if(this.value > str) res = 1;
@@ -109,7 +109,7 @@ export class MetaString extends Metaclass {
   }
 
   private compareIgnoreCase(vmStr: VmData) : VmInt {
-    let str = vmStr.unwrap().toUpperCase().toLowerCase();
+    let str = vmStr.unpack().toUpperCase().toLowerCase();
     let me = this.value.toUpperCase().toLowerCase();
     let res = 0;
     if(me < str) res = -1;
@@ -123,7 +123,7 @@ export class MetaString extends Metaclass {
   }
 
   private endsWith(vmStr: VmData): VmData {
-    let str = vmStr.unwrap();
+    let str = vmStr.unpack();
     return this.value.endsWith(str) ? new VmTrue() : new VmNil();
   }
 
@@ -131,7 +131,7 @@ export class MetaString extends Metaclass {
     let index = this.unwrapIndex(vmIndex);
 
     // Target is either a constant string, a metastring, or a RexPattern:
-    let target = vmTarget.unwrap();
+    let target = vmTarget.unpack();
 
     // If a RexPattern is specified, use it:
     if(target instanceof RexPattern) {
@@ -151,7 +151,7 @@ export class MetaString extends Metaclass {
   }
 
   private findAll(vmTarget: VmData, func?: VmFuncPtr): VmObject {
-    let target = vmTarget.unwrap();
+    let target = vmTarget.unpack();
 
     // Perform search using a RexPattern:
     if(target instanceof RexPattern) {
@@ -236,8 +236,8 @@ export class MetaString extends Metaclass {
   private splice(vmindex: VmInt, vmdeleteLength: VmInt, vminsertString?: VmObject): VmObject {
     let index = this.unwrapIndex(vmindex);
     // Decode arguments:
-    let deleteLength = vmdeleteLength.unwrap();
-    let insertString = vminsertString ? vminsertString.unwrap() : '';
+    let deleteLength = vmdeleteLength.unpack();
+    let insertString = vminsertString ? vminsertString.unpack() : '';
 
     // Get string before deletion point:
     let left = this.value.substr(0, index);
@@ -251,10 +251,10 @@ export class MetaString extends Metaclass {
 
   private split(vmDelim?: VmData, vmLimit?: VmInt): VmObject {
     // If no delimiter specified, use 1 (split into 1-character substrings)
-    let delim = vmDelim ? vmDelim.unwrap() : 1;
+    let delim = vmDelim ? vmDelim.unpack() : 1;
     
     // Limit is a VmInt. If no VmInt present, use 0 for no lmit.
-    let limit: number = vmLimit ? vmLimit.unwrap() : 0;
+    let limit: number = vmLimit ? vmLimit.unpack() : 0;
 
     // Decode delim object, if it is an object:
     let parts: string[] = [];
@@ -304,13 +304,13 @@ export class MetaString extends Metaclass {
   }
 
   private startsWith(vmStr: VmData): VmData {
-    let str = vmStr.unwrap();
+    let str = vmStr.unpack();
     return this.value.startsWith(str) ? new VmTrue() : new VmNil();
   }
 
   private substr(vmStart: VmInt, vmLength?: VmInt): VmObject {
-    let start = vmStart.unwrap() - 1;
-    let length = vmLength ? vmLength.unwrap() : null;
+    let start = vmStart.unpack() - 1;
+    let length = vmLength ? vmLength.unpack() : null;
 
     let out;
     // Negative start means an offset from the end of the string.

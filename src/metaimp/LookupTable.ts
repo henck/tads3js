@@ -182,7 +182,7 @@ export class LookupTable extends Collection  {
    * @returns Key
    */
   private nthKey(vmN: VmInt): VmData {
-    let n = vmN.unwrap(); n--;
+    let n = vmN.unpack(); n--;
     if(n < 0 || n >= this.value.size()) throw('Out of bounds');
     return this.value.keys()[n];
   }
@@ -193,7 +193,7 @@ export class LookupTable extends Collection  {
    * @returns Value
    */
   private nthVal(vmN: VmInt): VmData {
-    let n = vmN.unwrap(); n--;
+    let n = vmN.unpack(); n--;
     if(n < 0 || n >= this.value.size()) throw('Out of bounds');
     return this.value.values()[n];
   }

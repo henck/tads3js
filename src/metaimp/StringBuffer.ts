@@ -58,12 +58,12 @@ export class StringBuffer extends Metaclass {
   // TODO: Operators?
 
   public equals(data: VmData): boolean {
-    let str = data.unwrap();
+    let str = data.unpack();
     return this.toString() == str.toString();
   }
 
   public compare(data: VmData): boolean {
-    let str = data.unwrap();
+    let str = data.unpack();
     return this.toString() < str.toString();
   }
 
@@ -77,21 +77,21 @@ export class StringBuffer extends Metaclass {
    */
 
   private append(vmStr: VmData) : VmObject {
-    let str = vmStr.unwrap().toString();
+    let str = vmStr.unpack().toString();
     for(let i = 0; i < str.length; i++) { this.value.push(str[i]); }
     return null; // Returned in R0
   }
 
   private charAt(vmIdx: VmInt): VmInt {
-    let idx = vmIdx.unwrap();
+    let idx = vmIdx.unpack();
     idx = idx < 0 ? this.value.length + idx : idx - 1;
     return new VmInt(this.value[idx].charCodeAt(0));
   }
 
   private copyChars(vmIdx: VmInt, vmStr: VmData): VmObject {
-    let idx = vmIdx.unwrap()
+    let idx = vmIdx.unpack()
     idx = idx < 0 ? this.value.length + idx : idx - 1;
-    let str = vmStr.unwrap();
+    let str = vmStr.unpack();
     for(let i = 0; i < str.length; i++) {
       this.value[i + idx] = str[i];
     }
@@ -99,9 +99,9 @@ export class StringBuffer extends Metaclass {
   }
 
   private deleteChars(vmIdx: VmInt, vmLen?: VmInt): VmObject {
-    let idx = vmIdx.unwrap();
+    let idx = vmIdx.unpack();
     idx = idx < 0 ? this.value.length + idx : idx - 1;
-    let len = vmLen ? vmLen.unwrap() : null;
+    let len = vmLen ? vmLen.unpack() : null;
     if(!len) {
       this.value.length = idx;
     } else {
@@ -111,8 +111,8 @@ export class StringBuffer extends Metaclass {
   }
 
   private insert(vmStr: VmData, vmIdx: VmInt): VmObject {
-    let str = vmStr.unwrap().toString();
-    let idx = vmIdx.unwrap();
+    let str = vmStr.unpack().toString();
+    let idx = vmIdx.unpack();
     idx = idx < 0 ? this.value.length + idx : idx - 1;
     // If index is past end of string, place it at end of string.
     if(idx > this.value.length) idx = this.value.length;
@@ -125,19 +125,19 @@ export class StringBuffer extends Metaclass {
   }
 
   private splice(vmIdx: VmInt, vmLen: VmInt, vmStr: VmData): VmObject {
-    let idx = vmIdx.unwrap();
+    let idx = vmIdx.unpack();
     idx = idx < 0 ? this.value.length + idx : idx - 1;
-    let len = vmLen.unwrap();
+    let len = vmLen.unpack();
     if(len < 0) len = 0;
-    let str = vmStr.unwrap().toString();
+    let str = vmStr.unpack().toString();
     this.value.splice(idx, len, ...str.split(''));
     return null; // Returned in R0
   }
 
   private substr(vmIdx: VmInt, vmLen?: VmInt): VmObject {
-    let idx = vmIdx.unwrap();
+    let idx = vmIdx.unpack();
     idx = idx < 0 ? this.value.length + idx : idx - 1;
-    let len = vmLen ? vmLen.unwrap() : null; 
+    let len = vmLen ? vmLen.unpack() : null; 
     if(!len || len <= 0) len = this.value.length - idx;
     let end = idx + len;
     return new VmObject(new MetaString(this.value.slice(idx, end).join('')));

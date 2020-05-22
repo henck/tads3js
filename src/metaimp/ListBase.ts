@@ -43,7 +43,7 @@ export abstract class ListBase extends Collection {
 
   // Helper method
   protected unwrapIndex(vmIndex: VmInt): number {
-    let idx = vmIndex.unwrap();
+    let idx = vmIndex.unpack();
     idx = idx <= 0 ? this.value.length + idx : idx - 1;
     return idx;
   }     
@@ -84,7 +84,7 @@ export abstract class ListBase extends Collection {
 
   public getindex(vmIndex: VmData): VmData {
     if(!(vmIndex instanceof VmInt)) throw('NUM_VAL_REQD');
-    let idx = vmIndex.unwrap();
+    let idx = vmIndex.unpack();
     if(idx < 1 || idx > this.value.length) throw('INDEX_OUT_OF_RANGE');
     return this.value[idx-1];    
   }  
@@ -206,7 +206,7 @@ export abstract class ListBase extends Collection {
    * @returns Joined string
    */
   protected join(vmSep?: VmData) : VmObject {
-    let sep = vmSep ? vmSep.unwrap() : '';
+    let sep = vmSep ? vmSep.unpack() : '';
     let str = this.value.map((x) => x.value.toString()).join(sep);
     return new VmObject(new MetaString(str));
   }

@@ -110,7 +110,7 @@ export class Vector extends ListBase {
   
   public setindex(vmIndex: VmData, data: VmData): VmObject {
     if(!(vmIndex instanceof VmInt)) throw('NUM_VAL_REQD');
-    let idx = vmIndex.unwrap();
+    let idx = vmIndex.unpack();
     if(idx < 1) throw('INDEX_OUT_OF_RANGE');
     // If vector isn't big enough, add nil elements to the end:
     while(this.value.length < idx) this.value.push(new VmNil());
@@ -158,7 +158,7 @@ export class Vector extends ListBase {
    * @returns self
    */
   private appendUnique(vmList: VmData): VmObject {
-    let lst = vmList.unwrap();
+    let lst = vmList.unpack();
     let values = (lst instanceof ListBase) ? lst.getValue() : lst; 
     this.value = this.makeUnique([...this.value, ...values]);
     return new VmObject(this);    
@@ -186,7 +186,7 @@ export class Vector extends ListBase {
   private copyFrom(vmSource: VmData, vmSourceStart: VmInt, vmDestStart: VmInt, vmCount: VmInt): VmObject {
     let sourceStart = this.unwrapIndex(vmSourceStart);
     let destStart = this.unwrapIndex(vmDestStart);
-    let count = vmCount.unwrap();
+    let count = vmCount.unpack();
 
     let other = undefined;
     if(vmSource instanceof VmList) other = vmSource.value;
@@ -210,7 +210,7 @@ export class Vector extends ListBase {
   private fillValue(vmVal: VmData, vmStart?: VmInt, vmCount?: VmInt): VmObject {
     let start = this.unwrapIndex(vmStart);
     let count = vmCount 
-      ? vmCount.unwrap() 
+      ? vmCount.unpack() 
       : Math.max(this.value.length - start, 0);
     
     for(let i = 0; i < count; i++) {
@@ -227,12 +227,15 @@ export class Vector extends ListBase {
    * @param vmN Number of elements to create
    */
   private generate(vmFunc: VmData, vmN: VmData): VmObject {
-    let n = vmN.unwrap();
+    let n = vmN.unpack();
     if(n <= 0) n = 0;
 
     let arr = [];
     for(let i = 1; i <= n; i++) {
-      arr.push(vmFunc.invoke(new VmInt(i)).value);
+      let numParams = vmFunc.funcinfo().params;
+      let args = [];
+      if(numParams > 0) args.push(new VmInt(i));
+      arr.push(vmFunc.invoke(...args));
     }
 
     return new VmObject(new Vector(arr));
@@ -324,7 +327,7 @@ export class Vector extends ListBase {
    * @returns self
    */
   private setLength(vmLength: VmInt): VmObject {
-    let length = vmLength.unwrap();
+    let length = vmLength.unpack();
     // Add nil values if shorter than requested length.
     while(this.value.length < length) this.value.push(new VmNil());
     // Discard values if longer than requested length.
@@ -368,7 +371,7 @@ export class Vector extends ListBase {
    */
   private splice(vmStartIndex: VmInt, vmDeleteCount: VmInt, ...args: VmData[]): VmObject {
     let idx = this.unwrapIndex(vmStartIndex);
-    let deleteCount = vmDeleteCount.unwrap();
+    let deleteCount = vmDeleteCount.unpack();
     this.value.splice(idx, deleteCount, ...args);
     return new VmObject(this);
   }
@@ -391,10 +394,10 @@ export class Vector extends ListBase {
    * @returns New List
    */
   private toList(vmStartIdx?: VmInt, vmCount?: VmInt): VmObject {
-    let startIdx = vmStartIdx ? vmStartIdx.unwrap() : null;
+    let startIdx = vmStartIdx ? vmStartIdx.unpack() : null;
     if(startIdx == null) startIdx = 1;
     startIdx--;
-    let count = vmCount ? vmCount.unwrap() : null;
+    let count = vmCount ? vmCount.unpack() : null;
     let lst = new List(this.value.slice(startIdx, count ? (startIdx + count) : undefined));
     return new VmObject(lst);
   }

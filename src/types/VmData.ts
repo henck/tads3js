@@ -32,10 +32,6 @@ export abstract class VmData {
   /**
    * Retrieve native value from data. 
    */
-  unwrap(): any {
-    return this.value;
-  }
-
   unpack(): any {
     return this.value;
   }
@@ -124,10 +120,18 @@ export abstract class VmData {
     throw('CANNOT_INDEX_TYPE');
   }
 
+  /**
+   * Invoke this object as a function.
+   * @param args Function arguments
+   */
   invoke(...args: VmData[]): VmData {
     throw('CANNOT_INVOKE');
   }
 
+  /**
+   * Retrieve function info for this object (if it is a function
+   * or anonymous function).
+   */
   funcinfo(): IFuncInfo {
     throw('NOT A FUNCTION');
   }

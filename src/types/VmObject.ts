@@ -13,17 +13,6 @@ export class VmObject extends VmData {
     return 'obj';
   }
 
-  //
-  // - If a MetaString or StringBuffer, return its string value
-  // - Otherwise, return object instance
-  // 
-  unwrap(): any {
-    let obj = this.getInstance();
-    if(obj.constructor.name == 'MetaString') return obj.getValue();
-    if(obj.constructor.name == 'StringBuffer') return obj.getValue();
-    return obj;
-  }  
-
   unpack(): any {
     let obj = this.getInstance();
     return obj.unpack();

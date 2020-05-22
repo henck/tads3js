@@ -89,7 +89,7 @@ export class List extends ListBase {
    * @returns New list
    */
   private appendUnique(vmList: VmData): VmObject {
-    let lst = vmList.unwrap();
+    let lst = vmList.unpack();
     let values = (lst instanceof List) ? lst.getValue() : lst; 
     let newLst = this.makeUnique([...this.value, ...values]);
     return new VmObject(new List(newLst));    
@@ -120,7 +120,7 @@ export class List extends ListBase {
    * @param vmN Number of elements to generate
    */
   private generate(vmFunc: VmData, vmN: VmData) {
-    let n = vmN.unwrap();
+    let n = vmN.unpack();
     if(n <= 0) n = 0;
 
     let lst = [];
@@ -163,7 +163,7 @@ export class List extends ListBase {
    */
   private intersect(vmLst: VmObject) {
     // Convert argument to simple array:
-    let arg = vmLst.unwrap();
+    let arg = vmLst.unpack();
     let lst2: VmData[] = ((arg instanceof List) ? arg.getValue() : arg); 
 
     // Determine which is the shorter list:
@@ -277,7 +277,7 @@ export class List extends ListBase {
    */
   private splice(vmStartIndex: VmInt, vmDeleteCount: VmInt, ...args: VmData[]): VmObject {
     let idx = this.unwrapIndex(vmStartIndex);
-    let deleteCount = vmDeleteCount.unwrap();
+    let deleteCount = vmDeleteCount.unpack();
     let values = this.value.concat([]);
     values.splice(idx, deleteCount, ...args);
     return new VmObject(new List(values));
@@ -290,8 +290,8 @@ export class List extends ListBase {
    * @returns New List
    */
   private sublist(vmStartIndex: VmInt, vmLength?: VmInt) : VmObject {
-    let start = vmStartIndex.unwrap() - 1;
-    let length = vmLength ? vmLength.unwrap() : null;
+    let start = vmStartIndex.unpack() - 1;
+    let length = vmLength ? vmLength.unpack() : null;
 
     let out;
     // Negative start means an offset from the end of the list.

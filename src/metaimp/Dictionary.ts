@@ -128,8 +128,8 @@ export class Dictionary extends Metaclass {
    * @returns List of matching objects
    */
   findWord(vmStr: VmData, vocabProp?: VmProp): VmObject {
-    let str = vmStr.unwrap();
-    let propID = vocabProp ? vocabProp.unwrap() : null;
+    let str = vmStr.unpack();
+    let propID = vocabProp ? vocabProp.unpack() : null;
     let matches: (VmObject|VmTrue)[] = [];
 
     this.value.forEach((entry: DictionaryEntry) => {
@@ -161,7 +161,7 @@ export class Dictionary extends Metaclass {
    * @returns null
    */
   removeWord(vmObj: VmObject, vmStr: VmData, vocabProp: VmProp): VmData {
-    let propID = vocabProp ? vocabProp.unwrap() : null;
+    let propID = vocabProp ? vocabProp.unpack() : null;
 
     let words = vmStr.unpack(); // should be native string or array if list-like
     if (!Array.isArray(words)) words = [vmStr]; // if not list-like, make array

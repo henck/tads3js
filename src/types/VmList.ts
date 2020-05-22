@@ -46,7 +46,7 @@ export class VmList extends VmData {
 
   getind(vmIndex: VmData): VmData {
     if(!(vmIndex instanceof VmInt)) throw('NUM_VAL_REQD');
-    let idx = vmIndex.unwrap();
+    let idx = vmIndex.unpack();
     if(idx < 1 || idx > this.value.length) throw('INDEX_OUT_OF_RANGE');
     return this.value[idx-1];
   }

@@ -82,14 +82,14 @@ export class ByteArray extends Metaclass {
   
   public getindex(vmIndex: VmData): VmData {
     if(!(vmIndex instanceof VmInt)) throw('NUM_VAL_REQD');
-    let idx = vmIndex.unwrap();
+    let idx = vmIndex.unpack();
     if(idx < 1 || idx > this.value.length) throw('INDEX_OUT_OF_RANGE');
     return new VmInt(this.value[idx-1]);
   }     
 
   public setindex(vmIndex: VmData, data: VmData): VmObject {
     if(!(vmIndex instanceof VmInt)) throw('NUM_VAL_REQD');
-    let idx = vmIndex.unwrap();
+    let idx = vmIndex.unpack();
     if(idx < 1 || idx > this.value.length) throw('INDEX_OUT_OF_RANGE');
     this.value[idx - 1] = (data.unpack() & 0xff);
     return new VmObject(this);
