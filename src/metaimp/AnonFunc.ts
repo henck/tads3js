@@ -6,6 +6,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { Vm } from '../Vm';
 import { Vector } from './Vector';
+import { IFuncInfo } from '../IFuncInfo';
 
 
 
@@ -37,6 +38,9 @@ export class AnonFunc extends Vector {
     return Vm.getInstance().runContext(this.funcptr.value, new VmObject(this), ...args);
   }
    
+  funcinfo(): IFuncInfo {
+    return Vm.getInstance().getFuncInfo(this.funcptr.value);
+  }  
 
   /*
    * Meta methods - all private as they should not be called

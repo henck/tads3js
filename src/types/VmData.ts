@@ -1,3 +1,5 @@
+import { IFuncInfo } from "../IFuncInfo";
+
 export abstract class VmData {
   public value: any;
 
@@ -124,6 +126,10 @@ export abstract class VmData {
 
   invoke(...args: VmData[]): VmData {
     throw('CANNOT_INVOKE');
+  }
+
+  funcinfo(): IFuncInfo {
+    throw('NOT A FUNCTION');
   }
 
   toStr(radix?: number, isSigned?: boolean): string {

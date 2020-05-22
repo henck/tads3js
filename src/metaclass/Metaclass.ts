@@ -3,6 +3,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { Heap } from "../Heap";
 import { MetaclassRegistry } from "./MetaclassRegistry";
+import { IFuncInfo } from "../IFuncInfo";
 
 type TPropFunc = ((...args: any[]) => VmData);
 interface IPropFound {
@@ -187,6 +188,10 @@ class Metaclass {
 
   invoke(...args: VmData[]): VmData {
     throw('CANNOT_INVOKE_TYPE');
+  }
+
+  funcinfo(): IFuncInfo {
+    throw('NOT A FUNCTION');
   }
 
 }

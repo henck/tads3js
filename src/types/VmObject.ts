@@ -2,6 +2,7 @@ import { VmData } from "./VmData";
 import { VmNil } from "./VmNil";
 import { Heap } from "../Heap";
 import { Metaclass } from "../metaclass/Metaclass";
+import { IFuncInfo } from "../IFuncInfo";
 
 export class VmObject extends VmData {
   constructor(value: number | Metaclass) {
@@ -81,6 +82,11 @@ export class VmObject extends VmData {
     let obj: Metaclass = this.getInstance();
     return obj.invoke(...args);
   }
+
+  funcinfo(): IFuncInfo {
+    let obj: Metaclass = this.getInstance();
+    return obj.funcinfo();
+  }  
 
   toStr(radix?: number, isSigned?: boolean): string {
     let obj: Metaclass = this.getInstance();

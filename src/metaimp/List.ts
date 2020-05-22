@@ -5,6 +5,7 @@ import { VmData, VmInt, VmNil, VmObject, VmList } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { ListBase } from "./ListBase";
+import { Vm } from '../Vm';
 
 export class List extends ListBase {
   
@@ -124,7 +125,10 @@ export class List extends ListBase {
 
     let lst = [];
     for(let i = 1; i <= n; i++) {
-      lst.push(vmFunc.invoke(new VmInt(i)).value);
+      let numParams = vmFunc.funcinfo().params;
+      let args = [];
+      if(numParams > 0) args.push(new VmInt(i));
+      lst.push(vmFunc.invoke(...args));
     }
 
     return new VmObject(new List(lst));

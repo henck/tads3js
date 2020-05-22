@@ -10,9 +10,9 @@ export class IntrinsicClass extends Metaclass {
 
   constructor(metaclassDependencyTableIndex: number, modifierObjID: number) {
     super();
-    console.log("Intrinsic class", 
-      "metaclass index", metaclassDependencyTableIndex, 
-      "modifier object ID", modifierObjID);
+    //console.log("Intrinsic class", 
+    //  "metaclass index", metaclassDependencyTableIndex, 
+    //  "modifier object ID", modifierObjID);
     this.metaclassDependencyTableIndex = metaclassDependencyTableIndex;
     this.modifierObjID = modifierObjID;
     // Modifier object ID is not the object's ID, because other objects are loaded
