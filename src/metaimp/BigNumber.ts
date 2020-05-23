@@ -1,4 +1,4 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { SourceImage } from '../SourceImage'
@@ -7,7 +7,7 @@ import { VmObject } from '../types';
 
 type TNumber = 'num' | 'nan' | 'infinity';
 
-export class BigNumber extends Metaclass
+export class BigNumber extends RootObject
 {
   private digits: number[];
   private exponent: number;

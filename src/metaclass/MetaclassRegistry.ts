@@ -44,7 +44,7 @@ class MetaclassRegistry {
       if(reg) {
         reg.klass.metaclassID = i;
         metaclass.implementationClass = reg.klass;
-        //Debug.info("Register metaclass", "metaclassID", i, "name", metaclass.name);
+        // Debug.info("Register metaclass", "metaclassID", i, "name", metaclass.name);
       } 
       // No metaclass implementation has registered itself for this name.
       // TODO: This is a fatal error.
@@ -97,17 +97,6 @@ class MetaclassRegistry {
   public static getClass(metaclassID: number): any {
     return MetaclassRegistry.classes[metaclassID].implementationClass;
   }
-
-  //
-  // Get the method vector index for a metaclass,
-  // given a property ID, then return the associated
-  // function.
-  // 
-  /* public static getMetaProp(instance: Metaclass, propID: number) {
-    let id = instance.getMetaclassID();
-    let index = MetaclassFactory.classes[id].props.indexOf(propID);
-    return instance.getMetaProp(index);
-  } */
 }
 
 export { IMetaclass, MetaclassRegistry }

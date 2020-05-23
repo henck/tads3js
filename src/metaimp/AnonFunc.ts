@@ -1,9 +1,7 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmFuncPtr, VmObject } from "../types";
-import { SourceImage } from "../SourceImage";
-import { Pool } from "../Pool";
+import { VmData, VmFuncPtr, VmObject } from "../types";
 import { Vm } from '../Vm';
 import { Vector } from './Vector';
 import { IFuncInfo } from '../IFuncInfo';

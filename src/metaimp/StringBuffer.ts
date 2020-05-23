@@ -1,4 +1,4 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { VmData, VmInt, VmObject } from "../types";
@@ -6,7 +6,7 @@ import { MetaString } from "./MetaString";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
-export class StringBuffer extends Metaclass {
+export class StringBuffer extends RootObject {
   // The value of a StringBuffer is an array of characters.
   private value: string[];
   

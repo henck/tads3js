@@ -1,4 +1,4 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { SourceImage } from "../SourceImage";
@@ -7,6 +7,7 @@ import { VmObject, VmData, VmProp, VmNil, VmTrue, VmList, VmSstring, VmInt } fro
 import { List } from './List';
 import { MetaString } from './MetaString';
 import { levenshtein } from '../util/Levenshtein';
+
 
 class DictionaryEntry {
   public str: string;
@@ -42,7 +43,7 @@ class DictionaryEntry {
   }
 }
 
-export class Dictionary extends Metaclass {
+export class Dictionary extends RootObject {
   private value: DictionaryEntry[];
 
   constructor() {

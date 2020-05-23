@@ -1,4 +1,4 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass'
+import { TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { VmData, VmInt, VmObject, VmNil, VmTrue, VmList } from "../types"

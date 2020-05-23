@@ -3,6 +3,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { AnonFunc, BigNumber, ByteArray, IntrinsicClass, List, RexPattern, MetaString, 
          StringBuffer, TadsObject, Vector, LookupTable, Dictionary } from "../metaimp";
+import { RootObject } from "./RootObject";
 
 class MetaclassFactory {
   //
@@ -17,8 +18,8 @@ class MetaclassFactory {
     return instance;
   }
 
-  public static load(id: number, image: SourceImage, dataPool: Pool, dataOffset: number) {
-    let klass = MetaclassFactory.getClass(id);
+  public static load(metaclassID: number, image: SourceImage, dataPool: Pool, dataOffset: number) {
+    let klass = MetaclassFactory.getClass(metaclassID);
     if(!klass) return null;
     let instance = (klass as any).loadFromImage(image, dataPool, dataOffset)
     instance.metaclassID = (klass as any).metaclassID;
@@ -46,6 +47,7 @@ class MetaclassFactory {
       case 'lookuptable/030003': return LookupTable;
       case 'dictionary2/030001': return Dictionary;
       case 'anon-func-ptr/000000': return AnonFunc;
+      case 'root-object/030004': return RootObject;
       default:
         console.error('MetaclassFactory.getClass: Unknown metaclass ID ' + id.toString() + ': ' + metaclass.name);
         return null;

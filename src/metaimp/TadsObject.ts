@@ -1,17 +1,16 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
-
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
-import { DataFactory, VmData } from '../types';
+import { DataFactory, VmData, VmTrue, VmNil } from '../types';
 
-export class TadsObject extends Metaclass
+export class TadsObject extends RootObject
 {
-  private isClass: boolean;
+  private _isClass: boolean;
 
   constructor() {
     super();
-    this.isClass = false;
+    this._isClass = false;
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
@@ -24,15 +23,14 @@ export class TadsObject extends Metaclass
     let numProps = image.getUInt16(offset); offset += 2;
 
     // Read object flags
-    let flags = image.getUInt16(offset + 4); offset += 2;
-    //console.log('flags', flags);
-    obj.isClass = (flags & 0x8) == 0x8;
-    //console.log('isClass', obj.isClass ? 'true' : 'false' );
+    let flags = image.getUInt16(offset); offset += 2;
+    obj._isClass = (flags & 0x1) == 0x1;
+    // console.log('TADS OBJECT', 'superclasses', numSuperclasses, 'flags', flags, 'props', numProps);
 
     // Load superclasses
     for(let i = 0; i < numSuperclasses; i++) {
       let superClassID = image.getUInt32(offset); offset += 4;
-      //console.log("Superclass ID", superClassID);
+      // console.log("Superclass ID", superClassID);
       obj.superClasses.push(superClassID);
     }
     
@@ -43,17 +41,24 @@ export class TadsObject extends Metaclass
       let propID = image.getUInt16(offset);
       let type = image.getUInt8(offset + 2);
       let propOffset = image.getUInt32(offset + 3);
+      // console.log('prop',  DataFactory.load(type, dataPool, propOffset));
       obj.props.set(propID, DataFactory.load(type, dataPool, propOffset));
       offset += 7;
     }
 
-    // Dump props to console
-    obj.props.forEach((value: VmData, key: number) => {
-      //console.log("Prop ", key, 'value', value);
-    });
-
     return obj;
   }
+
+  protected isClass(): VmData {
+    return this._isClass ? new VmTrue() : new VmNil();
+  }
+
+
+  /*
+   * Meta methods - all private as they should not be called
+   * directly by other code, only when a property is evaluated.
+   */
+
 
 }
 

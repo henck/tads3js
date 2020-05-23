@@ -1,10 +1,10 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
-export class IntrinsicClass extends Metaclass {
+export class IntrinsicClass extends RootObject {
   public metaclassDependencyTableIndex: number;
   public modifierObjID: number;
 
@@ -28,6 +28,11 @@ export class IntrinsicClass extends Metaclass {
     let modifiedObjID = image.getUInt32(offset + 2);
     return new IntrinsicClass(metaclassDependencyTableIndex, modifiedObjID);
   }  
+
+  protected isAncestor(obj: RootObject) {
+    let classes = obj.getMetaChain();
+    return classes.includes(this.modifierObjID);
+  }
 
   getMethodByIndex(idx: number): TPropFunc {
     console.log("Instrinsic class; looking for prop index", idx);

@@ -1,10 +1,10 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { VmObject } from "../types";
 import { Iterator } from "./Iterator";
 
-export abstract class Collection extends Metaclass {
+export abstract class Collection extends RootObject {
   getMethodByIndex(idx: number): TPropFunc {
     switch(idx) {
       case 0: return this.createIterator;

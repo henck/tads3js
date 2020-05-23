@@ -1,17 +1,17 @@
 const MD5 = require("crypto-js/md5");
 const SHA256 = require("crypto-js/sha256");
 
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject, VmSstring, VmNil, VmTrue, VmFuncPtr, VmList } from "../types";
+import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr } from "../types";
 import { ByteArray } from "./ByteArray";
 import { RexPattern } from "./RexPattern";
 import { List } from "./List";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
-export class MetaString extends Metaclass {
+export class MetaString extends RootObject {
   private value: string;
 
   constructor(val: string) {

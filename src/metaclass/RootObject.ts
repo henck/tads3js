@@ -1,4 +1,4 @@
-import { VmData, VmObject } from "../types";
+import { VmData, VmObject, VmNil, VmTrue } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { Heap } from "../Heap";
@@ -15,18 +15,25 @@ interface IPropAndDistance {
   dist: number;
 }
 
-class Metaclass {
+class RootObject {
+  public id: number;
   public metaclassID: number;
   protected superClasses: number[];
   protected props: Map<number, VmData>;
+  private _isTransient: boolean;
 
   constructor() {
     this.props = new Map<number, VmData>();
     this.superClasses = [];
+    this._isTransient = false;
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
     throw('Cannot load meta object from image.');
+  }
+
+  public setID(id: number) {
+    this.id = id;
   }
 
   unpack(): any {
@@ -34,23 +41,63 @@ class Metaclass {
   }
 
   getMethodByIndex(idx: number): TPropFunc {
+    switch(idx) {
+      case 0: return this.ofKind;
+      case 6: return this.metaIsClass;
+      case 8: return this.isTransient;
+    }
     return null;
-  }
+  }  
 
   callVirtualMethod(prop: TPropFunc, ...args: any[]) {
     // Bind prop to self, then call it with args.
     return prop.bind(this)(...args);
   }
 
+  protected isClass(): VmData {
+    return new VmNil();
+  }
 
-  //
-  // Does this class derive from a given class?
-  // (Currently unused.)
-  //
-  private derivesFrom(objID: number): boolean {
+
+  /**
+   * Does this class derive from a given class 
+   * _through the superclasses chain_ ?
+   * @param obj Ancestor class
+   * @returns true if descendant
+   */
+  protected derivesFromSuperclass(objID: number): boolean {
     if(this.superClasses.includes(objID)) return true;
     return this.superClasses.reduce((prev:boolean, x:number) => 
-      prev || Heap.getObj(x).derivesFrom(objID), false);
+      prev || Heap.getObj(x).derivesFromSuperclass(objID), false);
+  }
+
+  /**
+   * Is this class an ancestor of the given class
+   * _through the metaclasses inheritance chain_ ?
+   * @param obj Descendant class
+   * @returns true if ancestor
+   */
+  protected isAncestor(obj: RootObject) {
+    return obj.derivesFromSuperclass(this.id);
+  }
+
+  /**
+   * Get a chain of metaclass IDs of classes that are ancestors of this instance,
+   * in order from closest to furthest.
+   * @returns e.g. [4,10,10,8]
+   */
+  public getMetaChain() {
+    let classes = [];
+    let prototype:any = this;
+    do {
+      prototype = Object.getPrototypeOf(prototype);
+      if(prototype && prototype.constructor.metaclassID != undefined) {
+        classes.push(prototype.constructor.metaclassID);
+      }
+    } while(prototype != null);
+    // Remove duplicate values resulting from base classes in chain
+    // that do not introduce a new metaclassID:
+    return [...new Set(classes)];
   }
 
   /**
@@ -194,6 +241,27 @@ class Metaclass {
     throw('NOT A FUNCTION');
   }
 
+  /*
+   * Meta methods - all private as they should not be called
+   * directly by other code, only when a property is evaluated.
+   */
+
+  protected metaIsClass(): VmData {
+    return this.isClass();
+  }
+
+  protected isTransient(): VmData {
+    return this._isTransient ? new VmTrue() : new VmNil();
+  }
+
+  protected ofKind(vmClass: VmObject): VmData {
+    let obj = vmClass.getInstance();
+    return obj.isAncestor(this) ? new VmTrue() : new VmNil();
+  }
+
 }
 
-export { Metaclass, TPropFunc, IPropFound }
+MetaclassRegistry.register('root-object/030004', RootObject);
+
+export { RootObject, TPropFunc, IPropFound }
+

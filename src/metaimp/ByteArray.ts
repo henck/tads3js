@@ -1,7 +1,7 @@
 const MD5 = require("crypto-js/md5");
 const SHA256 = require("crypto-js/sha256");
 
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { VmData, VmInt, VmObject } from "../types";
@@ -11,7 +11,7 @@ import { MetaString } from './MetaString';
 
 
 
-export class ByteArray extends Metaclass {
+export class ByteArray extends RootObject {
   private value: number[];
 
   // new ByteArray(native str)

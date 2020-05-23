@@ -5,7 +5,6 @@ import { Stack } from './Stack'
 import { Pool } from './Pool'
 import { Debug } from './Debug'
 import { Builtin } from './Builtin'
-import { Metaclass } from './metaclass/Metaclass'
 import { MetaclassRegistry } from './metaclass/MetaclassRegistry'
 import { MetaclassFactory } from './metaclass/MetaclassFactory'
 import { Heap } from './Heap'
@@ -191,7 +190,9 @@ export class Vm {
     // For an object, get value of the property from the object.
     if(data instanceof VmObject) {
       let obj = data.getInstance();
-      let { prop, object: definingObject } = obj.findProp(vmProp.value); // This will go through superclasses, as well
+      let res = obj.findProp(vmProp.value); // This will go through superclasses, as well
+      if(!res) throw(`callprop: Cannot find property ${vmProp.value} on object with metaclass ID ${obj.metaclassID}`);
+      let { prop, object: definingObject } = res;
 
       // If it's a virtual method, call it:
       if(typeof(prop) == 'function') {

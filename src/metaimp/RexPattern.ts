@@ -1,4 +1,4 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { VmObject } from "../types";
@@ -6,7 +6,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { MetaString } from "./MetaString";
 
-export class RexPattern extends Metaclass {
+export class RexPattern extends RootObject {
   static NamedCharacters: Map<string, string> = new Map<string, string>([
     ['lparen',  '\\('],
     ['rparen',  '\\)'],

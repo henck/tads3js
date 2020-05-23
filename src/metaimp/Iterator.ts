@@ -1,11 +1,12 @@
-import { Metaclass, TPropFunc } from '../metaclass/Metaclass';
+import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { VmData, VmNil, VmTrue } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
-export abstract class Iterator extends Metaclass {
+
+export abstract class Iterator extends RootObject {
   /**
    * Create a new Iterator. 
    */
