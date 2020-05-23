@@ -19,7 +19,7 @@ export class DataFactory {
       case VmType.ENUM:    return new VmEnum(offsetOrValue);
       case VmType.BIFPTR:  return new VmBifPtr((offsetOrValue >> 16), (offsetOrValue & 0xffff));
       default:
-        throw('Cannot create type ' + num.toString());
+        throw('Cannot load primitive type ' + num.toString());
     }    
   }
 }
