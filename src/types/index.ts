@@ -12,4 +12,5 @@ export { VmProp } from './VmProp'
 export { VmFuncPtr } from './VmFuncPtr'
 export { VmNativeCode } from './VmNativeCode'
 export { VmEmpty } from './VmEmpty'
+export { VmEnum } from './VmEnum'
 

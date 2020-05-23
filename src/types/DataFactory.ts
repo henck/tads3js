@@ -1,6 +1,6 @@
 import { VmType } from './VmType'
 import { Pool } from '../Pool';
-import { VmData, VmNil, VmTrue, VmObject, VmInt, VmSstring, VmList, VmCodeOffset, VmDstring, VmProp, VmFuncPtr, VmEmpty } from './';
+import { VmData, VmNil, VmTrue, VmObject, VmInt, VmSstring, VmList, VmCodeOffset, VmDstring, VmProp, VmFuncPtr, VmEmpty, VmEnum } from './';
 
 export class DataFactory {
   static load(num: VmType, dataPool: Pool, offsetOrValue: number): VmData {
@@ -16,6 +16,7 @@ export class DataFactory {
       case VmType.PROP:    return new VmProp(offsetOrValue & 0xffff); // only first two bytes are used, last two are arbitrary
       case VmType.FUNCPTR: return new VmFuncPtr(offsetOrValue);
       case VmType.EMPTY:   return new VmEmpty();
+      case VmType.ENUM:    return new VmEnum(offsetOrValue);
       default:
         throw('Cannot create type ' + num.toString());
     }    
