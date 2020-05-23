@@ -49,6 +49,7 @@ class RootObject {
     switch(idx) {
       case 0: return this.ofKind;
       case 1: return this.getSuperclassList;
+      case 2: return this.propDefined;
       case 3: return this.propType;
       case 4: return this.getPropList;
       case 6: return this.metaIsClass;
@@ -302,6 +303,30 @@ class RootObject {
   protected ofKind(vmClass: VmObject): VmData {
     let obj = vmClass.getInstance();
     return obj.isAncestor(this) ? new VmTrue() : new VmNil();
+  }
+
+  /**
+   * Determines if the object defines or inherits the property prop.
+   * @param prop Prop
+   * @param flags 
+   */
+  protected propDefined(vmProp: VmProp, vmFlags?: VmInt): VmData {
+    let flags = vmFlags ? vmFlags.unpack(): 1;
+    let propID = vmProp.unpack();
+    let propFound = this.findProp(propID);
+    if(!propFound) return new VmNil();
+    switch(flags) {
+      case 1: // PropDefAny
+        return new VmTrue();
+      case 2: // PropDefDirectly
+        return propFound.object.getInstance() == this ? new VmTrue() : new VmNil();
+      case 3: // PropDefInherits
+        return propFound.object.getInstance() != this ? new VmTrue() : new VmNil();
+      case 4: // PropDefGetClass
+        return propFound.object;
+      default:
+        throw(`propDefined: Unknown flag ${flags}`);
+    }
   }
 
   /**
