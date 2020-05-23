@@ -3,7 +3,7 @@ import { VmData, VmTrue, VmNil, VmInt } from "../types";
 import { MetaclassRegistry } from "../metaclass/MetaclassRegistry";
 import { VmMap } from "./VmMap";
 
-export class LookupTableIterator extends Iterator {
+class LookupTableIterator extends Iterator {
   public index: number;
   public data: VmMap;
 
@@ -56,3 +56,5 @@ export class LookupTableIterator extends Iterator {
 }
 
 MetaclassRegistry.register('lookuptable-iterator/030000', LookupTableIterator);
+
+export { LookupTableIterator }

@@ -11,7 +11,7 @@ import { List } from "./List";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
-export class MetaString extends RootObject {
+class MetaString extends RootObject {
   private value: string;
 
   constructor(val: string) {
@@ -387,3 +387,5 @@ export class MetaString extends RootObject {
 }
 
 MetaclassRegistry.register('string/030008', MetaString);
+
+export { MetaString }

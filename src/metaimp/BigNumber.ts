@@ -7,7 +7,7 @@ import { VmObject } from '../types';
 
 type TNumber = 'num' | 'nan' | 'infinity';
 
-export class BigNumber extends RootObject
+class BigNumber extends RootObject
 {
   private digits: number[];
   private exponent: number;
@@ -81,3 +81,5 @@ export class BigNumber extends RootObject
 }
 
 MetaclassRegistry.register('bignumber/030001', BigNumber);
+
+export { BigNumber }

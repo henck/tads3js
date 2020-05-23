@@ -7,7 +7,7 @@ import { Pool } from "../Pool";
 import { List } from "./List";
 import { ListBase } from "./ListBase";
 
-export class Vector extends ListBase {
+class Vector extends ListBase {
 
   constructor(a?: VmData[] | VmData, b?: VmData) {
     super();
@@ -404,3 +404,5 @@ export class Vector extends ListBase {
 }
 
 MetaclassRegistry.register('vector/030005', Vector);
+
+export { Vector }

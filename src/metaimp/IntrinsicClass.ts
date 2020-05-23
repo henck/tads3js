@@ -4,7 +4,7 @@ import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
-export class IntrinsicClass extends RootObject {
+class IntrinsicClass extends RootObject {
   public metaclassDependencyTableIndex: number;
   public modifierObjID: number;
 
@@ -50,3 +50,6 @@ export class IntrinsicClass extends RootObject {
 }
 
 MetaclassRegistry.register('intrinsic-class/030001', IntrinsicClass);
+
+export { IntrinsicClass }
+

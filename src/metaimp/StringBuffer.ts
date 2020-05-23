@@ -6,7 +6,7 @@ import { MetaString } from "./MetaString";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
-export class StringBuffer extends RootObject {
+class StringBuffer extends RootObject {
   // The value of a StringBuffer is an array of characters.
   private value: string[];
   
@@ -145,3 +145,5 @@ export class StringBuffer extends RootObject {
 }
 
 MetaclassRegistry.register('stringbuffer/030000', StringBuffer);
+
+export { StringBuffer }

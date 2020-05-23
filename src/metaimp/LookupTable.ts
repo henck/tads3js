@@ -9,7 +9,7 @@ import { List } from "./List"
 import { VmMap } from "./VmMap"
 import { LookupTableIterator } from './LookupTableIterator'
 
-export class LookupTable extends Collection  {
+class LookupTable extends Collection  {
   private value: VmMap;
   private default: VmData;
 
@@ -230,3 +230,6 @@ export class LookupTable extends Collection  {
 }
 
 MetaclassRegistry.register('lookuptable/030003', LookupTable);
+
+
+export { LookupTable }

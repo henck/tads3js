@@ -6,7 +6,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { MetaString } from "./MetaString";
 
-export class RexPattern extends RootObject {
+class RexPattern extends RootObject {
   static NamedCharacters: Map<string, string> = new Map<string, string>([
     ['lparen',  '\\('],
     ['rparen',  '\\)'],
@@ -120,3 +120,5 @@ export class RexPattern extends RootObject {
 }
 
 MetaclassRegistry.register('regex-pattern/030000', RexPattern);
+
+export { RexPattern }

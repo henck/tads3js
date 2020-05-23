@@ -10,8 +10,7 @@ import { Pool } from "../Pool";
 import { MetaString } from './MetaString';
 
 
-
-export class ByteArray extends RootObject {
+class ByteArray extends RootObject {
   private value: number[];
 
   // new ByteArray(native str)
@@ -211,3 +210,5 @@ export class ByteArray extends RootObject {
 }
 
 MetaclassRegistry.register('bytearray/030002', ByteArray);
+
+export { ByteArray }

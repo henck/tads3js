@@ -4,7 +4,7 @@ import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
 import { DataFactory, VmData, VmTrue, VmNil } from '../types';
 
-export class TadsObject extends RootObject
+class TadsObject extends RootObject
 {
   private _isClass: boolean;
 
@@ -63,3 +63,5 @@ export class TadsObject extends RootObject
 }
 
 MetaclassRegistry.register('tads-object/030005', TadsObject);
+
+export { TadsObject }

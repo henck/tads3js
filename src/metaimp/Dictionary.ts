@@ -43,7 +43,7 @@ class DictionaryEntry {
   }
 }
 
-export class Dictionary extends RootObject {
+class Dictionary extends RootObject {
   private value: DictionaryEntry[];
 
   constructor() {
@@ -254,3 +254,5 @@ export class Dictionary extends RootObject {
 
 
 MetaclassRegistry.register('dictionary2/030001', Dictionary);
+
+export { Dictionary }

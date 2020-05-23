@@ -1,4 +1,4 @@
-import { VmData, VmObject, VmNil, VmTrue } from "../types";
+import { VmData, VmObject, VmNil, VmTrue, VmList } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { Heap } from "../Heap";
@@ -43,6 +43,7 @@ class RootObject {
   getMethodByIndex(idx: number): TPropFunc {
     switch(idx) {
       case 0: return this.ofKind;
+      case 1: return this.getSuperclassList;
       case 6: return this.metaIsClass;
       case 8: return this.isTransient;
     }
@@ -245,6 +246,13 @@ class RootObject {
    * Meta methods - all private as they should not be called
    * directly by other code, only when a property is evaluated.
    */
+
+  protected getSuperclassList(): VmData {
+    // Forced to use VmList here rather than List, to avoid a
+    // circular reference: List imports RootObject, so RootObject
+    // cannot import List.
+    return new VmList(this.superClasses.map((sc) => Heap.getObj(sc)));
+  }
 
   protected metaIsClass(): VmData {
     return this.isClass();

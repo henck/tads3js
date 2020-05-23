@@ -5,9 +5,8 @@ import { VmData, VmInt, VmNil, VmObject, VmList } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { ListBase } from "./ListBase";
-import { Vm } from '../Vm';
 
-export class List extends ListBase {
+class List extends ListBase {
   
   //
   // A List can be constructed by either passing in an array of items,
@@ -317,7 +316,6 @@ export class List extends ListBase {
     return new VmObject(new List(out));
   }
 
-
   /**
    * 
    * @param vmFunc 
@@ -331,11 +329,6 @@ export class List extends ListBase {
     return new VmObject(new List(lst));
   }
 
-
-
-
-
-
   getValue() {
     return this.value;
   }  
@@ -343,3 +336,5 @@ export class List extends ListBase {
 }
 
 MetaclassRegistry.register('list/030008', List);
+
+export { List }

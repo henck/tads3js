@@ -1,6 +1,6 @@
 import { VmData, VmNil } from "../types";
 
-export class VmMap {
+class VmMap {
   private _keys: VmData[];
   private _values: VmData[];
 
@@ -66,3 +66,5 @@ export class VmMap {
     return this._values.slice();
   }
 }
+
+export { VmMap }

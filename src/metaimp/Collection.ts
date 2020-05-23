@@ -4,7 +4,7 @@ import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 import { VmObject } from "../types";
 import { Iterator } from "./Iterator";
 
-export abstract class Collection extends RootObject {
+abstract class Collection extends RootObject {
   getMethodByIndex(idx: number): TPropFunc {
     switch(idx) {
       case 0: return this.createIterator;
@@ -30,3 +30,5 @@ export abstract class Collection extends RootObject {
 }
 
 MetaclassRegistry.register('collection/030000', Collection);
+
+export { Collection }

@@ -6,7 +6,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
 
-export abstract class Iterator extends RootObject {
+abstract class Iterator extends RootObject {
   /**
    * Create a new Iterator. 
    */
@@ -75,3 +75,5 @@ export abstract class Iterator extends RootObject {
 }
 
 MetaclassRegistry.register('iterator/030001', Iterator);
+
+export { Iterator }

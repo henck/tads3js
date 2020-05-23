@@ -2,7 +2,7 @@ import { Iterator } from "./Iterator";
 import { VmData, VmTrue, VmNil, VmInt } from "../types";
 import { MetaclassRegistry } from "../metaclass/MetaclassRegistry";
 
-export class IndexedIterator extends Iterator {
+class IndexedIterator extends Iterator {
   public index: number;
   public data: VmData[];
 
@@ -55,3 +55,5 @@ export class IndexedIterator extends Iterator {
 }
 
 MetaclassRegistry.register('indexed-iterator/030000', IndexedIterator);
+
+export { IndexedIterator }

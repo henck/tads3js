@@ -6,9 +6,7 @@ import { Vm } from '../Vm';
 import { Vector } from './Vector';
 import { IFuncInfo } from '../IFuncInfo';
 
-
-
-export class AnonFunc extends Vector {
+class AnonFunc extends Vector {
   private funcptr: VmFuncPtr;
 
   constructor(...args: VmData[]) {
@@ -47,3 +45,5 @@ export class AnonFunc extends Vector {
 }
 
 MetaclassRegistry.register('anon-func-ptr/000000', AnonFunc);
+
+export { AnonFunc }

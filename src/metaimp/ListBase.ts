@@ -5,7 +5,7 @@ import { Iterator } from "./Iterator";
 import { IndexedIterator } from "./IndexedIterator";
 import { List } from "./List";
 
-export abstract class ListBase extends Collection {
+abstract class ListBase extends Collection {
   protected value: VmData[];
 
   public getValue() {
@@ -300,3 +300,5 @@ export abstract class ListBase extends Collection {
     return val ?? new VmNil();
   }
 }
+
+export { ListBase }
