@@ -1,9 +1,9 @@
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
-import { VmObject, VmData, VmProp, VmNil, VmTrue, VmList, VmSstring, VmInt } from '../types';
+import { VmObject, VmData, VmProp, VmNil, VmTrue, VmList, VmSstring, VmInt, VmNativeCode } from '../types';
 import { List } from './List';
 import { MetaString } from './MetaString';
 import { levenshtein } from '../util/Levenshtein';
@@ -55,15 +55,15 @@ class Dictionary extends RootObject {
     throw('Dictionary: Cannot load from image');
   }  
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.setComparator;
-      case 1: return this.findWord;
-      case 2: return this.addWord;
-      case 3: return this.removeWord;
-      case 4: return this.isWordDefined;
-      case 5: return this.forEachWord;
-      case 6: return this.correctSpelling;
+      case 0: return new VmNativeCode(this.setComparator);
+      case 1: return new VmNativeCode(this.findWord);
+      case 2: return new VmNativeCode(this.addWord);
+      case 3: return new VmNativeCode(this.removeWord);
+      case 4: return new VmNativeCode(this.isWordDefined);
+      case 5: return new VmNativeCode(this.forEachWord);
+      case 6: return new VmNativeCode(this.correctSpelling);
     }
     return null;
   }  

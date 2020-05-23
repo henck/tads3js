@@ -1,8 +1,9 @@
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
+import { VmNativeCode } from '../types';
 
 class IntrinsicClass extends RootObject {
   public metaclassDependencyTableIndex: number;
@@ -34,7 +35,7 @@ class IntrinsicClass extends RootObject {
     return classes.includes(this.modifierObjID);
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     console.log("Instrinsic class; looking for prop index", idx);
     switch(idx) {
       //case 0: return this.length;

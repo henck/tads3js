@@ -1,4 +1,4 @@
-import { VmData, VmObject, VmNil, VmTrue, VmList, VmProp, VmInt } from "../types";
+import { VmData, VmObject, VmNil, VmTrue, VmList, VmProp, VmInt, VmNativeCode } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { Heap } from "../Heap";
@@ -6,11 +6,11 @@ import { MetaclassRegistry } from "./MetaclassRegistry";
 import { IFuncInfo } from "../IFuncInfo";
 import { VmType } from "../types/VmType";
 
-type TPropFunc = ((...args: any[]) => VmData);
 interface IPropFound {
   object: VmObject;
-  prop: VmData | TPropFunc;
+  prop: VmData;
 }
+
 interface IPropAndDistance {
   prop: IPropFound;
   dist: number;
@@ -45,22 +45,22 @@ class RootObject {
     return null;
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.ofKind;
-      case 1: return this.getSuperclassList;
-      case 2: return this.propDefined;
-      case 3: return this.propType;
-      case 4: return this.getPropList;
-      case 6: return this.metaIsClass;
-      case 8: return this.isTransient;
+      case 0: return new VmNativeCode(this.ofKind);
+      case 1: return new VmNativeCode(this.getSuperclassList);
+      case 2: return new VmNativeCode(this.propDefined);
+      case 3: return new VmNativeCode(this.propType);
+      case 4: return new VmNativeCode(this.getPropList);
+      case 6: return new VmNativeCode(this.metaIsClass);
+      case 8: return new VmNativeCode(this.isTransient);
     }
     return null;
   }  
 
-  callVirtualMethod(prop: TPropFunc, ...args: any[]) {
+  public callNativeMethod(data: VmNativeCode, ...args: any[]) {
     // Bind prop to self, then call it with args.
-    return prop.bind(this)(...args);
+    return data.value.bind(this)(...args);
   }
 
   protected isClass(): VmData {
@@ -117,7 +117,7 @@ class RootObject {
    * a function.
    * @param propID 
    */
-  private getMetaProp(propID: number): TPropFunc {
+  private getMetaProp(propID: number): VmNativeCode {
     // See if propID corresponds to a metaprop. Look first in the current
     // class, then look in its parents.
     let index = null;
@@ -140,11 +140,11 @@ class RootObject {
     // If a metaprop index was found on the current prototype, convert it
     // to a function.
     if(index !== null) {
-      let metaProp = prototype.getMethodByIndex(index);
-      if(metaProp == null) {
+      let vmNativeCode = prototype.getMethodByIndex(index) as VmNativeCode;
+      if(vmNativeCode == null) {
         throw("CANNOT FIND METAPROP " + index.toString());
       }
-      return metaProp;
+      return vmNativeCode;
     }
 
     // Index was not found on any prototype, so we return null.
@@ -158,7 +158,7 @@ class RootObject {
   //   its function.
   // - If not, try regular props. Return prop or null if not found.
   // 
-  private getProp(propID: number): VmData | TPropFunc {
+  private getProp(propID: number): VmData {
     // Find a meta property:
     let f = this.getMetaProp(propID);
     if(f) return f;
@@ -350,5 +350,5 @@ class RootObject {
 
 MetaclassRegistry.register('root-object/030004', RootObject);
 
-export { RootObject, TPropFunc, IPropFound }
+export { RootObject, IPropFound }
 

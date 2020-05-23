@@ -1,10 +1,10 @@
 const MD5 = require("crypto-js/md5");
 const SHA256 = require("crypto-js/sha256");
 
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject } from "../types";
+import { VmData, VmInt, VmObject, VmNativeCode } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { MetaString } from './MetaString';
@@ -62,15 +62,15 @@ class ByteArray extends RootObject {
     return this.value;
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.length;
-      case 1: return this.subarray;
-      case 2: return this.copyFrom;
-      case 3: return this.fillValue;
-      case 4: return this.mapToString;
-      case 9: return this.sha256;
-      case 10: return this.digestMD5;
+      case 0: return  new VmNativeCode(this.length);
+      case 1: return  new VmNativeCode(this.subarray);
+      case 2: return  new VmNativeCode(this.copyFrom);
+      case 3: return  new VmNativeCode(this.fillValue);
+      case 4: return  new VmNativeCode(this.mapToString);
+      case 9: return  new VmNativeCode(this.sha256);
+      case 10: return new VmNativeCode(this.digestMD5);
     }
     return null;
   }  

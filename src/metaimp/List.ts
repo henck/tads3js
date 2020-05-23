@@ -1,7 +1,6 @@
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmNil, VmObject, VmList } from "../types";
+import { VmData, VmInt, VmNil, VmObject, VmList, VmNativeCode } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { ListBase } from "./ListBase";
@@ -26,43 +25,43 @@ class List extends ListBase {
     return VmType.LIST;
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     // Interestingly, applyAll does compile, but yields a propID that
     // the List metaclass does not recognize, although it should map
     // the same as 'mapAll'.
     switch(idx) {
-      case 0: return this.subset;
-      case 1: return this.mapAll;
-      case 2: return this.length;
-      case 3: return this.sublist;
-      case 4: return this.intersect;
-      case 5: return this.indexOf;
-      case 6: return this.car;
-      case 7: return this.cdr;      
-      case 8: return this.indexWhich;
-      case 9: return this.forEach;
-      case 10: return this.valWhich;
-      case 11: return this.lastIndexOf;
-      case 12: return this.lastIndexWhich;
-      case 13: return this.lastValWhich;
-      case 14: return this.countOf;
-      case 15: return this.countWhich;
-      case 16: return this.getUnique;
-      case 17: return this.appendUnique;
-      case 18: return this.append;
-      case 19: return this.sort;
-      case 20: return this.prepend;
-      case 21: return this.insertAt;
-      case 22: return this.removeElementAt;
-      case 23: return this.removeRange;
-      case 24: return this.forEachAssoc;
-      case 25: return this.generate;
-      case 26: return this.splice;
-      case 27: return this.join;
-      case 28: return this.indexOfMin;
-      case 29: return this.minVal;
-      case 30: return this.indexOfMax;
-      case 31: return this.maxVal;
+      case 0: return new VmNativeCode(this.subset);
+      case 1: return new VmNativeCode(this.mapAll);
+      case 2: return new VmNativeCode(this.length);
+      case 3: return new VmNativeCode(this.sublist);
+      case 4: return new VmNativeCode(this.intersect);
+      case 5: return new VmNativeCode(this.indexOf);
+      case 6: return new VmNativeCode(this.car);
+      case 7: return new VmNativeCode(this.cdr);
+      case 8: return new VmNativeCode(this.indexWhich);
+      case 9: return new VmNativeCode(this.forEach);
+      case 10: return new VmNativeCode(this.valWhich);
+      case 11: return new VmNativeCode(this.lastIndexOf);
+      case 12: return new VmNativeCode(this.lastIndexWhich);
+      case 13: return new VmNativeCode(this.lastValWhich);
+      case 14: return new VmNativeCode(this.countOf);
+      case 15: return new VmNativeCode(this.countWhich);
+      case 16: return new VmNativeCode(this.getUnique);
+      case 17: return new VmNativeCode(this.appendUnique);
+      case 18: return new VmNativeCode(this.append);
+      case 19: return new VmNativeCode(this.sort);
+      case 20: return new VmNativeCode(this.prepend);
+      case 21: return new VmNativeCode(this.insertAt);
+      case 22: return new VmNativeCode(this.removeElementAt);
+      case 23: return new VmNativeCode(this.removeRange);
+      case 24: return new VmNativeCode(this.forEachAssoc);
+      case 25: return new VmNativeCode(this.generate);
+      case 26: return new VmNativeCode(this.splice);
+      case 27: return new VmNativeCode(this.join);
+      case 28: return new VmNativeCode(this.indexOfMin);
+      case 29: return new VmNativeCode(this.minVal);
+      case 30: return new VmNativeCode(this.indexOfMax);
+      case 31: return new VmNativeCode(this.maxVal);
     }
     return null;
   }  

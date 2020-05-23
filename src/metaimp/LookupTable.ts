@@ -1,7 +1,6 @@
-import { TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject, VmNil, VmTrue, VmList } from "../types"
+import { VmData, VmInt, VmObject, VmNil, VmTrue, VmList, VmNativeCode } from "../types"
 import { Collection } from "./Collection"
 import { Iterator } from "./Iterator"
 import { ListBase } from "./ListBase"
@@ -44,21 +43,21 @@ class LookupTable extends Collection  {
     }
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.isKeyPresent;
-      case 1: return this.removeElement;
-      case 2: return this.applyAll;
-      case 3: return this.forEach;
-      case 4: return this.getBucketCount;
-      case 5: return this.getEntryCount;
-      case 6: return this.forEachAssoc;
-      case 7: return this.keysToList;
-      case 8: return this.valsToList;
-      case 9: return this.getDefaultValue;
-      case 10: return this.setDefaultValue;
-      case 11: return this.nthKey;
-      case 12: return this.nthVal;
+      case 0: return new VmNativeCode(this.isKeyPresent);
+      case 1: return new VmNativeCode(this.removeElement);
+      case 2: return new VmNativeCode(this.applyAll);
+      case 3: return new VmNativeCode(this.forEach);
+      case 4: return new VmNativeCode(this.getBucketCount);
+      case 5: return new VmNativeCode(this.getEntryCount);
+      case 6: return new VmNativeCode(this.forEachAssoc);
+      case 7: return new VmNativeCode(this.keysToList);
+      case 8: return new VmNativeCode(this.valsToList);
+      case 9: return new VmNativeCode(this.getDefaultValue);
+      case 10: return new VmNativeCode(this.setDefaultValue);
+      case 11: return new VmNativeCode(this.nthKey);
+      case 12: return new VmNativeCode(this.nthVal);
     }
     return super.getMethodByIndex(idx);
   }    

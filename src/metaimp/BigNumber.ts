@@ -1,9 +1,9 @@
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
 import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
-import { VmObject } from '../types';
+import { VmObject, VmNativeCode } from '../types';
 
 type TNumber = 'num' | 'nan' | 'infinity';
 
@@ -52,9 +52,9 @@ class BigNumber extends RootObject
     return new BigNumber(digits, exponent, negative, type, zero);
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 7: return this.getAbs;
+      case 7: return new VmNativeCode(this.getAbs);
     }
     return null;
   }  

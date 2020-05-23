@@ -1,7 +1,7 @@
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmObject } from "../types";
+import { VmObject, VmNativeCode } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { MetaString } from "./MetaString";
@@ -86,9 +86,9 @@ class RexPattern extends RootObject {
     return new RexPattern(magic, value);
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.getPatternString;
+      case 0: return new VmNativeCode(this.getPatternString);
     }
     return null;
   }

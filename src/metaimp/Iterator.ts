@@ -1,7 +1,7 @@
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmNil, VmTrue } from "../types";
+import { VmData, VmNil, VmTrue, VmNativeCode } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 
@@ -18,13 +18,13 @@ abstract class Iterator extends RootObject {
     throw('Iterator: Cannot load from image');
   }  
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.meta_getNext;
-      case 1: return this.meta_isNextAvailable;
-      case 2: return this.meta_resetIterator;
-      case 3: return this.meta_getCurKey;
-      case 4: return this.meta_getCurVal;
+      case 0: return new VmNativeCode(this.meta_getNext);
+      case 1: return new VmNativeCode(this.meta_isNextAvailable);
+      case 2: return new VmNativeCode(this.meta_resetIterator);
+      case 3: return new VmNativeCode(this.meta_getCurKey);
+      case 4: return new VmNativeCode(this.meta_getCurVal);
     }
     return null;
   }

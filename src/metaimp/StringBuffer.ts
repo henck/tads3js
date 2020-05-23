@@ -1,7 +1,7 @@
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject } from "../types";
+import { VmData, VmInt, VmObject, VmNativeCode } from "../types";
 import { MetaString } from "./MetaString";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
@@ -25,16 +25,16 @@ class StringBuffer extends RootObject {
     return this.value.join('');
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.length;
-      case 1: return this.charAt;
-      case 2: return this.append;
-      case 3: return this.insert;
-      case 4: return this.copyChars;
-      case 5: return this.deleteChars;
-      case 6: return this.splice;
-      case 7: return this.substr;
+      case 0: return new VmNativeCode(this.length);
+      case 1: return new VmNativeCode(this.charAt);
+      case 2: return new VmNativeCode(this.append);
+      case 3: return new VmNativeCode(this.insert);
+      case 4: return new VmNativeCode(this.copyChars);
+      case 5: return new VmNativeCode(this.deleteChars);
+      case 6: return new VmNativeCode(this.splice);
+      case 7: return new VmNativeCode(this.substr);
     }
     return null;
   }

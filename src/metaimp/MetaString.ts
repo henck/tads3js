@@ -1,10 +1,10 @@
 const MD5 = require("crypto-js/md5");
 const SHA256 = require("crypto-js/sha256");
 
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr } from "../types";
+import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr, VmNativeCode } from "../types";
 import { ByteArray } from "./ByteArray";
 import { RexPattern } from "./RexPattern";
 import { List } from "./List";
@@ -28,36 +28,36 @@ class MetaString extends RootObject {
     return this.value;
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.length;
-      case 1: return this.substr;
-      case 2: return this.toUpper;
-      case 3: return this.toLower;
-      case 4: return this.find;
-      case 5: return this.toUnicode;
-      case 6: return this.htmlify;
-      case 7: return this.startsWith;
-      case 8: return this.endsWith;
-      case 9: return this.mapToByteArray;
+      case 0: return new VmNativeCode(this.length);
+      case 1: return new VmNativeCode(this.substr);
+      case 2: return new VmNativeCode(this.toUpper);
+      case 3: return new VmNativeCode(this.toLower);
+      case 4: return new VmNativeCode(this.find);
+      case 5: return new VmNativeCode(this.toUnicode);
+      case 6: return new VmNativeCode(this.htmlify);
+      case 7: return new VmNativeCode(this.startsWith);
+      case 8: return new VmNativeCode(this.endsWith);
+      case 9: return new VmNativeCode(this.mapToByteArray);
       
-      case 11: return this.splice;
-      case 12: return this.split;
-      
-
-      case 15: return this.urlEncode;
-      case 16: return this.urlDecode;
-      case 17: return this.sha256;
-      case 18: return this.digestMD5;
+      case 11: return new VmNativeCode(this.splice);
+      case 12: return new VmNativeCode(this.split);
       
 
-      case 21: return this.toTitleCase;
-      case 22: return this.toFoldedCase;
-      case 23: return this.compareTo;
-      case 24: return this.compareIgnoreCase;
+      case 15: return new VmNativeCode(this.urlEncode);
+      case 16: return new VmNativeCode(this.urlDecode);
+      case 17: return new VmNativeCode(this.sha256);
+      case 18: return new VmNativeCode(this.digestMD5);
       
-      case 26: return this.findAll;
-      case 27: return this.match;
+
+      case 21: return new VmNativeCode(this.toTitleCase);
+      case 22: return new VmNativeCode(this.toFoldedCase);
+      case 23: return new VmNativeCode(this.compareTo);
+      case 24: return new VmNativeCode(this.compareIgnoreCase);
+      
+      case 26: return new VmNativeCode(this.findAll);
+      case 27: return new VmNativeCode(this.match);
   
       // findLast
       // findReplace

@@ -1,6 +1,6 @@
 import { SourceImage } from './SourceImage'
 import { DataBlock, DataBlockFactory, CPDF, CPPG, ENTP, MCLD, OBJS } from './blocks/'
-import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring } from './types/'
+import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring, VmNativeCode } from './types/'
 import { Stack } from './Stack'
 import { Pool } from './Pool'
 import { Debug } from './Debug'
@@ -194,10 +194,10 @@ export class Vm {
       if(!res) throw(`callprop: Cannot find property ${vmProp.value} on object with metaclass ID ${obj.metaclassID}`);
       let { prop, object: definingObject } = res;
 
-      // If it's a virtual method, call it:
-      if(typeof(prop) == 'function') {
+      // If it's native code on an intrinsic class, call it:
+      if(prop instanceof VmNativeCode) {
         let args = this.stack.popMany(argc);
-        this.r0 = obj.callVirtualMethod(prop, ...args);
+        this.r0 = obj.callNativeMethod(prop, ...args);
         return;
       }
 
@@ -236,7 +236,7 @@ export class Vm {
       let s = new MetaString(data.value);
       let args = this.stack.popMany(argc);
       let { prop, object } = s.findProp(vmProp.value);
-      this.r0 = s.callVirtualMethod((prop as any), ...args);
+      this.r0 = s.callNativeMethod((prop as any), ...args);
     }
 
     // For a list, use the string metaclass:
@@ -244,7 +244,7 @@ export class Vm {
       let lst = new List(data.value);
       let args = this.stack.popMany(argc);
       let { prop, object } = lst.findProp(vmProp.value);
-      this.r0 = lst.callVirtualMethod((prop as any), ...args);
+      this.r0 = lst.callNativeMethod((prop as any), ...args);
     }
   }
 

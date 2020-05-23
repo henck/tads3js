@@ -1,14 +1,14 @@
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmObject } from "../types";
+import { VmObject, VmNativeCode } from "../types";
 import { Iterator } from "./Iterator";
 
 abstract class Collection extends RootObject {
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return this.createIterator;
-      case 1: return this.createLiveIterator;
+      case 0: return new VmNativeCode(this.createIterator);
+      case 1: return new VmNativeCode(this.createLiveIterator);
     }
     return null;
   }  

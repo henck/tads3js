@@ -1,7 +1,6 @@
-import { TPropFunc } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmFuncPtr, VmObject } from "../types";
+import { VmData, VmFuncPtr, VmObject, VmNativeCode } from "../types";
 import { Vm } from '../Vm';
 import { Vector } from './Vector';
 import { IFuncInfo } from '../IFuncInfo';
@@ -33,7 +32,7 @@ class AnonFunc extends Vector {
     return VmType.OBJ;
   }
 
-  getMethodByIndex(idx: number): TPropFunc {
+  getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
     }
     return null;

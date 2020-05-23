@@ -10,4 +10,5 @@ export { VmCodeOffset } from './VmCodeOffset'
 export { VmObject } from './VmObject'
 export { VmProp } from './VmProp'
 export { VmFuncPtr } from './VmFuncPtr'
+export { VmNativeCode } from './VmNativeCode'
 

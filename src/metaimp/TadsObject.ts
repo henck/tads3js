@@ -1,8 +1,8 @@
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
-import { RootObject, TPropFunc } from '../metaclass/RootObject';
+import { RootObject } from '../metaclass/RootObject';
 import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
-import { DataFactory, VmData, VmTrue, VmNil } from '../types';
+import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode } from '../types';
 
 class TadsObject extends RootObject
 {
@@ -49,6 +49,13 @@ class TadsObject extends RootObject
     return obj;
   }
 
+  getMethodByIndex(idx: number): VmNativeCode {
+    switch(idx) {
+      case 5: return new VmNativeCode(this.setSuperclassList);
+    }
+    return null;
+  }    
+
   protected isClass(): VmData {
     return this._isClass ? new VmTrue() : new VmNil();
   }
@@ -59,6 +66,11 @@ class TadsObject extends RootObject
    * directly by other code, only when a property is evaluated.
    */
 
+   protected setSuperclassList(vmClasses: VmData): VmData {
+     let lst = vmClasses.unpack();
+     this.superClasses = lst.map((vmObj: VmObject) => vmObj.getInstance().id);
+     return new VmNil();
+   }
 
 }
 
