@@ -25,7 +25,6 @@ class TadsObject extends RootObject
     // Read object flags
     let flags = image.getUInt16(offset); offset += 2;
     obj._isClass = (flags & 0x1) == 0x1;
-    // console.log('TADS OBJECT', 'superclasses', numSuperclasses, 'flags', flags, 'props', numProps);
 
     // Load superclasses
     for(let i = 0; i < numSuperclasses; i++) {
@@ -45,6 +44,8 @@ class TadsObject extends RootObject
       obj.props.set(propID, DataFactory.load(type, dataPool, propOffset));
       offset += 7;
     }
+
+    console.log('TADS OBJECT', 'superclasses', numSuperclasses, 'flags', flags, 'props', obj.props);
 
     return obj;
   }

@@ -46,7 +46,7 @@ export class Pool {
     return  this.getByte(offset) 
          + (this.getByte(offset+1) << 8)
          + (this.getByte(offset+2) << 16)
-         + (this.getByte(offset+3) << 32);
+         + (this.getByte(offset+3) << 24);
   }
 
   // Read an Int32 from a page:
