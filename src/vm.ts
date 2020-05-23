@@ -295,6 +295,7 @@ export class Vm {
       case 0x61: this.op_callprop(); break;
       case 0x62: this.op_ptrcallprop(); break;
       case 0x63: this.op_getpropself(); break;
+      case 0x64: this.op_callpropself(); break;
       case 0x66: this.op_objgetprop(); break;
       case 0x67: this.op_objcallprop(); break;
       case 0x6a: this.op_getproplcl1(); break;
@@ -767,6 +768,14 @@ export class Vm {
     Debug.instruction({ propID: propID });
     this.ip += 2;
     this.callprop(this.stack.getSelf(), new VmProp(propID), 0);
+  }
+
+  op_callpropself() { // 0x64 
+    let argc = this.codePool.getByte(this.ip);
+    let propID = this.codePool.getUint2(this.ip + 1);
+    Debug.instruction({ propID: propID, argc: argc });
+    this.ip += 3;
+    this.callprop(this.stack.getSelf(), new VmProp(propID), argc);
   }
 
   op_objgetprop() { // 0x66
