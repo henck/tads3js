@@ -1,5 +1,6 @@
 import { VmData } from "./VmData";
 import { VmNil } from "./VmNil";
+import { VmType } from "./VmType";
 
 export class VmTrue extends VmData {
   constructor() {
@@ -9,6 +10,10 @@ export class VmTrue extends VmData {
   getName() {
     return 'true';
   }
+
+  getType() {
+    return VmType.TRUE;
+  }  
 
   not() {
     return new VmNil();

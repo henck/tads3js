@@ -1,9 +1,10 @@
-import { VmData, VmObject, VmNil, VmTrue, VmList } from "../types";
+import { VmData, VmObject, VmNil, VmTrue, VmList, VmProp, VmInt } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { Heap } from "../Heap";
 import { MetaclassRegistry } from "./MetaclassRegistry";
 import { IFuncInfo } from "../IFuncInfo";
+import { VmType } from "../types/VmType";
 
 type TPropFunc = ((...args: any[]) => VmData);
 interface IPropFound {
@@ -36,6 +37,10 @@ class RootObject {
     this.id = id;
   }
 
+  public getType() {
+    return VmType.OBJ;
+  }
+
   unpack(): any {
     return null;
   }
@@ -44,6 +49,8 @@ class RootObject {
     switch(idx) {
       case 0: return this.ofKind;
       case 1: return this.getSuperclassList;
+      case 3: return this.propType;
+      case 4: return this.getPropList;
       case 6: return this.metaIsClass;
       case 8: return this.isTransient;
     }
@@ -247,6 +254,14 @@ class RootObject {
    * directly by other code, only when a property is evaluated.
    */
 
+  protected getPropList(): VmData {
+    let arr = [];
+    for(let p of this.props.keys()) {
+      arr.push(new VmProp(p));
+    }
+    return new VmList(arr);
+  }
+
   protected getSuperclassList(): VmData {
     // Forced to use VmList here rather than List, to avoid a
     // circular reference: List imports RootObject, so RootObject
@@ -265,6 +280,17 @@ class RootObject {
   protected ofKind(vmClass: VmObject): VmData {
     let obj = vmClass.getInstance();
     return obj.isAncestor(this) ? new VmTrue() : new VmNil();
+  }
+
+  protected propType(prop: VmProp): VmData {
+    throw('halt');
+    let propFound = this.findProp(prop.value);
+    // nil if prop not found
+    if(!propFound) return new VmNil();
+    // If a primitive type, return type code.
+    if(propFound.prop instanceof VmData) return new VmInt((propFound.prop as VmData).getType());
+    // Otherwise, it is an intrinsic class method.
+    return new VmInt(VmType.NATIVE_CODE);
   }
 
 }

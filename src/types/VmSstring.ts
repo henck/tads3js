@@ -2,6 +2,7 @@ import { VmData } from "./VmData"
 import { VmNil } from "./VmNil"
 import { VmObject } from "./VmObject"
 import { MetaString } from "../metaimp"
+import { VmType } from "./VmType";
 
 export class VmSstring extends VmData {
   constructor(value: string) {
@@ -11,6 +12,10 @@ export class VmSstring extends VmData {
   getName() {
     return 'sstring';
   }
+
+  getType() {
+    return VmType.SSTRING;
+  }  
   
   add(data: VmData): VmObject {
     let str = this.value;

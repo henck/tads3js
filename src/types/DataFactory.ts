@@ -1,8 +1,6 @@
 import { VmType } from './VmType'
 import { Pool } from '../Pool';
-import { VmData, VmNil, VmTrue, VmObject, VmInt, VmSstring, VmList, VmCodeOffset } from './';
-import { VmProp } from './VmProp';
-import { VmDstring } from './VmDstring';
+import { VmData, VmNil, VmTrue, VmObject, VmInt, VmSstring, VmList, VmCodeOffset, VmDstring, VmProp } from './';
 
 export class DataFactory {
   static load(num: VmType, dataPool: Pool, offset: number): VmData {

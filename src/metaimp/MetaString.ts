@@ -10,6 +10,7 @@ import { RexPattern } from "./RexPattern";
 import { List } from "./List";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
+import { VmType } from '../types/VmType';
 
 class MetaString extends RootObject {
   private value: string;
@@ -17,6 +18,10 @@ class MetaString extends RootObject {
   constructor(val: string) {
     super();
     this.value = val;
+  }
+
+  getType() {
+    return VmType.SSTRING;
   }
 
   unpack(): string {

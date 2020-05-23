@@ -1,6 +1,7 @@
 import { VmData } from "./VmData";
 import { Vm } from "../Vm";
 import { IFuncInfo } from "../IFuncInfo";
+import { VmType } from "./VmType";
 
 export class VmFuncPtr extends VmData {
   constructor(value: number) {
@@ -10,6 +11,10 @@ export class VmFuncPtr extends VmData {
   getName() {
     return 'funcptr';
   }
+
+  getType() {
+    return VmType.FUNCPTR;
+  }  
 
   invoke(...args: VmData[]): VmData {
     return Vm.getInstance().runContext(this.value, null, ...args);

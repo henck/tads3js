@@ -1,6 +1,7 @@
 import { VmData } from "./VmData";
 import { VmTrue } from "./VmTrue";
 import { VmNil } from "./VmNil";
+import { VmType } from "./VmType";
 
 export class VmInt extends VmData {
   constructor(value: number) {
@@ -10,6 +11,10 @@ export class VmInt extends VmData {
   getName() {
     return 'int';
   }
+
+  getType() {
+    return VmType.INT;
+  }  
 
   isFalsy(): boolean {
     return this.value == 0;

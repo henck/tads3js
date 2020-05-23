@@ -5,6 +5,7 @@ import { VmData, VmFuncPtr, VmObject } from "../types";
 import { Vm } from '../Vm';
 import { Vector } from './Vector';
 import { IFuncInfo } from '../IFuncInfo';
+import { VmType } from '../types/VmType';
 
 class AnonFunc extends Vector {
   private funcptr: VmFuncPtr;
@@ -18,6 +19,18 @@ class AnonFunc extends Vector {
     for(let i = 0; i < args.length; i++) {
       this.value.push(args[i]);
     }
+  }
+
+  getType() {
+    // TODO: An anonymous function can be represented as either TypeFuncPtr or TypeObject. 
+    // This depends on whether or not the function refers to any of the local variables from 
+    // the enclosing scope where the function is defined. (This includes self and the other 
+    // method context pseudo-variables.) If the anonymous function does refer to any variables 
+    // from the enclosing scope, it's represented as an object, which contains the context 
+    // information tying the function to the local scope in effect when the function was created. 
+    // If the function doesn't reference anything in its enclosing scope, no context information 
+    // is required, so the function is represented as a simple static function pointer. 
+    return VmType.OBJ;
   }
 
   getMethodByIndex(idx: number): TPropFunc {

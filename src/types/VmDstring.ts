@@ -1,4 +1,5 @@
 import { VmData } from "./VmData";
+import { VmType } from "./VmType";
 
 export class VmDstring extends VmData {
   constructor(value: string) {
@@ -7,5 +8,9 @@ export class VmDstring extends VmData {
 
   getName() {
     return 'dstring';
+  }
+
+  getType() {
+    return VmType.DSTRING;
   }
 }

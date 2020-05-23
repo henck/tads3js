@@ -1,4 +1,5 @@
 import { IFuncInfo } from "../IFuncInfo";
+import { VmType } from "./VmType";
 
 export abstract class VmData {
   public value: any;
@@ -7,9 +8,9 @@ export abstract class VmData {
     this.value = value;
   }
 
-  getName() {
-    return '(type not set)';
-  }
+  abstract getName(): string;
+
+  abstract getType(): VmType;
 
   //
   // Helper methods

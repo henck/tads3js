@@ -3,6 +3,7 @@ import { VmNil } from "./VmNil";
 import { VmInt } from "./VmInt";
 import { VmObject } from "./VmObject";
 import { List } from "../metaimp";
+import { VmType } from "./VmType";
 
 export class VmList extends VmData {
   constructor(value: any[]) {
@@ -12,6 +13,10 @@ export class VmList extends VmData {
   getName() {
     return 'list';
   }
+
+  getType() {
+    return VmType.LIST;
+  }  
 
   add(data: VmData): VmData {
     if(data instanceof VmList) {

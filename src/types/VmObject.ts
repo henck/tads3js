@@ -13,6 +13,11 @@ export class VmObject extends VmData {
     return 'obj';
   }
 
+  getType() {
+    let obj = this.getInstance();
+    return obj.getType();
+  }
+
   unpack(): any {
     let obj = this.getInstance();
     return obj.unpack();

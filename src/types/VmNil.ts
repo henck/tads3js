@@ -1,5 +1,6 @@
 import { VmData } from "./VmData";
 import { VmTrue } from "./VmTrue";
+import { VmType } from "./VmType";
 
 export class VmNil extends VmData {
   constructor() {
@@ -9,6 +10,10 @@ export class VmNil extends VmData {
   getName() {
     return 'nil';
   }
+
+  getType() {
+    return VmType.NIL;
+  }  
 
   isFalsy(): boolean {
     return true;

@@ -5,6 +5,7 @@ import { VmData, VmInt, VmNil, VmObject, VmList } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { ListBase } from "./ListBase";
+import { VmType } from '../types/VmType';
 
 class List extends ListBase {
   
@@ -19,6 +20,10 @@ class List extends ListBase {
     } else {
       this.value = [...args];
     }
+  }
+
+  getType() {
+    return VmType.LIST;
   }
 
   getMethodByIndex(idx: number): TPropFunc {
