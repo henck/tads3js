@@ -13,4 +13,5 @@ export { VmFuncPtr } from './VmFuncPtr'
 export { VmNativeCode } from './VmNativeCode'
 export { VmEmpty } from './VmEmpty'
 export { VmEnum } from './VmEnum'
+export { VmBifPtr } from './VmBifPtr'
 
