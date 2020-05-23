@@ -6,13 +6,13 @@ import { MetaclassRegistry } from "./MetaclassRegistry";
 import { IFuncInfo } from "../IFuncInfo";
 import { VmType } from "../types/VmType";
 
-interface IPropFound {
+interface IPropLocation {
   object: VmObject;
   prop: VmData;
 }
 
 interface IPropAndDistance {
-  prop: IPropFound;
+  prop: IPropLocation;
   dist: number;
 }
 
@@ -189,7 +189,7 @@ class RootObject {
     return lst;
   }
 
-  public findProp(propID: number): IPropFound {
+  public findProp(propID: number): IPropLocation {
     let lst: IPropAndDistance[] = this.findPropWalker(propID);
 
     // Calculate the minimum distance in the list.
@@ -350,5 +350,5 @@ class RootObject {
 
 MetaclassRegistry.register('root-object/030004', RootObject);
 
-export { RootObject, IPropFound }
+export { RootObject }
 
