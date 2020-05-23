@@ -129,7 +129,7 @@ class RootObject {
         // Get the prototype's metaclassID, if any. Some base classes
         // may not have a metaclassID and must be ignored.
         let metaclassID = (prototype.constructor as any).metaclassID;
-        if(!metaclassID) continue;
+        if(metaclassID == undefined) continue;
         // Get a prop index from the registry for the current metaclassID.
         index = MetaclassRegistry.getMetaIndex(metaclassID, propID);
       }
