@@ -254,6 +254,10 @@ class RootObject {
    * directly by other code, only when a property is evaluated.
    */
 
+   /**
+    * Returns a list of the properties directly defined by this object. 
+    * Each entry in the list is a property pointer value. 
+    */
   protected getPropList(): VmData {
     let arr = [];
     for(let p of this.props.keys()) {
@@ -262,6 +266,9 @@ class RootObject {
     return new VmList(arr);
   }
 
+  /**
+   * Returns a list containing the immediate superclasses of the object. 
+   */
   protected getSuperclassList(): VmData {
     // Forced to use VmList here rather than List, to avoid a
     // circular reference: List imports RootObject, so RootObject
@@ -269,21 +276,42 @@ class RootObject {
     return new VmList(this.superClasses.map((sc) => Heap.getObj(sc)));
   }
 
+  /**
+   * Returns true if the object was declared as a "class", nil otherwise. 
+   * @returns true if object is class
+   */
   protected metaIsClass(): VmData {
     return this.isClass();
   }
 
+  /**
+   * Returns true if the object is transient, nil otherwise. 
+   * @returns true if object is transient
+   */
   protected isTransient(): VmData {
     return this._isTransient ? new VmTrue() : new VmNil();
   }
 
+  /**
+   * Determines if the object is an instance of the class cls, or an instance 
+   * of any subclass of cls. Returns true if so, nil if not. This method always 
+   * returns true if cls is Object, since every object ultimately derives from the Object intrinsic class. 
+   * @param vmClass Ancestor class
+   * @returns true if descendent, nil if not
+   */
   protected ofKind(vmClass: VmObject): VmData {
     let obj = vmClass.getInstance();
     return obj.isAncestor(this) ? new VmTrue() : new VmNil();
   }
 
+  /**
+   * Returns the datatype of the given property of the given object, or nil if the object does not 
+   * define or inherit the property. This function does not evaluate the property, but merely determines 
+   * its type. The return value is one of the TYPE_xxx values.
+   * @param prop Prop to check
+   * @returns Prop type (int)
+   */
   protected propType(prop: VmProp): VmData {
-    throw('halt');
     let propFound = this.findProp(prop.value);
     // nil if prop not found
     if(!propFound) return new VmNil();
