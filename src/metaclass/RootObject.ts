@@ -275,12 +275,17 @@ class RootObject {
    * @returns List with three elements
    */
   protected getPropParams(vmProp: VmProp): VmData {
+    // Retrieve propInfo for given prop. Among other things, this includes the prop's value.
     let propInfo = Vm.getInstance().getprop(new VmObject(this), vmProp);
+    // By default, we return no params, no opt params, no varying args
+    // (even if the prop was not found)
     let result = [new VmInt(0), new VmInt(0), new VmNil()];
     if(propInfo)  {
+      // For native code, get the param info from the VmNativeCode object.
       if(propInfo.data instanceof VmNativeCode) {
         result = [new VmInt(propInfo.data.params), new VmInt(propInfo.data.optParams), propInfo.data.varyingParams ? new VmTrue() : new VmNil()];
       }
+      // For a static function, get the function info from the image.
       if(propInfo.data instanceof VmCodeOffset) {
          let info = Vm.getInstance().getFuncInfo(propInfo.data.value);
          result = [new VmInt(info.params), new VmInt(info.optParams), info.varargs ? new VmTrue() : new VmNil()];
