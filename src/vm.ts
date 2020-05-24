@@ -12,7 +12,14 @@ import { MetaString, List, Iterator, IntrinsicClass } from './metaimp'
 import { OPCODES } from './Opcodes'
 import { IFuncInfo } from './IFuncInfo'
 
+
 const fs = require('fs');
+
+interface IPropInfo {
+  targetObject: VmObject,
+  definingObject: VmObject,
+  data: VmData
+}
 
 export class Vm {
   private static instance: Vm = null;
@@ -172,67 +179,88 @@ export class Vm {
     for(let i = 0; i < argc.value + 5; i++) this.stack.pop();
   }
 
-  callprop(data: VmData, vmProp: VmProp, argc: number) {
+  /**
+   * Find a property on value 'data'. Data should be a VmObject, VmSstring or VmList.
+   * In case of a VmSstring, it is converted to a MetaString.
+   * In case of a VmList, it is converted to a List.
+   * In case of an IntrinsicClass, an instance of its class if created.
+   * Returns property value, object (possibly ancestor) that value was found on, and 
+   * target object (as created by the these rules).
+   * @param data value to find prop on
+   * @param vmProp prop to look for
+   * @returns IPropInfo
+   * @throws Exception if prop not found
+   */
+  getprop(data: VmData, vmProp: VmProp): IPropInfo {
     // "data" can be an object, a constant string or a constant list.
     if(!(data instanceof VmObject) && !(data instanceof VmSstring) && !(data instanceof VmList)) 
       throw('CALLPROP: OBJ_VAL_REQD');
 
-    // IntrinsicClass is a special case. It actually references another metaclass
-    // ID. Find the implementation of that meteclass, instantiate it, and then
-    // call the required prop on it by calling `callProp` again.
+    // For a constant string or list, create a temporary MetaString/List with the same value.
+    if(data instanceof VmSstring) data = new VmObject(new MetaString(data.value));
+    if(data instanceof VmList) data = new VmObject(new List(data.value));
+
+    // For an IntrinsicClass, create a temporay instance of the class it represents.
     if(data instanceof VmObject && data.getInstance() instanceof IntrinsicClass) {
-      let obj = data.getInstance() as IntrinsicClass;
-      let klass = MetaclassRegistry.getClass(obj.modifierObjID);
-      this.callprop(new VmObject(new klass()), vmProp, argc);
+      let intrinsicClass = data.getInstance() as IntrinsicClass;
+      let klass = MetaclassRegistry.getClass(intrinsicClass.modifierObjID);
+      data = new VmObject(new klass());
+    }
+
+    // Find the requested property on data, which is now always a VmObject.
+    let obj = (data as VmObject).getInstance();
+    let res = obj.findProp(vmProp.value); // This will go through superclasses, as well
+    if(!res) throw(`callprop: Cannot find property ${vmProp.value} on object with metaclass ID ${obj.metaclassID}`);
+
+    return {
+      targetObject: data as VmObject, // object that was passed in, converted to object if constant string/list/IntrinsicClass
+      definingObject: res.object,     // object that the property was found on (possibly ancestor)
+      data: res.prop                  // property value that was found
+    }
+  }
+
+  callprop(data: VmData, vmProp: VmProp, argc: number) {
+    let propInfo: IPropInfo = this.getprop(data, vmProp);
+
+    // If it's native code on an intrinsic class, call it:
+    if(propInfo.data instanceof VmNativeCode) {
+      let args = this.stack.popMany(argc);
+      this.r0 = propInfo.targetObject.getInstance().callNativeMethod(propInfo.data, ...args);
       return;
     }
-    
-    // For an object, get value of the property from the object.
-    if(data instanceof VmObject) {
-      let obj = data.getInstance();
-      let res = obj.findProp(vmProp.value); // This will go through superclasses, as well
-      if(!res) throw(`callprop: Cannot find property ${vmProp.value} on object with metaclass ID ${obj.metaclassID}`);
-      let { prop, object: definingObject } = res;
 
-      // If it's native code on an intrinsic class, call it:
-      if(prop instanceof VmNativeCode) {
-        let args = this.stack.popMany(argc);
-        this.r0 = obj.callNativeMethod(prop, ...args);
-        return;
-      }
+    // If a primitive value, store it in R0:
+    if(  propInfo.data instanceof VmNil 
+      || propInfo.data instanceof VmTrue 
+      || propInfo.data instanceof VmObject 
+      || propInfo.data instanceof VmProp
+      || propInfo.data instanceof VmInt
+      || propInfo.data instanceof VmSstring
+      || propInfo.data instanceof VmFuncPtr
+      || propInfo.data instanceof VmList) this.r0 = propInfo.data;
 
-      // If a primitive value, store it in R0:
-      if(  prop instanceof VmNil 
-        || prop instanceof VmTrue 
-        || prop instanceof VmObject 
-        || prop instanceof VmProp
-        || prop instanceof VmInt
-        || prop instanceof VmSstring
-        || prop instanceof VmFuncPtr
-        || prop instanceof VmList) this.r0 = prop;
-
-      // If a double-quoted string, print it.
-      else if(prop instanceof VmDstring) {
-        Debug.info("[PRINT]", prop.value);
-      }
-
-      // If a code offset, call function
-      else if(prop instanceof VmCodeOffset) {
-        this.call(prop.value, argc,
-          vmProp,          // property
-          data,            // target object
-          definingObject,  // defining object
-          data,            // self object
-          prop);           // invokee
-      }
-
-      else {
-        throw('CALLPROP: Don\'t know what to do with this property.');
-      }
+    // If a double-quoted string, print it.
+    else if(propInfo.data instanceof VmDstring) {
+      Debug.info("[PRINT]", propInfo.data.value);
     }
 
+    // If a code offset, call function
+    else if(propInfo.data instanceof VmCodeOffset) {
+      this.call(propInfo.data.value, argc,
+        vmProp,                   // property
+        propInfo.targetObject,    // target object
+        propInfo.definingObject,  // defining object
+        propInfo.targetObject,    //  self object
+        propInfo.data);           // invokee
+    }
+
+    else {
+      throw('CALLPROP: Don\'t know what to do with this property.');
+    }
+    
+
     // For a string, use the string metaclass constant string property evaluator.
-    if(data instanceof VmSstring) {
+    /* if(data instanceof VmSstring) {
       let s = new MetaString(data.value);
       let args = this.stack.popMany(argc);
       let { prop, object } = s.findProp(vmProp.value);
@@ -245,7 +273,7 @@ export class Vm {
       let args = this.stack.popMany(argc);
       let { prop, object } = lst.findProp(vmProp.value);
       this.r0 = lst.callNativeMethod((prop as any), ...args);
-    }
+    } */
   }
 
   executeInstruction(byte: number) {

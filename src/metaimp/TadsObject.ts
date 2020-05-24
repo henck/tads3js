@@ -45,7 +45,7 @@ class TadsObject extends RootObject
       offset += 7;
     }
 
-    console.log('TADS OBJECT', 'superclasses', numSuperclasses, 'flags', flags, 'props', obj.props);
+    // console.log('TADS OBJECT', 'superclasses', numSuperclasses, 'flags', flags, 'props', obj.props);
 
     return obj;
   }
