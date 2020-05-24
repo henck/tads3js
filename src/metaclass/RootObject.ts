@@ -1,10 +1,11 @@
-import { VmData, VmObject, VmNil, VmTrue, VmList, VmProp, VmInt, VmNativeCode } from "../types";
+import { VmData, VmObject, VmNil, VmTrue, VmList, VmProp, VmInt, VmNativeCode, VmFuncPtr, VmCodeOffset } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { Heap } from "../Heap";
 import { MetaclassRegistry } from "./MetaclassRegistry";
 import { IFuncInfo } from "../IFuncInfo";
 import { VmType } from "../types/VmType";
+import { Vm } from "../Vm";
 
 interface IPropLocation {
   object: VmObject;
@@ -52,6 +53,7 @@ class RootObject {
       case 2: return new VmNativeCode(this.propDefined);
       case 3: return new VmNativeCode(this.propType);
       case 4: return new VmNativeCode(this.getPropList);
+      case 5: return new VmNativeCode(this.getPropParams);
       case 6: return new VmNativeCode(this.metaIsClass);
       case 8: return new VmNativeCode(this.isTransient);
     }
@@ -265,6 +267,26 @@ class RootObject {
       arr.push(new VmProp(p));
     }
     return new VmList(arr);
+  }
+
+  /**
+   * Returns information on the parameters taken by the given property or method of this object. 
+   * @param vmProp Property
+   * @returns List with three elements
+   */
+  protected getPropParams(vmProp: VmProp): VmData {
+    let propInfo = Vm.getInstance().getprop(new VmObject(this), vmProp);
+    let result = [new VmInt(0), new VmInt(0), new VmNil()];
+    if(propInfo)  {
+      if(propInfo.data instanceof VmNativeCode) {
+        result = [new VmInt(propInfo.data.params), new VmInt(propInfo.data.optParams), propInfo.data.varyingParams ? new VmTrue() : new VmNil()];
+      }
+      if(propInfo.data instanceof VmCodeOffset) {
+         let info = Vm.getInstance().getFuncInfo(propInfo.data.value);
+         result = [new VmInt(info.params), new VmInt(info.optParams), info.varargs ? new VmTrue() : new VmNil()];
+      }
+    }
+    return new VmList(result);
   }
 
   /**

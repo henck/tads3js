@@ -188,8 +188,7 @@ export class Vm {
    * target object (as created by the these rules).
    * @param data value to find prop on
    * @param vmProp prop to look for
-   * @returns IPropInfo
-   * @throws Exception if prop not found
+   * @returns IPropInfo, or null if prop not found
    */
   getprop(data: VmData, vmProp: VmProp): IPropInfo {
     // "data" can be an object, a constant string or a constant list.
@@ -210,7 +209,7 @@ export class Vm {
     // Find the requested property on data, which is now always a VmObject.
     let obj = (data as VmObject).getInstance();
     let res = obj.findProp(vmProp.value); // This will go through superclasses, as well
-    if(!res) throw(`callprop: Cannot find property ${vmProp.value} on object with metaclass ID ${obj.metaclassID}`);
+    if(!res) return null;
 
     return {
       targetObject: data as VmObject, // object that was passed in, converted to object if constant string/list/IntrinsicClass
@@ -221,6 +220,7 @@ export class Vm {
 
   callprop(data: VmData, vmProp: VmProp, argc: number) {
     let propInfo: IPropInfo = this.getprop(data, vmProp);
+    if(!propInfo) throw(`callprop: Cannot find property ${vmProp.value} on object`);
 
     // If it's native code on an intrinsic class, call it:
     if(propInfo.data instanceof VmNativeCode) {
