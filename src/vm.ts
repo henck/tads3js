@@ -765,6 +765,8 @@ export class Vm {
     let val = this.stack.pop();
     if(val instanceof VmFuncPtr) {
       this.call(val.value, argc, null, null, null, null, null);
+    } else if(val instanceof VmBifPtr) { // This isn't in the docs, but I think it should be supported.
+      this.r0 = Builtin.call(val.getSetIndex(), val.getFunctionIndex(), argc);
     } else if(val instanceof VmProp) {
       throw('TODO: PTRCALL NOT IMPLEMENTED FOR PROPID');
     } else if(val instanceof VmObject) {

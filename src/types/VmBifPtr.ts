@@ -24,6 +24,14 @@ export class VmBifPtr extends VmData {
     return true;
   }    
 
+  getSetIndex() {
+    return this.value.set;
+  }
+
+  getFunctionIndex() {
+    return this.value.index;
+  }
+
   eq(data: VmData): boolean {
     if(!(data instanceof VmBifPtr)) return false;
     if ((this.value as IBifPtr).set != (data.value as IBifPtr).set) return false;
