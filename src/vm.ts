@@ -1,6 +1,6 @@
 import { SourceImage } from './SourceImage'
 import { DataBlock, DataBlockFactory, CPDF, CPPG, ENTP, MCLD, OBJS } from './blocks/'
-import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring, VmNativeCode } from './types/'
+import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring, VmNativeCode, VmBifPtr } from './types/'
 import { Stack } from './Stack'
 import { Pool } from './Pool'
 import { Debug } from './Debug'
@@ -290,6 +290,7 @@ export class Vm {
       case 0x0a: this.op_pushpropid(); break;
       case 0x0b: this.op_pushfuncptr(); break;
       case 0x0d: this.op_pushparlst(); break;
+      case 0x10: this.op_pushbifptr(); break;
       case 0x20: this.op_neg(); break;
       case 0x21: this.op_bnot(); break;
       case 0x22: this.op_add(); break;
@@ -556,6 +557,14 @@ export class Vm {
     // Push the list on the stack.
     this.stack.push(new VmList(lst));
     this.ip++;
+  }
+
+  op_pushbifptr() { // 0x10
+    let funcIndex = this.codePool.getUint2(this.ip); 
+    let setIndex = this.codePool.getUint2(this.ip + 2); 
+    Debug.instruction({ funcIndex: funcIndex, setIndex: setIndex });
+    this.stack.push(new VmBifPtr(setIndex, funcIndex));
+    this.ip += 4;
   }
 
   op_neg() { // 0x20
