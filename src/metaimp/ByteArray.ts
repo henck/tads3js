@@ -64,13 +64,13 @@ class ByteArray extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return  new VmNativeCode(this.length);
-      case 1: return  new VmNativeCode(this.subarray);
-      case 2: return  new VmNativeCode(this.copyFrom);
-      case 3: return  new VmNativeCode(this.fillValue);
-      case 4: return  new VmNativeCode(this.mapToString);
-      case 9: return  new VmNativeCode(this.sha256);
-      case 10: return new VmNativeCode(this.digestMD5);
+      case 0: return  new VmNativeCode(this.length, 0);
+      case 1: return  new VmNativeCode(this.subarray, 1, 1);
+      case 2: return  new VmNativeCode(this.copyFrom, 4);
+      case 3: return  new VmNativeCode(this.fillValue, 1, 2);
+      case 4: return  new VmNativeCode(this.mapToString, 0, 3);
+      case 9: return  new VmNativeCode(this.sha256, 0, 2);
+      case 10: return new VmNativeCode(this.digestMD5, 0, 2);
     }
     return null;
   }  
@@ -133,8 +133,15 @@ class ByteArray extends RootObject {
    * Calculates the 128-bit RSA MD5 message digest of the string.
    * @returns hash string
    */
-  private digestMD5(): VmObject {
-    let hash = MD5(this.value).toString();
+  private digestMD5(vmStartIndex?: VmInt, vmLength?: VmInt): VmObject {
+    let startIndex = vmStartIndex ? vmStartIndex.unpack() - 1 : 0;
+    let length = vmLength ? vmLength.unpack() : this.value.length;
+    
+    let endIndex = startIndex + length;
+    if(endIndex > this.value.length) endIndex = this.value.length;
+    let slice = this.value.slice(startIndex, endIndex);
+
+    let hash = MD5(slice).toString();
     return new VmObject(new MetaString(hash));
   }  
 
@@ -191,8 +198,15 @@ class ByteArray extends RootObject {
    * Calculates the 256-bit SHA-2 (Secure Hash Algorithm 2) hash of the string.
    * @returns hash string
    */
-  private sha256(): VmObject {
-    let hash = SHA256(this.value).toString();
+  private sha256(vmStartIndex?: VmInt, vmLength?: VmInt): VmObject {
+    let startIndex = vmStartIndex ? vmStartIndex.unpack() - 1 : 0;
+    let length = vmLength ? vmLength.unpack() : this.value.length;
+    
+    let endIndex = startIndex + length;
+    if(endIndex > this.value.length) endIndex = this.value.length;
+    let slice = this.value.slice(startIndex, endIndex);
+
+    let hash = SHA256(slice).toString();
     return new VmObject(new MetaString(hash));
   }      
 
