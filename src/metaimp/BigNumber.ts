@@ -54,7 +54,7 @@ class BigNumber extends RootObject
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 7: return new VmNativeCode(this.getAbs);
+      case 7: return new VmNativeCode(this.getAbs, 0);
     }
     return null;
   }  

@@ -50,41 +50,41 @@ class Vector extends ListBase {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.toList);
-      case 1: return new VmNativeCode(this.length);
-      case 2: return new VmNativeCode(this.copyFrom);
-      case 3: return new VmNativeCode(this.fillValue);
-      case 4: return new VmNativeCode(this.subset);
-      case 5: return new VmNativeCode(this.applyAll);
-      case 6: return new VmNativeCode(this.indexWhich);
-      case 7: return new VmNativeCode(this.forEach);
-      case 8: return new VmNativeCode(this.forEachAssoc);
-      case 9: return new VmNativeCode(this.mapAll);
-      case 10: return new VmNativeCode(this.indexOf);
-      case 11: return new VmNativeCode(this.valWhich);
-      case 12: return new VmNativeCode(this.lastIndexOf);
-      case 13: return new VmNativeCode(this.lastIndexWhich);
-      case 14: return new VmNativeCode(this.lastValWhich);
-      case 15: return new VmNativeCode(this.countOf);
-      case 16: return new VmNativeCode(this.countWhich);
-      case 17: return new VmNativeCode(this.getUnique);
-      case 18: return new VmNativeCode(this.appendUnique);
-      case 19: return new VmNativeCode(this.sort);
-      case 20: return new VmNativeCode(this.setLength);
-      case 21: return new VmNativeCode(this.insertAt);
-      case 22: return new VmNativeCode(this.removeElementAt);
-      case 23: return new VmNativeCode(this.removeRange);
-      case 24: return new VmNativeCode(this.append);
-      case 25: return new VmNativeCode(this.prepend);
-      case 26: return new VmNativeCode(this.appendAll);
-      case 27: return new VmNativeCode(this.removeElement);
-      case 28: return new VmNativeCode(this.splice);
-      case 29: return new VmNativeCode(this.join);
-      case 30: return new VmNativeCode(this.generate);
-      case 31: return new VmNativeCode(this.indexOfMin);
-      case 32: return new VmNativeCode(this.minVal);
-      case 33: return new VmNativeCode(this.indexOfMax);
-      case 34: return new VmNativeCode(this.maxVal);
+      case 0: return new VmNativeCode(this.toList, 0, 2);
+      case 1: return new VmNativeCode(this.length, 0);
+      case 2: return new VmNativeCode(this.copyFrom, 4);
+      case 3: return new VmNativeCode(this.fillValue, 1, 2);
+      case 4: return new VmNativeCode(this.subset, 1);
+      case 5: return new VmNativeCode(this.applyAll, 1);
+      case 6: return new VmNativeCode(this.indexWhich, 1);
+      case 7: return new VmNativeCode(this.forEach, 1);
+      case 8: return new VmNativeCode(this.forEachAssoc, 1);
+      case 9: return new VmNativeCode(this.mapAll, 1);
+      case 10: return new VmNativeCode(this.indexOf, 1);
+      case 11: return new VmNativeCode(this.valWhich, 1);
+      case 12: return new VmNativeCode(this.lastIndexOf, 1);
+      case 13: return new VmNativeCode(this.lastIndexWhich, 1);
+      case 14: return new VmNativeCode(this.lastValWhich, 1);
+      case 15: return new VmNativeCode(this.countOf, 1);
+      case 16: return new VmNativeCode(this.countWhich, 1);
+      case 17: return new VmNativeCode(this.getUnique, 0);
+      case 18: return new VmNativeCode(this.appendUnique, 1);
+      case 19: return new VmNativeCode(this.sort, 0, 2);
+      case 20: return new VmNativeCode(this.setLength, 1);
+      case 21: return new VmNativeCode(this.insertAt, 2, 0, true); // one arg is required
+      case 22: return new VmNativeCode(this.removeElementAt, 1);
+      case 23: return new VmNativeCode(this.removeRange, 2);
+      case 24: return new VmNativeCode(this.append, 1);
+      case 25: return new VmNativeCode(this.prepend, 1);
+      case 26: return new VmNativeCode(this.appendAll, 1);
+      case 27: return new VmNativeCode(this.removeElement, 1);
+      case 28: return new VmNativeCode(this.splice, 2, 0, true);
+      case 29: return new VmNativeCode(this.join, 0, 1);
+      case 30: return new VmNativeCode(this.generate, 2);
+      case 31: return new VmNativeCode(this.indexOfMin, 0, 1);
+      case 32: return new VmNativeCode(this.minVal, 0, 1);
+      case 33: return new VmNativeCode(this.indexOfMax, 0, 1);
+      case 34: return new VmNativeCode(this.maxVal, 0, 1);
     }
     return null;
   }  

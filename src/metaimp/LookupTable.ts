@@ -45,19 +45,19 @@ class LookupTable extends Collection  {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.isKeyPresent);
-      case 1: return new VmNativeCode(this.removeElement);
-      case 2: return new VmNativeCode(this.applyAll);
-      case 3: return new VmNativeCode(this.forEach);
-      case 4: return new VmNativeCode(this.getBucketCount);
-      case 5: return new VmNativeCode(this.getEntryCount);
-      case 6: return new VmNativeCode(this.forEachAssoc);
-      case 7: return new VmNativeCode(this.keysToList);
-      case 8: return new VmNativeCode(this.valsToList);
-      case 9: return new VmNativeCode(this.getDefaultValue);
-      case 10: return new VmNativeCode(this.setDefaultValue);
-      case 11: return new VmNativeCode(this.nthKey);
-      case 12: return new VmNativeCode(this.nthVal);
+      case 0: return new VmNativeCode(this.isKeyPresent, 1);
+      case 1: return new VmNativeCode(this.removeElement, 1);
+      case 2: return new VmNativeCode(this.applyAll, 1);
+      case 3: return new VmNativeCode(this.forEach, 1);
+      case 4: return new VmNativeCode(this.getBucketCount, 0);
+      case 5: return new VmNativeCode(this.getEntryCount, 0);
+      case 6: return new VmNativeCode(this.forEachAssoc, 1);
+      case 7: return new VmNativeCode(this.keysToList, 0);
+      case 8: return new VmNativeCode(this.valsToList, 0);
+      case 9: return new VmNativeCode(this.getDefaultValue, 0);
+      case 10: return new VmNativeCode(this.setDefaultValue, 1);
+      case 11: return new VmNativeCode(this.nthKey, 1);
+      case 12: return new VmNativeCode(this.nthVal, 1);
     }
     return super.getMethodByIndex(idx);
   }    

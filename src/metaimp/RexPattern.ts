@@ -88,7 +88,7 @@ class RexPattern extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.getPatternString);
+      case 0: return new VmNativeCode(this.getPatternString, 0);
     }
     return null;
   }

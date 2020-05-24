@@ -30,34 +30,34 @@ class MetaString extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.length);
-      case 1: return new VmNativeCode(this.substr);
-      case 2: return new VmNativeCode(this.toUpper);
-      case 3: return new VmNativeCode(this.toLower);
-      case 4: return new VmNativeCode(this.find);
-      case 5: return new VmNativeCode(this.toUnicode);
-      case 6: return new VmNativeCode(this.htmlify);
-      case 7: return new VmNativeCode(this.startsWith);
-      case 8: return new VmNativeCode(this.endsWith);
-      case 9: return new VmNativeCode(this.mapToByteArray);
+      case 0: return new VmNativeCode(this.length, 0);
+      case 1: return new VmNativeCode(this.substr, 1, 1);
+      case 2: return new VmNativeCode(this.toUpper, 0);
+      case 3: return new VmNativeCode(this.toLower, 0);
+      case 4: return new VmNativeCode(this.find, 1, 1);
+      case 5: return new VmNativeCode(this.toUnicode, 0, 1);
+      case 6: return new VmNativeCode(this.htmlify, 0, 1);
+      case 7: return new VmNativeCode(this.startsWith, 1);
+      case 8: return new VmNativeCode(this.endsWith, 1);
+      case 9: return new VmNativeCode(this.mapToByteArray, 0, 1);
       
-      case 11: return new VmNativeCode(this.splice);
-      case 12: return new VmNativeCode(this.split);
-      
-
-      case 15: return new VmNativeCode(this.urlEncode);
-      case 16: return new VmNativeCode(this.urlDecode);
-      case 17: return new VmNativeCode(this.sha256);
-      case 18: return new VmNativeCode(this.digestMD5);
+      case 11: return new VmNativeCode(this.splice, 2, 1);
+      case 12: return new VmNativeCode(this.split, 0, 2);
       
 
-      case 21: return new VmNativeCode(this.toTitleCase);
-      case 22: return new VmNativeCode(this.toFoldedCase);
-      case 23: return new VmNativeCode(this.compareTo);
-      case 24: return new VmNativeCode(this.compareIgnoreCase);
+      case 15: return new VmNativeCode(this.urlEncode, 0);
+      case 16: return new VmNativeCode(this.urlDecode, 0);
+      case 17: return new VmNativeCode(this.sha256, 0);
+      case 18: return new VmNativeCode(this.digestMD5, 0);
       
-      case 26: return new VmNativeCode(this.findAll);
-      case 27: return new VmNativeCode(this.match);
+
+      case 21: return new VmNativeCode(this.toTitleCase, 0);
+      case 22: return new VmNativeCode(this.toFoldedCase, 0);
+      case 23: return new VmNativeCode(this.compareTo, 1);
+      case 24: return new VmNativeCode(this.compareIgnoreCase, 1);
+      
+      case 26: return new VmNativeCode(this.findAll, 1, 0);
+      case 27: return new VmNativeCode(this.match, 1, 0);
   
       // findLast
       // findReplace

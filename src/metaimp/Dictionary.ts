@@ -57,13 +57,13 @@ class Dictionary extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.setComparator);
-      case 1: return new VmNativeCode(this.findWord);
-      case 2: return new VmNativeCode(this.addWord);
-      case 3: return new VmNativeCode(this.removeWord);
-      case 4: return new VmNativeCode(this.isWordDefined);
-      case 5: return new VmNativeCode(this.forEachWord);
-      case 6: return new VmNativeCode(this.correctSpelling);
+      case 0: return new VmNativeCode(this.setComparator, 1);
+      case 1: return new VmNativeCode(this.findWord, 1, 1);
+      case 2: return new VmNativeCode(this.addWord, 3);
+      case 3: return new VmNativeCode(this.removeWord, 3);
+      case 4: return new VmNativeCode(this.isWordDefined, 1);
+      case 5: return new VmNativeCode(this.forEachWord, 1);
+      case 6: return new VmNativeCode(this.correctSpelling, 2);
     }
     return null;
   }  

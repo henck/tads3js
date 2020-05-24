@@ -6,8 +6,15 @@ import { VmType } from "./VmType";
 type TPropFunc = ((...args: any[]) => VmData);
 
 export class VmNativeCode extends VmData {
-  constructor(value: TPropFunc) {
+  public params: number;
+  public optParams: number;
+  public varyingParams: boolean;
+
+  constructor(value: TPropFunc, params?: number, optParams?: number, varyingParams?: boolean) {
     super(value);
+    this.params = params ?? 0;
+    this.optParams = optParams ?? 0;
+    this.varyingParams = varyingParams ?? false;
   }
 
   getName() {
