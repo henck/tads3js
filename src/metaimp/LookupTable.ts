@@ -62,6 +62,10 @@ class LookupTable extends Collection  {
     return super.getMethodByIndex(idx);
   }    
 
+  unpack() {
+    return this.value;
+  }
+
   getValue() {
     return this.value;
   }  

@@ -42,7 +42,7 @@ class RootObject {
   }
 
   unpack(): any {
-    return null;
+    return this;
   }
 
   getMethodByIndex(idx: number): VmNativeCode {
@@ -350,5 +350,5 @@ class RootObject {
 
 MetaclassRegistry.register('root-object/030004', RootObject);
 
-export { RootObject }
+export { RootObject, IPropLocation }
 
