@@ -1,6 +1,6 @@
 import { SourceImage } from './SourceImage'
 import { DataBlock, DataBlockFactory, CPDF, CPPG, ENTP, MCLD, OBJS } from './blocks/'
-import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring, VmNativeCode, VmBifPtr } from './types/'
+import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring, VmNativeCode, VmBifPtr, VmEnum } from './types/'
 import { Stack } from './Stack'
 import { Pool } from './Pool'
 import { Debug } from './Debug'
@@ -33,6 +33,7 @@ export class Vm {
   private ep: number = 0;
   public stack: Stack;
   public stop = false;
+  private varargc: number = undefined;
 
   constructor() {
   }
@@ -104,6 +105,19 @@ export class Vm {
 
     // Create stack.
     this.stack = new Stack();
+  }
+
+  /**
+   * If a VARARGC instruction was seen previously, overwrite an instructions
+   * encoded argc value with the VARARGC value. Then turn VARARGC mode off.
+   * @param argc Instruction's argc value
+   */
+  maybe_varargc(argc: number) {
+    if(this.varargc != undefined) {
+      argc = this.varargc;
+      this.varargc = undefined;
+    }
+    return argc;
   }
 
   getFuncInfo(offset: number): IFuncInfo {
@@ -218,9 +232,14 @@ export class Vm {
     }
   }
 
-  callprop(data: VmData, vmProp: VmProp, argc: number) {
+  callprop(data: VmData, vmProp: VmProp, argc: number, explicitTargetObject?: VmObject) {
     let propInfo: IPropInfo = this.getprop(data, vmProp);
     if(!propInfo) throw(`callprop: Cannot find property ${vmProp.value} on object`);
+
+    // If an explicit target object was given (through EXPINHERIT and friends), use it:
+    if(explicitTargetObject) {
+      propInfo.targetObject = explicitTargetObject;
+    }
 
     // If it's native code on an intrinsic class, call it:
     if(propInfo.data instanceof VmNativeCode) {
@@ -290,6 +309,8 @@ export class Vm {
       case 0x0a: this.op_pushpropid(); break;
       case 0x0b: this.op_pushfuncptr(); break;
       case 0x0d: this.op_pushparlst(); break;
+      case 0x0e: this.op_makelistpar(); break;
+      case 0x0f: this.op_pushenum(); break;
       case 0x10: this.op_pushbifptr(); break;
       case 0x20: this.op_neg(); break;
       case 0x21: this.op_bnot(); break;
@@ -331,6 +352,8 @@ export class Vm {
       case 0x6b: this.op_callproplcl1(); break;
       case 0x6c: this.op_getpropr0(); break;
       case 0x6d: this.op_callpropr0(); break;
+      case 0x74: this.op_expinherit(); break;
+      case 0x76: this.op_varargc(); break;
       case 0x7a: this.op_swap2(); break;
       case 0x7b: this.op_swapn(); break;
       case 0x7c: this.op_getargn0(); break;
@@ -341,6 +364,7 @@ export class Vm {
       case 0x81: this.op_getlcl2(); break;
       case 0x82: this.op_getarg1(); break;
       case 0x83: this.op_getarg2(); break;
+      case 0x84: this.op_pushself(); break;
       case 0x87: this.op_getargc(); break;
       case 0x88: this.op_dup(); break;
       case 0x89: this.op_disc(); break;
@@ -429,13 +453,13 @@ export class Vm {
     let codeStart = (this.blocks.find((b) => b instanceof ENTP) as ENTP).codePoolOffset;
     // Run a content with 1 argument that ends when IP = -1,
     // with a single argument for _main function.
-    return this.runContext(codeStart, null, new VmSstring('args'));
+    return this.runContext(codeStart, null, null, new VmSstring('args'));
   }
 
   //
   // Returns R0 after context runs
   // 
-  runContext(offset: number, invokee: VmData, ...args: VmData[]): VmData {
+  runContext(offset: number, self: VmObject, invokee: VmData, ...args: VmData[]): VmData {
     // Push all arguments on the stack (in reverse)
     args.reverse().forEach((a) => this.stack.push(a));
     // Save old IP, so we can return to it when context ends:
@@ -448,7 +472,7 @@ export class Vm {
       null,      // prop
       null,      // target object
       null,      // defining object
-      null,      // self object
+      self,      // self object
       invokee);  // invokee
     // Execute until end of context is detected:
     do {
@@ -561,6 +585,28 @@ export class Vm {
     // Push the list on the stack.
     this.stack.push(new VmList(lst));
     this.ip++;
+  }
+
+  op_makelistpar() { // 0x0e
+    let val = this.stack.pop();
+    let argc = this.stack.pop();
+    if(!(argc instanceof VmInt)) throw('INT_VAL_REQD');
+    let lst = val.unpack();
+    if(Array.isArray(lst)) {
+      for(let i = lst.length - 1; i >= 0; i--) this.stack.push(lst[i]);
+      argc.value += lst.length;
+    } else {
+      this.stack.push(val);
+      argc.value++;
+    }
+    this.stack.push(argc);
+  }
+
+  op_pushenum() { // 0x0f
+    let val = this.codePool.getUint4(this.ip);
+    Debug.instruction();
+    this.stack.push(new VmEnum(val));
+    this.ip += 4;
   }
 
   op_pushbifptr() { // 0x10
@@ -870,6 +916,22 @@ export class Vm {
     this.callprop(this.r0, new VmProp(propID), argc);
   }
 
+  op_expinherit() { // 0x74
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
+    let propID = this.codePool.getUint2(this.ip + 1);
+    let objID = this.codePool.getUint4(this.ip + 3);
+    Debug.instruction({ argc: argc, propID: propID, objID: objID });
+    this.ip += 7;
+    this.callprop(new VmObject(Heap.getObj(objID)), new VmProp(propID), argc, this.stack.getSelf() as VmObject); 
+  }
+
+  op_varargc() { // 0x76
+    let val = this.stack.pop();
+    Debug.instruction({ argc: val });
+    if(!(val instanceof VmInt)) throw('NUM_VAL_REQD');
+    this.varargc = val.unpack();
+  }
+
   op_getargn0() { Debug.instruction(); this.stack.push(this.stack.getArg(0)); } // 0x7c
   op_getargn1() { Debug.instruction(); this.stack.push(this.stack.getArg(1)); } // 0x7d
   op_getargn2() { Debug.instruction(); this.stack.push(this.stack.getArg(2)); } // 0x7e
@@ -926,6 +988,11 @@ export class Vm {
     this.ip += 2;
   }
 
+  op_pushself() { // 0x84
+    Debug.instruction();
+    this.stack.push(this.stack.getSelf());
+  }
+
   op_getargc() { // 0x87 
     Debug.instruction();
     let argcount = this.stack.getArgCount();
@@ -968,11 +1035,18 @@ export class Vm {
     Debug.instruction({'element': element});
     this.ip++;
     switch(element) {
+      case 1:
+        this.stack.push(this.stack.getTargetProperty());
+        break;
+      case 2:
+        this.stack.push(this.stack.getTargetObject());
+        break;
+      case 3:
+        this.stack.push(this.stack.getDefiningObject());
+        break;
       case 4:
         this.stack.push(this.stack.getInvokee());
         break;
-      default:
-        throw('PUSHCTXELE: ELEMENT UNIMPLEMENTED');
     }
   }
 
@@ -1238,14 +1312,14 @@ export class Vm {
   }
 
   op_new1() { // 0xc0
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let metaclass_id = this.codePool.getByte(this.ip + 1);
     this.imp_new(metaclass_id, argc);
     this.ip += 2;
   }
 
   op_new2() { // 0xc1
-    let argc = this.codePool.getUint2(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getUint2(this.ip));
     let metaclass_id = this.codePool.getUint2(this.ip + 2);
     this.imp_new(metaclass_id, argc);
     this.ip += 4;
