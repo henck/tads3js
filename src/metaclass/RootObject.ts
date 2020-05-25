@@ -38,6 +38,10 @@ class RootObject {
     this.id = id;
   }
 
+  public setTransient(transient: boolean) {
+    this._isTransient = transient;
+  }
+
   public getType() {
     return VmType.OBJ;
   }
