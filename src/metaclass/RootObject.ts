@@ -192,8 +192,14 @@ class RootObject {
     return lst;
   }
 
-  public findProp(propID: number): IPropLocation {
+  public findProp(propID: number, onlyInherited: boolean): IPropLocation {
     let lst: IPropAndDistance[] = this.findPropWalker(propID);
+
+    // If looking only for inherited properties, ignore properties with
+    // distance 0.
+    if(onlyInherited) {
+      lst = lst.filter((propdist) => propdist.dist > 0);
+    }
 
     // Calculate the minimum distance in the list.
     let minDist = lst.reduce((p, x) => Math.min(p, x.dist), 999);
@@ -281,7 +287,7 @@ class RootObject {
    */
   protected getPropParams(vmProp: VmProp): VmData {
     // Retrieve propInfo for given prop. Among other things, this includes the prop's value.
-    let propInfo = Vm.getInstance().getprop(new VmObject(this), vmProp);
+    let propInfo = Vm.getInstance().getprop(new VmObject(this), vmProp, false);
     // By default, we return no params, no opt params, no varying args
     // (even if the prop was not found)
     let result = [new VmInt(0), new VmInt(0), new VmNil()];
@@ -345,7 +351,7 @@ class RootObject {
   protected propDefined(vmProp: VmProp, vmFlags?: VmInt): VmData {
     let flags = vmFlags ? vmFlags.unpack(): 1;
     let propID = vmProp.unpack();
-    let propFound = this.findProp(propID);
+    let propFound = this.findProp(propID, false);
     if(!propFound) return new VmNil();
     switch(flags) {
       case 1: // PropDefAny
@@ -369,7 +375,7 @@ class RootObject {
    * @returns Prop type (int)
    */
   protected propType(prop: VmProp): VmData {
-    let propFound = this.findProp(prop.value);
+    let propFound = this.findProp(prop.value, false);
     // nil if prop not found
     if(!propFound) return new VmNil();
     // If a primitive type, return type code.
