@@ -385,6 +385,7 @@ export class Vm {
       case 0x8d: this.op_swap(); break;
       case 0x8e: this.op_pushctxele(); break;
       case 0x8f: this.op_dup2(); break;
+      // case 0x90: SWITCH
       case 0x91: this.op_jmp(); break;
       case 0x92: this.op_jt(); break;
       case 0x93: this.op_jf(); break;
@@ -392,6 +393,8 @@ export class Vm {
       case 0x95: this.op_jne(); break;
       case 0x96: this.op_jgt(); break;
       case 0x97: this.op_jge(); break;
+      case 0x98: this.op_jlt(); break;
+      case 0x99: this.op_jle(); break;
       case 0x9a: this.op_jst(); break;
       case 0x9b: this.op_jsf(); break;
       case 0x9c: this.op_ljsr(); break;
@@ -1213,6 +1216,30 @@ export class Vm {
       this.ip += branch_offset;
     }
   }
+
+  op_jlt() { // 0x98
+    let branch_offset = this.codePool.getInt2(this.ip);
+    Debug.instruction({ offset: branch_offset});
+    let val2 = this.stack.pop();
+    let val1 = this.stack.pop();
+    if(val1.lt(val2)) {
+      this.ip += branch_offset;
+    } else {
+      this.ip += 2;
+    }
+  }  
+
+  op_jle() { // 0x99
+    let branch_offset = this.codePool.getInt2(this.ip);
+    Debug.instruction({ offset: branch_offset});
+    let val2 = this.stack.pop();
+    let val1 = this.stack.pop();
+    if(val1.lt(val2) || val1.eq(val2)) {
+      this.ip += branch_offset;
+    } else {
+      this.ip += 2;
+    }
+  }    
 
   op_jst() { // 0x9a 
     let branch_offset = this.codePool.getInt2(this.ip);
