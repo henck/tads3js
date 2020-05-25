@@ -361,6 +361,8 @@ export class Vm {
       case 0x74: this.op_expinherit(); break;
       case 0x75: this.op_ptrexpinherit(); break;
       case 0x76: this.op_varargc(); break;
+      // case 0x77: DELEGATE
+      // case 0x78: PTRDELEGATE
       case 0x7a: this.op_swap2(); break;
       case 0x7b: this.op_swapn(); break;
       case 0x7c: this.op_getargn0(); break;
@@ -372,6 +374,8 @@ export class Vm {
       case 0x82: this.op_getarg1(); break;
       case 0x83: this.op_getarg2(); break;
       case 0x84: this.op_pushself(); break;
+      case 0x85: this.op_getdblcl(); break;
+      case 0x86: this.op_getdbarg(); break;
       case 0x87: this.op_getargc(); break;
       case 0x88: this.op_dup(); break;
       case 0x89: this.op_disc(); break;
@@ -1055,6 +1059,16 @@ export class Vm {
   op_pushself() { // 0x84
     Debug.instruction();
     this.stack.push(this.stack.getSelf());
+  }
+
+  op_getdblcl() { // 0x85
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS NOT SUPORTED');
+  }
+
+  op_getdbarg() { // 0x86
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS NOT SUPORTED');
   }
 
   op_getargc() { // 0x87 
