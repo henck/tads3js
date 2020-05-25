@@ -44,6 +44,21 @@ class Stack {
     return this.elements[this.fp - 2].value;
   }
 
+  // Return target property (if any)
+  getTargetProperty(): VmData {
+    return this.elements[this.fp - 9];
+  }
+
+  // Return target object (if any)
+  getTargetObject(): VmData {
+    return this.elements[this.fp - 8];
+  }
+
+  // Return defining object (if any)
+  getDefiningObject(): VmData {
+    return this.elements[this.fp - 7];
+  }
+
   // Return self object (if any)
   getSelf(): VmData {
     return this.elements[this.fp - 6];
