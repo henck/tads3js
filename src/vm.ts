@@ -350,6 +350,8 @@ export class Vm {
       case 0x65: this.op_ptrcallpropself(); break;
       case 0x66: this.op_objgetprop(); break;
       case 0x67: this.op_objcallprop(); break;
+      case 0x68: this.op_getpropdata(); break;
+      case 0x69: this.op_ptrgetpropdata(); break;
       case 0x6a: this.op_getproplcl1(); break;
       case 0x6b: this.op_callproplcl1(); break;
       case 0x6c: this.op_getpropr0(); break;
@@ -909,6 +911,16 @@ export class Vm {
     Debug.instruction({ objID: objID, propID: propID, argc: argc});
     this.ip += 7;
     this.callprop(new VmObject(objID), new VmProp(propID), argc, false);
+  }
+
+  op_getpropdata() { // 0x68
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS NOT SUPPORTED');
+  }
+
+  op_ptrgetpropdata() { // 0x69
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS NOT SUPPORTED');
   }
 
   op_getproplcl1() { // 0x6a 
