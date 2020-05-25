@@ -48,14 +48,15 @@ class RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.ofKind);
-      case 1: return new VmNativeCode(this.getSuperclassList);
-      case 2: return new VmNativeCode(this.propDefined);
-      case 3: return new VmNativeCode(this.propType);
-      case 4: return new VmNativeCode(this.getPropList);
-      case 5: return new VmNativeCode(this.getPropParams);
-      case 6: return new VmNativeCode(this.metaIsClass);
-      case 8: return new VmNativeCode(this.isTransient);
+      case 0: return new VmNativeCode(this.ofKind, 1);
+      case 1: return new VmNativeCode(this.getSuperclassList, 0);
+      case 2: return new VmNativeCode(this.propDefined, 1, 1);
+      case 3: return new VmNativeCode(this.propType, 1);
+      case 4: return new VmNativeCode(this.getPropList, 0);
+      case 5: return new VmNativeCode(this.getPropParams, 1);
+      case 6: return new VmNativeCode(this.metaIsClass, 0);
+      // propInherited (multimethod only)
+      case 8: return new VmNativeCode(this.isTransient, 0);
     }
     return null;
   }  
