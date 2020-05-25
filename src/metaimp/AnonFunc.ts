@@ -43,7 +43,7 @@ class AnonFunc extends Vector {
    */
   
   invoke(...args: VmData[]): VmData {
-    return Vm.getInstance().runContext(this.funcptr.value, new VmObject(this), ...args);
+    return Vm.getInstance().runContext(this.funcptr.value, null, new VmObject(this), ...args);
   }
    
   funcinfo(): IFuncInfo {
