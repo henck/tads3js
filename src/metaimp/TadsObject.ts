@@ -3,13 +3,33 @@ import { RootObject } from '../metaclass/RootObject';
 import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
 import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode } from '../types';
+import { Vm } from '../Vm';
 
 class TadsObject extends RootObject
 {
   private _isClass: boolean;
 
-  constructor() {
+  constructor(...args: any[]) {
+    // 1st arg = superclass
+    // other args: constructor arguments
+
     super();
+
+    // If this is called with any arguments, then it's been called through bytecode.
+    // The first argument is the superclass object.
+    // The rest of the arguments are constructor arguments.
+    // The constructor is always property #1 (if one exists).
+    if(args.length >= 1) {
+      // Set the superclass.
+      console.log("NEW superclass=", args[0].value);
+      this.superClasses = [args[0].value];
+      // See if there is a constructor.
+      let propLocation = this.findProp(1);
+      if(propLocation) {
+        Vm.getInstance().runContext(propLocation.prop.value, new VmObject(this), new VmNil(), ...args.slice(1));
+      }
+    }
+
     this._isClass = false;
   }
 
@@ -45,14 +65,15 @@ class TadsObject extends RootObject
       offset += 7;
     }
 
-    // console.log('TADS OBJECT', 'superclasses', numSuperclasses, 'flags', flags, 'props', obj.props);
+    console.log('TADS OBJECT', 'superclasses', numSuperclasses, 'flags', flags, 'props', obj.props);
 
     return obj;
   }
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 5: return new VmNativeCode(this.setSuperclassList);
+      case 1: return new VmNativeCode(this.createClone, 0);
+      case 5: return new VmNativeCode(this.setSuperclassList, 1);
     }
     return null;
   }    
@@ -72,6 +93,22 @@ class TadsObject extends RootObject
      this.superClasses = lst.map((vmObj: VmObject) => vmObj.getInstance().id);
      return new VmNil();
    }
+
+   /**
+    * Creates a new object that is an identical copy of this object.
+    * @returns TadsObject instance
+    */
+   protected createClone(): VmData {
+     let instance = new TadsObject();
+     instance._isClass = this._isClass;
+     // Copy superclass list:
+     instance.superClasses = this.superClasses.slice();
+     // Copy properties map:
+     instance.props = new Map(this.props);
+     return new VmObject(instance);
+   }
+
+
 
 }
 
