@@ -408,6 +408,9 @@ export class Vm {
       case 0xbb: this.op_idxlcl1int8(); break;
       case 0xbc: this.op_idxint8(); break;
       case 0xc0: this.op_new1(); break;
+      case 0xc1: this.op_new2(); break;
+      case 0xc2: this.op_trnew1(); break;
+      case 0xc3: this.op_trnew2(); break;
       case 0xd0: this.op_inclcl(); break;
       case 0xd1: this.op_declcl(); break;
       case 0xd2: this.op_addilcl1(); break;
@@ -429,7 +432,13 @@ export class Vm {
       case 0xe6: this.op_ptrsetprop(); break;
       case 0xe7: this.op_setpropself(); break;
       case 0xe8: this.op_objsetprop(); break;
+      case 0xe9: this.op_setdblcl(); break;
+      case 0xea: this.op_setdbarg(); break;
+      case 0xeb: this.op_setself(); break;
+      case 0xec: this.op_loadctx(); break;
+      case 0xed: this.op_storectx(); break;
       case 0xee: this.op_setlcl1r0(); break;
+      
       case 0xef: this.op_setindlcl1i8(); break;
       case 0xf1: this.op_bp(); break;
       case 0xf2: this.op_nop(); break;
@@ -1336,30 +1345,40 @@ export class Vm {
   op_new1() { // 0xc0
     let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let metaclass_id = this.codePool.getByte(this.ip + 1);
-    this.imp_new(metaclass_id, argc);
+    this.imp_new(metaclass_id, argc, false);
     this.ip += 2;
   }
 
   op_new2() { // 0xc1
     let argc = this.maybe_varargc(this.codePool.getUint2(this.ip));
     let metaclass_id = this.codePool.getUint2(this.ip + 2);
-    this.imp_new(metaclass_id, argc);
+    this.imp_new(metaclass_id, argc, false);
     this.ip += 4;
   }
 
-  imp_new(metaclass_id: number, argc: number): string {
+  op_trnew1() { // 0xc2
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
+    let metaclass_id = this.codePool.getByte(this.ip + 1);
+    this.imp_new(metaclass_id, argc, true);
+    this.ip += 2;
+  }
+
+  op_trnew2() { // 0xc3
+    let argc = this.maybe_varargc(this.codePool.getUint2(this.ip));
+    let metaclass_id = this.codePool.getUint2(this.ip + 2);
+    this.imp_new(metaclass_id, argc, true);
+    this.ip += 4;
+  }  
+
+  imp_new(metaclass_id: number, argc: number, transient: boolean) {
     // Get metaclass definition block and get the requested 
     // metaclass's name from its index.
     let args = this.stack.popMany(argc);
     let name = MetaclassRegistry.indexToName(metaclass_id);
     Debug.instruction({'metaclassID': metaclass_id, 'argc': argc, 'class': name });
     let instance = MetaclassFactory.create(metaclass_id, ...args);
+    instance.setTransient(transient);
     this.r0 = new VmObject(instance);
-
-    // TODO: Support for persistent/transient
-    // TODO: Provide arguments to constructor
-    // TODO: Call bytecode constructor
-    return name;
   }
 
   op_inclcl() { // 0xd0 
@@ -1537,6 +1556,38 @@ export class Vm {
     let obj = Heap.getObj(objID);
     obj.setprop(propID, val);
     this.ip + 6;
+  }
+  
+  op_setdblcl() { // 0xe9
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS ARE NOT SUPPORTED.');
+  }
+
+  op_setdbarg() { // 0xea
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS ARE NOT SUPPORTED.');
+  }
+
+  op_setself() { // 0xeb
+    let vmVal = this.stack.pop();
+    Debug.instruction({value: vmVal});
+    if(!(vmVal instanceof VmNil) && !(vmVal instanceof VmObject)) throw('OBJ_VAL_REQD');
+    this.stack.setSelf(vmVal);
+  }
+
+  op_loadctx() { // 0xec 
+    Debug.instruction();
+    let lst = this.stack.pop().unpack();
+    this.stack.setSelf(lst[0]);
+    this.stack.setTargetObject(lst[1]);
+    this.stack.setDefiningObject(lst[2]);
+    this.stack.setTargetProperty(lst[3]);
+  }
+
+  op_storectx() { // 0xed
+    Debug.instruction();
+    let lst = new VmList([this.stack.getSelf(), this.stack.getTargetObject(), this.stack.getDefiningObject(), this.stack.getTargetProperty()]);
+    this.stack.push(lst);
   }
 
   op_setlcl1r0() { // 0xee 
