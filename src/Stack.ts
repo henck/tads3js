@@ -49,9 +49,17 @@ class Stack {
     return this.elements[this.fp - 9];
   }
 
+  setTargetProperty(vmVal: VmData) {
+    this.elements[this.fp - 9] = vmVal;
+  }
+
   // Return target object (if any)
   getTargetObject(): VmData {
     return this.elements[this.fp - 8];
+  }
+
+  setTargetObject(vmVal: VmData) {
+    this.elements[this.fp - 8] = vmVal;
   }
 
   // Return defining object (if any)
@@ -59,9 +67,17 @@ class Stack {
     return this.elements[this.fp - 7];
   }
 
+  setDefiningObject(vmVal: VmData) {
+    this.elements[this.fp - 7] = vmVal;
+  }
+
   // Return self object (if any)
   getSelf(): VmData {
     return this.elements[this.fp - 6];
+  }
+
+  setSelf(vmVal: VmData) {
+    this.elements[this.fp - 6] = vmVal;
   }
 
   // Return invokee
