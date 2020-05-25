@@ -381,6 +381,7 @@ export class Vm {
       case 0x89: this.op_disc(); break;
       case 0x8a: this.op_disc1(); break;
       case 0x8b: this.op_getr0(); break;
+      case 0x8c: this.op_getdbargc(); break;
       case 0x8d: this.op_swap(); break;
       case 0x8e: this.op_pushctxele(); break;
       case 0x91: this.op_jmp(); break;
@@ -1098,6 +1099,11 @@ export class Vm {
   op_getr0() { // 0x8b
     Debug.instruction();
     this.stack.push(this.r0);
+  }
+
+  op_getdbargc() { // 0x8c
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS NOT SUPPORTED');
   }
 
   op_swap() { // 0x8d 
