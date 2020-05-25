@@ -2,7 +2,7 @@ import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 import { RootObject } from '../metaclass/RootObject';
 import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
-import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode } from '../types';
+import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp } from '../types';
 import { Vm } from '../Vm';
 
 class TadsObject extends RootObject
@@ -24,9 +24,9 @@ class TadsObject extends RootObject
       console.log("NEW superclass=", args[0].value);
       this.superClasses = [args[0].value];
       // See if there is a constructor.
-      let propLocation = this.findProp(1);
+      let propLocation = this.findProp(1, false);
       if(propLocation) {
-        Vm.getInstance().runContext(propLocation.prop.value, new VmObject(this), new VmNil(), ...args.slice(1));
+        Vm.getInstance().runContext(propLocation.prop.value, new VmProp(1), new VmObject(this), new VmObject(this), new VmObject(this), new VmNil(), ...args.slice(1));
       }
     }
 
