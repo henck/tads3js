@@ -3,6 +3,7 @@ import { VmNil } from "./VmNil";
 import { Heap } from "../Heap";
 import { IFuncInfo } from "../IFuncInfo";
 import { RootObject } from "../metaclass/RootObject";
+import { VmProp } from "./VmProp";
 
 export class VmObject extends VmData {
   constructor(value: number | RootObject) {
@@ -70,6 +71,11 @@ export class VmObject extends VmData {
   setind(vmIndex: VmData, data: VmData): VmObject {
     let obj: RootObject = this.getInstance();
     return obj.setindex(vmIndex, data);
+  }
+
+  setprop(propID: number, data: VmData) {
+    let obj: RootObject = this.getInstance();
+    obj.setprop(propID, data);
   }
 
   invoke(...args: VmData[]): VmData {

@@ -245,6 +245,10 @@ class RootObject {
     throw('CANNOT_INDEX_TYPE');
   }  
 
+  setprop(propID: number, data: VmData) {
+    this.props.set(propID, data);
+  }
+
   invoke(...args: VmData[]): VmData {
     throw('CANNOT_INVOKE_TYPE');
   }
