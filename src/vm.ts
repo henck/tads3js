@@ -398,6 +398,10 @@ export class Vm {
       case 0xe2: this.op_setarg1(); break;
       case 0xe3: this.op_setarg2(); break;
       case 0xe4: this.op_setind(); break;
+      case 0xe5: this.op_setprop(); break;
+      case 0xe6: this.op_ptrsetprop(); break;
+      case 0xe7: this.op_setpropself(); break;
+      case 0xe8: this.op_objsetprop(); break;
       case 0xee: this.op_setlcl1r0(); break;
       case 0xef: this.op_setindlcl1i8(); break;
       case 0xf1: this.op_bp(); break;
@@ -1397,6 +1401,46 @@ export class Vm {
     let val = this.stack.pop();
     let newlist = container.setind(idx, val);
     this.stack.push(newlist);
+  }
+
+  op_setprop() { // 0xe5
+    let propID = this.codePool.getUint2(this.ip);
+    Debug.instruction({ propID: propID });
+    let obj = this.stack.pop();
+    let val = this.stack.pop();
+    if(!(obj instanceof VmObject)) throw('OBJ_VAL_REQD');
+    obj.setprop(propID, val);
+    this.ip += 2;
+  }
+
+  op_ptrsetprop() { // 0xe6
+    let vmProp = this.stack.pop();
+    Debug.instruction({ propID: vmProp });
+    if(!(vmProp instanceof VmProp)) throw('PROPPTR_VAL_REQD');
+    let obj = this.stack.pop();
+    let val = this.stack.pop();
+    if(!(obj instanceof VmObject)) throw('OBJ_VAL_REQD');
+    obj.setprop(vmProp.value, val);
+  }
+
+  op_setpropself() { // 0xe7
+    let propID = this.codePool.getUint2(this.ip);
+    Debug.instruction({ propID: propID });
+    let obj = this.stack.getSelf();
+    let val = this.stack.pop();
+    if(!(obj instanceof VmObject)) throw('OBJ_VAL_REQD');
+    obj.setprop(propID, val);
+    this.ip += 2;
+  }
+
+  op_objsetprop() { // 0xe8 
+    let objID = this.codePool.getUint4(this.ip);
+    let propID = this.codePool.getUint2(this.ip + 4);
+    Debug.instruction({ propID: propID, objID: objID });
+    let val = this.stack.pop();
+    let obj = Heap.getObj(objID);
+    obj.setprop(propID, val);
+    this.ip + 6;
   }
 
   op_setlcl1r0() { // 0xee 
