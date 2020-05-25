@@ -384,6 +384,7 @@ export class Vm {
       case 0x8c: this.op_getdbargc(); break;
       case 0x8d: this.op_swap(); break;
       case 0x8e: this.op_pushctxele(); break;
+      case 0x8f: this.op_dup2(); break;
       case 0x91: this.op_jmp(); break;
       case 0x92: this.op_jt(); break;
       case 0x93: this.op_jf(); break;
@@ -1126,6 +1127,15 @@ export class Vm {
       default:
         throw(`PUSHCTXELE: Unsupported element ${element}`);
     }
+  }
+
+  op_dup2() { // 0x8f
+    Debug.instruction();
+    let val1 = this.stack.peek(this.stack.sp - 1); // top of stack
+    let val2 = this.stack.peek(this.stack.sp - 2);
+    this.stack.push(val2);
+    this.stack.push(val1);
+    // TODO: Probably needs deep copy
   }
 
   op_jmp() { // 0x91
