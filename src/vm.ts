@@ -308,6 +308,7 @@ export class Vm {
       case 0x09: this.op_pushtrue(); break;
       case 0x0a: this.op_pushpropid(); break;
       case 0x0b: this.op_pushfuncptr(); break;
+      case 0x0c: this.op_pushstri(); break;
       case 0x0d: this.op_pushparlst(); break;
       case 0x0e: this.op_makelistpar(); break;
       case 0x0f: this.op_pushenum(); break;
@@ -346,6 +347,7 @@ export class Vm {
       case 0x62: this.op_ptrcallprop(); break;
       case 0x63: this.op_getpropself(); break;
       case 0x64: this.op_callpropself(); break;
+      case 0x65: this.op_ptrcallpropself(); break;
       case 0x66: this.op_objgetprop(); break;
       case 0x67: this.op_objcallprop(); break;
       case 0x6a: this.op_getproplcl1(); break;
@@ -438,7 +440,6 @@ export class Vm {
       case 0xec: this.op_loadctx(); break;
       case 0xed: this.op_storectx(); break;
       case 0xee: this.op_setlcl1r0(); break;
-      
       case 0xef: this.op_setindlcl1i8(); break;
       case 0xf1: this.op_bp(); break;
       case 0xf2: this.op_nop(); break;
@@ -582,6 +583,11 @@ export class Vm {
     Debug.instruction({ funcPtr: funcPtr });
     this.stack.push(new VmFuncPtr(funcPtr));
     this.ip += 4;
+  }
+
+  op_pushstri() { // 0x0c 
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS NOT SUPPORTED.');
   }
 
   op_pushparlst() { // 0x0d 
@@ -877,6 +883,15 @@ export class Vm {
     Debug.instruction({ propID: propID, argc: argc });
     this.ip += 3;
     this.callprop(this.stack.getSelf(), new VmProp(propID), argc, false);
+  }
+
+  op_ptrcallpropself() { // 0x65
+    let argc = this.codePool.getByte(this.ip);
+    let vmProp = this.stack.pop();
+    let data = this.stack.getSelf();
+    Debug.instruction({'obj': data, 'propID': vmProp, 'argc': argc});
+    this.ip++;
+    this.callprop(data, vmProp, argc, false);
   }
 
   op_objgetprop() { // 0x66
