@@ -308,7 +308,7 @@ export class Vm {
       case 0x09: this.op_pushtrue(); break;
       case 0x0a: this.op_pushpropid(); break;
       case 0x0b: this.op_pushfuncptr(); break;
-      case 0x0c: this.op_pushstri(); break;
+      case 0x0c: this.op_no_debug_support(); break; // PUSHSTRI
       case 0x0d: this.op_pushparlst(); break;
       case 0x0e: this.op_makelistpar(); break;
       case 0x0f: this.op_pushenum(); break;
@@ -340,6 +340,8 @@ export class Vm {
       case 0x51: this.op_retnil(); break;
       case 0x52: this.op_rettrue(); break;
       case 0x54: this.op_ret(); break;
+      case 0x56: this.op_no_debug_support(); break; // NAMEDARGPTR
+      case 0x57: this.op_no_debug_support(); break; // NAMEDARGTAB
       case 0x58: this.op_call(); break;
       case 0x59: this.op_ptrcall(); break;
       case 0x60: this.op_getprop(); break;
@@ -350,8 +352,8 @@ export class Vm {
       case 0x65: this.op_ptrcallpropself(); break;
       case 0x66: this.op_objgetprop(); break;
       case 0x67: this.op_objcallprop(); break;
-      case 0x68: this.op_getpropdata(); break;
-      case 0x69: this.op_ptrgetpropdata(); break;
+      case 0x68: this.op_no_debug_support(); break;    // GETPROPDATA
+      case 0x69: this.op_no_debug_support(); break; // PTRGETPROPDATA
       case 0x6a: this.op_getproplcl1(); break;
       case 0x6b: this.op_callproplcl1(); break;
       case 0x6c: this.op_getpropr0(); break;
@@ -381,11 +383,11 @@ export class Vm {
       case 0x89: this.op_disc(); break;
       case 0x8a: this.op_disc1(); break;
       case 0x8b: this.op_getr0(); break;
-      case 0x8c: this.op_getdbargc(); break;
+      case 0x8c: this.op_no_debug_support(); break; // GETDBARGC
       case 0x8d: this.op_swap(); break;
       case 0x8e: this.op_pushctxele(); break;
       case 0x8f: this.op_dup2(); break;
-      // case 0x90: SWITCH
+      
       case 0x91: this.op_jmp(); break;
       case 0x92: this.op_jt(); break;
       case 0x93: this.op_jf(); break;
@@ -445,8 +447,8 @@ export class Vm {
       case 0xe6: this.op_ptrsetprop(); break;
       case 0xe7: this.op_setpropself(); break;
       case 0xe8: this.op_objsetprop(); break;
-      case 0xe9: this.op_setdblcl(); break;
-      case 0xea: this.op_setdbarg(); break;
+      case 0xe9: this.op_no_debug_support(); break; // SETDBLCL
+      case 0xea: this.op_no_debug_support(); break; // SETDBARG
       case 0xeb: this.op_setself(); break;
       case 0xec: this.op_loadctx(); break;
       case 0xed: this.op_storectx(); break;
@@ -646,11 +648,6 @@ export class Vm {
     Debug.instruction({ funcPtr: funcPtr });
     this.stack.push(new VmFuncPtr(funcPtr));
     this.ip += 4;
-  }
-
-  op_pushstri() { // 0x0c 
-    Debug.instruction();
-    throw('DEBUG INSTRUCTIONS NOT SUPPORTED.');
   }
 
   /**
@@ -993,7 +990,6 @@ export class Vm {
     this.ret();
   }
 
-
   op_call() { // 0x58
     let argc = this.codePool.getByte(this.ip);
     let func_offset = this.codePool.getUint4(this.ip + 1);
@@ -1087,16 +1083,6 @@ export class Vm {
     Debug.instruction({ objID: objID, propID: propID, argc: argc});
     this.ip += 7;
     this.callprop(new VmObject(objID), new VmProp(propID), argc, false);
-  }
-
-  op_getpropdata() { // 0x68
-    Debug.instruction();
-    throw('DEBUG INSTRUCTIONS NOT SUPPORTED');
-  }
-
-  op_ptrgetpropdata() { // 0x69
-    Debug.instruction();
-    throw('DEBUG INSTRUCTIONS NOT SUPPORTED');
   }
 
   op_getproplcl1() { // 0x6a 
@@ -1270,11 +1256,6 @@ export class Vm {
   op_getr0() { // 0x8b
     Debug.instruction();
     this.stack.push(this.r0);
-  }
-
-  op_getdbargc() { // 0x8c
-    Debug.instruction();
-    throw('DEBUG INSTRUCTIONS NOT SUPPORTED');
   }
 
   op_swap() { // 0x8d 
@@ -1809,16 +1790,6 @@ export class Vm {
     this.ip + 6;
   }
   
-  op_setdblcl() { // 0xe9
-    Debug.instruction();
-    throw('DEBUG INSTRUCTIONS ARE NOT SUPPORTED.');
-  }
-
-  op_setdbarg() { // 0xea
-    Debug.instruction();
-    throw('DEBUG INSTRUCTIONS ARE NOT SUPPORTED.');
-  }
-
   op_setself() { // 0xeb
     let vmVal = this.stack.pop();
     Debug.instruction({value: vmVal});
@@ -1872,6 +1843,11 @@ export class Vm {
   op_nop() { // 0xf2 
     Debug.instruction();
     return ['NOP'];
+  }
+
+  op_no_debug_support() {
+    Debug.instruction();
+    throw('DEBUG INSTRUCTIONS NOT SUPPORTED.');    
   }
 
 }
