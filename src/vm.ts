@@ -376,8 +376,8 @@ export class Vm {
       case 0x82: this.op_getarg1(); break;
       case 0x83: this.op_getarg2(); break;
       case 0x84: this.op_pushself(); break;
-      case 0x85: this.op_getdblcl(); break;
-      case 0x86: this.op_getdbarg(); break;
+      case 0x85: this.op_no_debug_support(); break; // GETDBLCL
+      case 0x86: this.op_no_debug_support; break; // GETDBARG
       case 0x87: this.op_getargc(); break;
       case 0x88: this.op_dup(); break;
       case 0x89: this.op_disc(); break;
@@ -1175,6 +1175,10 @@ export class Vm {
     this.stack.push(val3);
   }
 
+  /**
+   * Swap stack elements at indices
+   * @done
+   */
   op_swapn() { // 0x7b (error in docs, they say this is 0x7a)
     let idx1 = this.codePool.getByte(this.ip);     // offset from top of stack, 0-based
     let idx2 = this.codePool.getByte(this.ip + 1); // offset from top of stack, 0-based
@@ -1186,6 +1190,10 @@ export class Vm {
     this.stack.poke(idx2, val1);
   }
 
+  /**
+   * Get local variable
+   * @done
+   */
   op_getlcl1() { // 0x80
     let index = this.codePool.getByte(this.ip);
     Debug.instruction({ index: index });
@@ -1193,6 +1201,10 @@ export class Vm {
     this.ip++;
   }
 
+  /**
+   * Get local variable
+   * @done
+   */  
   op_getlcl2() { // 0x81
     let index = this.codePool.getUint2(this.ip);
     Debug.instruction({ index: index });
@@ -1200,6 +1212,10 @@ export class Vm {
     this.ip += 2;
   }
 
+  /**
+   * Get current function argument
+   * @done
+   */  
   op_getarg1() { // 0x82 
     let index = this.codePool.getByte(this.ip);
     Debug.instruction({ index: index });
@@ -1207,28 +1223,30 @@ export class Vm {
     this.ip++;
   }
 
+  /**
+   * Get current function argument
+   * @done
+   */  
   op_getarg2() { // 0x83 
     let index = this.codePool.getUint2(this.ip);
     Debug.instruction({ index: index });
     this.stack.push(this.stack.getArg(index));
     this.ip += 2;
   }
-
+  
+  /**
+   * Push self object on stack
+   * @done
+   */  
   op_pushself() { // 0x84
     Debug.instruction();
     this.stack.push(this.stack.getSelf());
   }
 
-  op_getdblcl() { // 0x85
-    Debug.instruction();
-    throw('DEBUG INSTRUCTIONS NOT SUPORTED');
-  }
-
-  op_getdbarg() { // 0x86
-    Debug.instruction();
-    throw('DEBUG INSTRUCTIONS NOT SUPORTED');
-  }
-
+  /**
+   * Get current function's actual parameter count.
+   * @done
+   */
   op_getargc() { // 0x87 
     Debug.instruction();
     let argcount = this.stack.getArgCount();
@@ -1241,23 +1259,39 @@ export class Vm {
     // TODO: Probably needs deep copy
   }
 
+  /**
+   * Discard value at top of stack.
+   * @done
+   */
   op_disc() { // 0x89
     Debug.instruction();
     this.stack.pop();
   }
 
+  /**
+   * Discard values at top of stack.
+   * @done
+   */
   op_disc1() { // 0x8a
     let count = this.codePool.getByte(this.ip);
-    Debug.instruction({ count: count});
+    Debug.instruction({ count: count });
     this.ip++;
     this.stack.popMany(count);
   }
 
+  /**
+   * Push R0 on stack.
+   * @done
+   */
   op_getr0() { // 0x8b
     Debug.instruction();
     this.stack.push(this.r0);
   }
 
+  /** 
+   * Swap elements at top of stack. 
+   * @done
+   */
   op_swap() { // 0x8d 
     Debug.instruction();
     let val1 = this.stack.pop();
