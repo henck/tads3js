@@ -1,5 +1,6 @@
 import { VmData } from "./VmData";
 import { VmType } from "./VmType";
+import { VmNil } from "./VmNil";
 
 export class VmCodeOffset extends VmData {
   constructor(value: number) {
@@ -13,6 +14,12 @@ export class VmCodeOffset extends VmData {
   getType() {
     return VmType.CODEOFS;
   }
+
+  // Operators
+
+  not() {
+    return new VmNil();
+  }  
 
   toStr(): string {
     return `codeoffsetp#${this.value}`;

@@ -2,6 +2,7 @@ import { VmData } from "./VmData";
 import { Vm } from "../Vm";
 import { IFuncInfo } from "../IFuncInfo";
 import { VmType } from "./VmType";
+import { VmNil } from "./VmNil";
 
 type TPropFunc = ((...args: any[]) => VmData);
 
@@ -24,6 +25,12 @@ export class VmNativeCode extends VmData {
   getType() {
     return VmType.NATIVE_CODE;
   }  
+
+  // Operators
+
+  not() {
+    return new VmNil();
+  }    
 
   /*invoke(...args: VmData[]): VmData {
     return Vm.getInstance().runContext(this.value, null, ...args);

@@ -1,5 +1,6 @@
 import { VmData } from "./VmData";
 import { VmType } from "./VmType";
+import { VmNil } from "./VmNil";
 
 interface IBifPtr {
   set: number;
@@ -31,6 +32,12 @@ export class VmBifPtr extends VmData {
   getFunctionIndex() {
     return this.value.index;
   }
+
+  // Operators
+
+  not() {
+    return new VmNil();
+  }  
 
   eq(data: VmData): boolean {
     if(!(data instanceof VmBifPtr)) return false;

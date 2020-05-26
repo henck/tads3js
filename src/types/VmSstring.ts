@@ -16,6 +16,8 @@ export class VmSstring extends VmData {
   getType() {
     return VmType.SSTRING;
   }  
+
+  // Operators
   
   add(data: VmData): VmObject {
     let str = this.value;

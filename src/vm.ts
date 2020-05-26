@@ -525,16 +525,35 @@ export class Vm {
     }
   }
 
+  /***************************************************
+   *                                                 *
+   *                   INSTRUCTIONS                  *
+   *                                                 *
+   ***************************************************/
+
+  /**
+   * Push integer 0 onto the stack.
+   * @done
+   */
   op_push_0() { // 0x01 
     this.stack.push(new VmInt(0));
     Debug.instruction();
   }
 
+  /** 
+   * Push integer 1 onto the stack.
+   * @done
+   */
   op_push_1() { // 0x02 
     this.stack.push(new VmInt(1));
     Debug.instruction();
   }
 
+  
+  /**
+   * Push byte-sized signed integer onto the stack
+   * @done
+   */
   op_pushint8() { // 0x03
     let val = this.codePool.getSbyte(this.ip);
     Debug.instruction({ value: val });
@@ -542,6 +561,10 @@ export class Vm {
     this.ip++;
   }
 
+  /**
+   * Push signed integer value onto stack
+   * @done
+   */
   op_pushint() { // 0x04
     let val = this.codePool.getInt4(this.ip);
     Debug.instruction({ value: val });
@@ -549,22 +572,35 @@ export class Vm {
     this.ip += 4;
   }
 
+  /**
+   * Push the constant string at offset in the constant pool onto the stack
+   * @done
+   */
   op_pushstr() { // 0x05
     let offset = this.codePool.getUint4(this.ip);  // Get string offset
     let str = this.dataPool.getString(offset);     // Get string from constant pool
     Debug.instruction({ value: str });
-    this.stack.push(new VmSstring(str));          // Push string on stack
+    this.stack.push(new VmSstring(str));           // Push string on stack
     this.ip += 4;
   }
 
+  /**
+   * Push the constant list af offset in the constant pool onto the stack.
+   * @done
+   */
   op_pushlst() { // 0x06
     let offset = this.codePool.getUint4(this.ip);  // Get list offset
     let lst = this.dataPool.getList(offset);       // Get list from constant pool
     Debug.instruction({ value: lst });
-    this.stack.push(new VmList(lst)); // Push list on stack
+    this.stack.push(new VmList(lst));              // Push list on stack
     this.ip += 4;
   }  
 
+  
+  /**
+   * Push a reference to the object with ID objID onto the stack.
+   * @done
+   */
   op_pushobj() { // 0x07
     let ref = this.codePool.getUint4(this.ip);
     Debug.instruction({ value: ref });
@@ -572,16 +608,28 @@ export class Vm {
     this.ip += 4;
   }
 
+  /**
+   * Push NIL onto the stack.
+   * @done
+   */
   op_pushnil() { // 0x08
     this.stack.push(new VmNil());
     Debug.instruction();
   }
 
+  /**
+   * Push TRUE onto the stack.
+   * @done
+   */
   op_pushtrue() { // 0x09
     this.stack.push(new VmTrue());
     Debug.instruction();
   }
 
+  /**
+   * Push PropID onto the stack.
+   * @done
+   */
   op_pushpropid() { // 0x0a
     let propID = this.codePool.getUint2(this.ip);
     Debug.instruction({ propID: propID });
@@ -589,6 +637,10 @@ export class Vm {
     this.ip += 2;
   }
 
+  /**
+   * Push function pointer onto the stack.
+   * @done
+   */
   op_pushfuncptr() { // 0x0b
     let funcPtr = this.codePool.getUint4(this.ip);
     Debug.instruction({ funcPtr: funcPtr });
@@ -601,10 +653,15 @@ export class Vm {
     throw('DEBUG INSTRUCTIONS NOT SUPPORTED.');
   }
 
+  /**
+   * Push Parameters as List
+   * Get variable args from stack, build list, push onto stack.
+   * @done
+   */
   op_pushparlst() { // 0x0d 
     let fixedArgCount = this.codePool.getByte(this.ip); // Fixed arguments to skip
     Debug.instruction({ argc: fixedArgCount });
-    this.stack.getArgCount();
+    this.stack.getArgCount(); // arg count of current function
     let lst = [];
     // Get function arguments (skipping fixed arguments)
     // and place them in a list.
@@ -616,13 +673,18 @@ export class Vm {
     this.ip++;
   }
 
+  /**
+   * Push varargs onto the stack.
+   * @done
+   */
   op_makelistpar() { // 0x0e
     let val = this.stack.pop();
     let argc = this.stack.pop();
     if(!(argc instanceof VmInt)) throw('INT_VAL_REQD');
-    let lst = val.unpack();
+    let lst = val.unpack(); // yields an array for list-likes
     if(Array.isArray(lst)) {
-      for(let i = lst.length - 1; i >= 0; i--) this.stack.push(lst[i]);
+      // Push list items onto stack (in reverse order)
+      lst.slice().reverse().forEach((elem) => this.stack.push(elem));
       argc.value += lst.length;
     } else {
       this.stack.push(val);
@@ -631,33 +693,50 @@ export class Vm {
     this.stack.push(argc);
   }
 
+  /**
+   * Push enum value onto the stack.
+   * @done
+   */
   op_pushenum() { // 0x0f
-    let val = this.codePool.getUint4(this.ip);
+    let val = this.codePool.getInt4(this.ip);
     Debug.instruction();
     this.stack.push(new VmEnum(val));
     this.ip += 4;
   }
 
+  /**
+   * Push built-in function pointer onto the stack.
+   * @done
+   */
   op_pushbifptr() { // 0x10
     let funcIndex = this.codePool.getUint2(this.ip); 
     let setIndex = this.codePool.getUint2(this.ip + 2); 
-    Debug.instruction({ funcIndex: funcIndex, setIndex: setIndex });
+    Debug.instruction({ setIndex: setIndex, funcIndex: funcIndex });
     this.stack.push(new VmBifPtr(setIndex, funcIndex));
     this.ip += 4;
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */
   op_neg() { // 0x20
     Debug.instruction();
     let val = this.stack.pop();
     this.stack.push(val.neg());
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */
   op_bnot() { // 0x21
     Debug.instruction();
     let val = this.stack.pop();
     this.stack.push(val.bnot());
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_add() { // 0x22
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -665,6 +744,9 @@ export class Vm {
     this.stack.push(val1.add(val2));
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_sub() { // 0x23
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -672,6 +754,9 @@ export class Vm {
     this.stack.push(val1.sub(val2));
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_mul() { // 0x24
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -679,6 +764,9 @@ export class Vm {
     this.stack.push(val1.mul(val2));
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_band() { // 0x25 
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -686,6 +774,9 @@ export class Vm {
     this.stack.push(val1.band(val2));
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_bor() { // 0x26
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -693,6 +784,9 @@ export class Vm {
     this.stack.push(val1.bor(val2));
   }  
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_shl() { // 0x27
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -700,6 +794,9 @@ export class Vm {
     this.stack.push(val1.shl(val2));
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_ashr() { // 0x28
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -707,6 +804,9 @@ export class Vm {
     this.stack.push(val1.ashr(val2));
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_xor() { // 0x29
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -714,6 +814,9 @@ export class Vm {
     this.stack.push(val1.xor(val2));
   }
   
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_div() { // 0x2a
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -721,6 +824,9 @@ export class Vm {
     this.stack.push(val1.div(val2));
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_mod() { // 0x2b
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -728,6 +834,10 @@ export class Vm {
     this.stack.push(val1.mod(val2));
   }
 
+  /**
+   * Logical inversion
+   * @done (All possibilities covered)
+   */
   op_not() { // 0x2c
     Debug.instruction();
     let val = this.stack.pop();

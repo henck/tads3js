@@ -2,6 +2,7 @@ import { VmData } from "./VmData";
 import { Vm } from "../Vm";
 import { IFuncInfo } from "../IFuncInfo";
 import { VmType } from "./VmType";
+import { VmNil } from "./VmNil";
 
 export class VmFuncPtr extends VmData {
   constructor(value: number) {
@@ -16,6 +17,18 @@ export class VmFuncPtr extends VmData {
     return VmType.FUNCPTR;
   }  
 
+  // Operators
+
+  not() {
+    return new VmNil();
+  }  
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return `funcptr#${this.value}`;
+  }   
+
+  // ...
+
   invoke(...args: VmData[]): VmData {
     return Vm.getInstance().runContext(this.value, null, null, null, null, null, ...args);
   }  
@@ -24,7 +37,4 @@ export class VmFuncPtr extends VmData {
     return Vm.getInstance().getFuncInfo(this.value);
   }
 
-  toStr(radix?: number, isSigned?: boolean): string {
-    return `funcptr#${this.value}`;
-  }   
 }

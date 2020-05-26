@@ -15,6 +15,8 @@ export class VmTrue extends VmData {
     return VmType.TRUE;
   }  
 
+  // Operators
+  
   not() {
     return new VmNil();
   }

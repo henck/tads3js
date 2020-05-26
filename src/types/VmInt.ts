@@ -20,6 +20,8 @@ export class VmInt extends VmData {
     return this.value == 0;
   }  
 
+  // Operators
+
   neg(): VmInt {
     return new VmInt(-this.value);
   }

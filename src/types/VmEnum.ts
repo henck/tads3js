@@ -1,5 +1,6 @@
 import { VmData } from "./VmData";
 import { VmType } from "./VmType";
+import { VmNil } from "./VmNil";
 
 export class VmEnum extends VmData {
   constructor(value: number) {
@@ -16,6 +17,12 @@ export class VmEnum extends VmData {
 
   isFalsy(): boolean {
     return this.value == 0;
+  }  
+
+  // Operators
+
+  not() {
+    return new VmNil();
   }  
 
   eq(data: VmData): boolean {

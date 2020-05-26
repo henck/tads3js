@@ -13,4 +13,7 @@ export class VmDstring extends VmData {
   getType() {
     return VmType.DSTRING;
   }
+
+  // Operators
+  
 }

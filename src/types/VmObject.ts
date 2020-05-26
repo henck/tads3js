@@ -34,6 +34,8 @@ export class VmObject extends VmData {
     return Heap.getObj(this.value);
   }
 
+  // Operators
+
   not() {
     return new VmNil();
   }

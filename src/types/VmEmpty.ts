@@ -13,4 +13,7 @@ export class VmEmpty extends VmData {
   getType() {
     return VmType.EMPTY;
   }  
+
+  // Operators
+  
 }

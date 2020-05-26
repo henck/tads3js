@@ -19,6 +19,8 @@ export class VmNil extends VmData {
     return true;
   }    
 
+  // Operators
+
   not(): VmData {
     return new VmTrue();
   }

@@ -18,6 +18,8 @@ export class VmList extends VmData {
     return VmType.LIST;
   }  
 
+  // Operators
+
   add(data: VmData): VmData {
     if(data instanceof VmList) {
       return new VmObject(new List(this.value.concat(data.value)));
