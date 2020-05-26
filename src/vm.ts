@@ -854,18 +854,29 @@ export class Vm {
     this.stack.push(val.boolize());
   }
 
+  /**
+   * Add 1 to value
+   * @done (Depends on ADD)
+   */
   op_inc() { // 0x2e 
     Debug.instruction();
     let val = this.stack.pop();
     this.stack.push(val.add(new VmInt(1)));
   }
 
+  /**
+   * Subtract 1 from value
+   * @done (Depends on SUB)
+   */
   op_dec() { // 0x2f
     Debug.instruction();
     let val = this.stack.pop();
     this.stack.push(val.sub(new VmInt(1)));
   }
 
+  /**
+   * @todo Needs operator overloading.
+   */  
   op_lshr() { // 0x30
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -873,6 +884,10 @@ export class Vm {
     this.stack.push(val1.lshr(val2));
   }    
 
+  /**
+   * Test equality
+   * @todo Needs BigNumber support through "equals" method
+   */
   op_eq() { // 0x40
     Debug.instruction();
     let val2 = this.stack.pop();

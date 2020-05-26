@@ -21,6 +21,10 @@ export class VmProp extends VmData {
     return new VmNil();
   }  
 
+  eq(data: VmData, depth?: number): boolean {
+    return ((data instanceof VmProp) && this.value == data.value);
+  }  
+
   toStr(radix?: number, isSigned?: boolean): string {
     return `prop#${this.value}`;
   }  

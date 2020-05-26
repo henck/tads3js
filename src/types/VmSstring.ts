@@ -36,7 +36,7 @@ export class VmSstring extends VmData {
     return new VmNil();
   }
 
-  eq(data: VmData): boolean {
+  eq(data: VmData, depth?: number): boolean {
     // Compare to sstring:
     if(data instanceof VmSstring) return this.value == data.value;
     // Compare to MetaString:

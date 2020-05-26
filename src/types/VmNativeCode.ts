@@ -32,6 +32,10 @@ export class VmNativeCode extends VmData {
     return new VmNil();
   }    
 
+  eq(data: VmData, depth?: number): boolean {
+    return ((data instanceof VmNativeCode) && this.value == data.value);
+  }    
+
   /*invoke(...args: VmData[]): VmData {
     return Vm.getInstance().runContext(this.value, null, ...args);
   }*/ 

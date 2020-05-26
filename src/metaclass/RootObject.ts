@@ -239,7 +239,7 @@ class RootObject {
     throw('CANNOT_SUBTRACT_TYPE');
   }
 
-  equals(data: VmData): boolean {
+  equals(data: VmData, depth?: number): boolean {
     throw('CANNOT_COMPARE_TYPE');
   }
 

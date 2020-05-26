@@ -55,9 +55,9 @@ export class VmObject extends VmData {
     return obj.subtract(data);
   }
 
-  eq(data: VmData): boolean {
+  eq(data: VmData, depth?: number): boolean {
     let obj: RootObject = this.getInstance();
-    return obj.equals(data);
+    return obj.equals(data, depth);
   }
 
   lt(data: VmData): boolean {

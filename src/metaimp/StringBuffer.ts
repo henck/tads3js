@@ -57,7 +57,7 @@ class StringBuffer extends RootObject {
 
   // TODO: Operators?
 
-  public equals(data: VmData): boolean {
+  public equals(data: VmData, depth?: number): boolean {
     let str = data.unpack();
     return this.toString() == str.toString();
   }

@@ -25,7 +25,7 @@ export class VmEnum extends VmData {
     return new VmNil();
   }  
 
-  eq(data: VmData): boolean {
+  eq(data: VmData, depth?: number): boolean { 
     return ((data instanceof VmEnum) && this.value == data.value);
   }
 

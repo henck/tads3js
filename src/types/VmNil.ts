@@ -29,7 +29,7 @@ export class VmNil extends VmData {
     return new VmNil();
   }
 
-  eq(data: VmData): boolean {
+  eq(data: VmData, depth?: number): boolean {
     return data instanceof VmNil;
   }
 

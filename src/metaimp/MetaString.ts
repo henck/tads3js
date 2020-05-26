@@ -81,7 +81,7 @@ class MetaString extends RootObject {
     return idx;
   }   
 
-  equals(data: VmData): boolean {
+  equals(data: VmData, depth?: number): boolean {
     let str = data.unpack();
     return this.value == str.toString();
   }

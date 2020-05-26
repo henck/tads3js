@@ -21,6 +21,10 @@ export class VmCodeOffset extends VmData {
     return new VmNil();
   }  
 
+  eq(data: VmData, depth?: number): boolean {
+    return ((data instanceof VmCodeOffset) && this.value == data.value);
+  }    
+
   toStr(): string {
     return `codeoffsetp#${this.value}`;
   }   

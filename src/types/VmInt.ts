@@ -95,7 +95,7 @@ export class VmInt extends VmData {
     return this.value == 0 ? new VmNil() : new VmTrue();
   }
 
-  eq(data: VmData): boolean {
+  eq(data: VmData, depth?: number): boolean {
     return ((data instanceof VmInt) && this.value == data.value);
   }
 

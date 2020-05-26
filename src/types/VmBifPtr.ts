@@ -39,7 +39,7 @@ export class VmBifPtr extends VmData {
     return new VmNil();
   }  
 
-  eq(data: VmData): boolean {
+  eq(data: VmData, depth?: number): boolean {
     if(!(data instanceof VmBifPtr)) return false;
     if ((this.value as IBifPtr).set != (data.value as IBifPtr).set) return false;
     if ((this.value as IBifPtr).index != (data.value as IBifPtr).index) return false;

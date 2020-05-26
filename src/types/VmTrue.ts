@@ -25,7 +25,7 @@ export class VmTrue extends VmData {
     return new VmTrue();
   }
 
-  eq(data: VmData): boolean {
+  eq(data: VmData, depth?: number): boolean {
     return (data instanceof VmTrue);
   }
 

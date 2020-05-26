@@ -40,28 +40,23 @@ abstract class ListBase extends Collection {
    * Virtual methods
    */
 
-  equals(data: VmData): boolean {
-    let otherObj = null;
-    // If data is a VmObject, get its instance and check
-    // that it is a meta list.
-    if(data instanceof VmObject) {
-      otherObj = data.getInstance();
-      if(!(otherObj instanceof ListBase)) return false;
-    // If data is a VmList, convert it to a meta list.
-    } else if(data instanceof VmList) {
-      otherObj = new List((data as VmList).value);
-    // Other types are always unequal.
-    } else {
-      return false;
-    }
+  equals(data: VmData, depth?: number): boolean {
+    // Cancel equals check after 256 stack levels. 
+    // This happens when list elements point back to the parent list.
+    depth = depth ?? 0;
+    if(depth > 256) return false;
+
+    // Check that other object is also a list-like.
+    let arr = data.unpack();
+    if(!Array.isArray(arr)) return false;
 
     // Lists must have same length to be equal.
-    if(this.value.length != otherObj.value.length) return false;
+    if(this.value.length != arr.length) return false;
 
     // Check elements of objects for equality
     // by calling "eq" on them.
     for(let i = 0; i < this.value.length; i++) {
-      if (!this.value[i].eq(otherObj.value[i])) return false;
+      if (!this.value[i].eq(arr[i], depth + 1)) return false;
     }    
     return true;
   }   

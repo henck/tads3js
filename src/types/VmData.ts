@@ -101,7 +101,10 @@ export abstract class VmData {
     throw('NO_LOG_CONV');
   }
 
-  eq(data: VmData): boolean {
+  // A depth counter is passed along to be able to cancel equality
+  // checks for list-likes that have elements that reference the
+  // original lit.
+  eq(data: VmData, depth?: number): boolean {
     return false;
   }
 
