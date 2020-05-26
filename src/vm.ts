@@ -26,14 +26,14 @@ export class Vm {
 
   private image: SourceImage;
   private blocks: DataBlock[] = [];
-  private codePool: Pool;
+  public codePool: Pool;
   private dataPool: Pool;
   public r0: VmData = null;
-  private ip: number = 0;
+  public ip: number = 0;
   private ep: number = 0;
   public stack: Stack;
   public stop = false;
-  private varargc: number = undefined;
+  public varargc: number = undefined;
 
   constructor() {
   }
