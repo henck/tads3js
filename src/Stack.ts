@@ -104,7 +104,12 @@ class Stack {
     return datas;
   }
 
-  public peek(offset: number) {
+  /**
+   * Peek at value on stack.
+   * @param offset 
+   */
+  public peek(offset?: number) {
+    offset = offset ?? this.sp - 1;
     return this.elements[offset];
   }
 
