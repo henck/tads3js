@@ -844,6 +844,10 @@ export class Vm {
     this.stack.push(val.not());
   }
 
+  /**
+   * Convert to boolean
+   * @done (All possibilities covered)
+   */
   op_boolize() { // 0x2d
     Debug.instruction();
     let val = this.stack.pop();
