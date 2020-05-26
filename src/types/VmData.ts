@@ -108,10 +108,6 @@ export abstract class VmData {
     return false;
   }
 
-  ne(data: VmData): boolean {
-    return !this.eq(data);
-  }
-
   lt(data: VmData): boolean {
     throw('INVALID_COMPARISON');
   }

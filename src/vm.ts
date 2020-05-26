@@ -887,6 +887,7 @@ export class Vm {
   /**
    * Test equality
    * @todo Needs BigNumber support through "equals" method
+   * @todo Which other metaclasses must implement "equals"?
    */
   op_eq() { // 0x40
     Debug.instruction();
@@ -895,6 +896,10 @@ export class Vm {
     this.stack.push(val1.eq(val2) ? new VmTrue() : new VmNil());
   }
 
+  /**
+   * Test if items on stack are unequal.
+   * @done through EQ
+   */
   op_ne() { // 0x41
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -902,6 +907,10 @@ export class Vm {
     this.stack.push(val1.eq(val2) ? new VmNil() : new VmTrue());
   }
 
+  /**
+   * Test if second stack element is less than top stack element.
+   * @todo Which metaclasses must implement "compare" ?
+   */
   op_lt() { // 0x42
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -1315,10 +1324,10 @@ export class Vm {
     Debug.instruction({ offset: branch_offset});
     let val2 = this.stack.pop();
     let val1 = this.stack.pop();
-    if(val1.ne(val2)) {
-      this.ip += branch_offset;
-    } else {
+    if(val1.eq(val2)) {
       this.ip += 2;
+    } else {
+      this.ip += branch_offset;
     }
   }
 
