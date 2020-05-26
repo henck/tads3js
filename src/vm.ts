@@ -918,6 +918,10 @@ export class Vm {
     this.stack.push(val1.lt(val2) ? new VmTrue() : new VmNil());
   }
 
+  /**
+   * Test if second stack element is less than/equal to top stack element.
+   * @done through EQ and LT
+   */
   op_le() { // 0x43
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -926,6 +930,10 @@ export class Vm {
     this.stack.push(res ? new VmTrue() : new VmNil());
   }
 
+  /**
+   * Test if second stack element is greater than top stack element.
+   * @done through EQ and LT
+   */
   op_gt() { // 0x44
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -934,6 +942,10 @@ export class Vm {
     this.stack.push(res ? new VmTrue() : new VmNil());
   }
 
+  /**
+   * Test if second stack element is greater than/equal to top stack element.
+   * @done through LT
+   */  
   op_ge() { // 0x45
     Debug.instruction();
     let val2 = this.stack.pop();
@@ -942,28 +954,45 @@ export class Vm {
     this.stack.push(res ? new VmTrue() : new VmNil());
   }  
 
+  /**
+   * Return top of stack.
+   * @done
+   */
   op_retval() { // 0x50
     Debug.instruction();
     this.r0 = this.stack.pop();
     this.ret();
   }
 
+  /**
+   * Return NIL.
+   * @done
+   */
   op_retnil() { // 0x51
     Debug.instruction();
     this.r0 = new VmNil();
     this.ret();
   }
 
+  /**
+   * Return TRUE.
+   * @done
+   */
   op_rettrue() { // 0x52
     Debug.instruction();
     this.r0 = new VmTrue();
     this.ret();    
   }
 
+  /**
+   * Return.
+   * @done
+   */
   op_ret() { // 0x54
     Debug.instruction();
     this.ret();
   }
+
 
   op_call() { // 0x58
     let argc = this.codePool.getByte(this.ip);

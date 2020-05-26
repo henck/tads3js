@@ -37,21 +37,15 @@ export class VmSstring extends VmData {
   }
 
   eq(data: VmData, depth?: number): boolean {
-    // Compare to sstring:
-    if(data instanceof VmSstring) return this.value == data.value;
-    // Compare to MetaString:
-    if(data instanceof VmObject && data.getInstance() instanceof MetaString) return this.value == data.getInstance().getValue();
-    // Anything else:
-    return false;
+    let str = data.unpack();
+    if(typeof(str) !== 'string') return false;
+    return this.value == str;
   }
 
   lt(data: VmData): boolean {
-    // Compare to sstring:
-    if(data instanceof VmSstring) return this.value < data.value;
-    // Compare to MetaString:
-    if(data instanceof VmObject && data.getInstance() instanceof MetaString) return this.value < data.getInstance().getValue();
-    // Anything else:
-    throw('INVALID_COMPARISON');
+    let str = data.unpack();
+    if(typeof(str) !== 'string') throw('INVALID_COMPARISON');
+    return this.value < str;
   }    
 
   toStr(radix?: number, isSigned?: boolean): string {
