@@ -1289,6 +1289,10 @@ export class Vm {
     // TODO: Probably needs deep copy
   }
 
+  /**
+   * Switch between cases.
+   * @done
+   */
   op_switch() { // 0x90
     let val = this.stack.pop();
     let case_count = this.codePool.getUint2(this.ip);
@@ -1319,12 +1323,20 @@ export class Vm {
     this.ip = default_branch_offset;
   }
 
+  /** 
+   * Unconditional jump
+   * @done
+   */
   op_jmp() { // 0x91
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
     this.ip += branch_offset;
   }
 
+  /** 
+   * Jump if true
+   * @done
+   */
   op_jt() { // 0x92
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1335,7 +1347,11 @@ export class Vm {
       this.ip += branch_offset;
     }
   }
-  
+
+  /** 
+   * Jump if false
+   * @done
+   */
   op_jf() { // 0x93
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1347,6 +1363,10 @@ export class Vm {
     }
   }  
 
+  /** 
+   * Jump if equal
+   * @done
+   */
   op_je() { // 0x94
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1359,6 +1379,10 @@ export class Vm {
     }
   }
 
+  /** 
+   * Jump if unequal
+   * @done
+   */
   op_jne() { // 0x95
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1371,6 +1395,10 @@ export class Vm {
     }
   }
 
+  /** 
+   * Jump if greater than
+   * @done
+   */
   op_jgt() { // 0x96
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1383,6 +1411,10 @@ export class Vm {
     }
   }
 
+  /** 
+   * Jump if greater than or equal
+   * @done
+   */
   op_jge() { // 0x97
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1395,6 +1427,10 @@ export class Vm {
     }
   }
 
+  /**
+   * Jump if less than
+   * @done
+   */
   op_jlt() { // 0x98
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1407,6 +1443,10 @@ export class Vm {
     }
   }  
 
+  /** 
+   * Jump if less than or equal
+   * @done
+   */
   op_jle() { // 0x99
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1419,6 +1459,10 @@ export class Vm {
     }
   }    
 
+  /** 
+   * Jump and save if true
+   * @done
+   */
   op_jst() { // 0x9a 
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
