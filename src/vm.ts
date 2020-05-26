@@ -1,6 +1,6 @@
 import { SourceImage } from './SourceImage'
 import { DataBlock, DataBlockFactory, CPDF, CPPG, ENTP, MCLD, OBJS } from './blocks/'
-import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring, VmNativeCode, VmBifPtr, VmEnum } from './types/'
+import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring, VmNativeCode, VmBifPtr, VmEnum, DataFactory } from './types/'
 import { Stack } from './Stack'
 import { Pool } from './Pool'
 import { Debug } from './Debug'
@@ -387,7 +387,7 @@ export class Vm {
       case 0x8d: this.op_swap(); break;
       case 0x8e: this.op_pushctxele(); break;
       case 0x8f: this.op_dup2(); break;
-      
+      case 0x90: this.op_switch(); break;
       case 0x91: this.op_jmp(); break;
       case 0x92: this.op_jt(); break;
       case 0x93: this.op_jf(); break;
@@ -1287,6 +1287,36 @@ export class Vm {
     this.stack.push(val2);
     this.stack.push(val1);
     // TODO: Probably needs deep copy
+  }
+
+  op_switch() { // 0x90
+    let val = this.stack.pop();
+    let case_count = this.codePool.getUint2(this.ip);
+    Debug.instruction();
+    this.ip += 2;
+
+    // Read cases:
+    let cases = [];
+    for(let i = 0; i < case_count; i++) {
+      let type = this.codePool.getByte(this.ip++);
+      let offset = this.codePool.getUint4(this.ip); this.ip += 4;
+      let value = DataFactory.load(type, this.dataPool, offset);
+      let branch_offset = this.codePool.getInt2(this.ip) + this.ip; this.ip += 2;
+      cases.push({ value: value, branch_offset: branch_offset });
+    }
+    let default_branch_offset = this.codePool.getInt2(this.ip) + this.ip;
+
+    // Evaluate cases:
+    for(let i = 0; i < case_count; i++) {
+      let c = cases[i];
+      if(c.value.eq(val)) { 
+        this.ip = c.branch_offset;
+        return;
+      }
+    }
+
+    // No match; jump to default.
+    this.ip = default_branch_offset;
   }
 
   op_jmp() { // 0x91
