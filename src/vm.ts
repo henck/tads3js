@@ -182,7 +182,7 @@ export class Vm {
   }
 
   ret() {
-    if(this.stack.peek(this.stack.fp - 4).value == -1) this.stop = true;
+    if(this.stack.peekAbsolute(this.stack.fp - 4).value == -1) this.stop = true;
     this.stack.sp = this.stack.fp;
     let fp = this.stack.pop(); this.stack.fp = fp.value;// pop FP
     let argc = this.stack.pop(); // pop argc
@@ -1176,27 +1176,27 @@ export class Vm {
   }
 
   op_swapn() { // 0x7b (error in docs, they say this is 0x7a)
-    let idx1 = this.codePool.getByte(this.ip);
-    let idx2 = this.codePool.getByte(this.ip + 1);
+    let idx1 = this.codePool.getByte(this.ip);     // offset from top of stack, 0-based
+    let idx2 = this.codePool.getByte(this.ip + 1); // offset from top of stack, 0-based
     Debug.instruction({ idx1: idx1, idx2: idx2 });
     this.ip += 2;
-    let val1 = this.stack.elements[this.stack.sp - idx1 - 1];
-    let val2 = this.stack.elements[this.stack.sp - idx2 - 1];
-    this.stack.elements[this.stack.sp - idx1 - 1] = val2;
-    this.stack.elements[this.stack.sp - idx2 - 1] = val1;
+    let val1 = this.stack.peek(idx1);
+    let val2 = this.stack.peek(idx2);
+    this.stack.poke(idx1, val2);
+    this.stack.poke(idx2, val1);
   }
 
   op_getlcl1() { // 0x80
     let index = this.codePool.getByte(this.ip);
     Debug.instruction({ index: index });
-    this.stack.push(this.stack.peek(this.stack.fp + index));
+    this.stack.push(this.stack.getLocal(index));
     this.ip++;
   }
 
   op_getlcl2() { // 0x81
     let index = this.codePool.getUint2(this.ip);
     Debug.instruction({ index: index });
-    this.stack.push(this.stack.peek(this.stack.fp + index));
+    this.stack.push(this.stack.getLocal(index));
     this.ip += 2;
   }
 
@@ -1237,7 +1237,7 @@ export class Vm {
 
   op_dup() { // 0x88
     Debug.instruction();
-    this.stack.push(this.stack.peek(this.stack.sp - 1));
+    this.stack.push(this.stack.peek());
     // TODO: Probably needs deep copy
   }
 
@@ -1282,8 +1282,8 @@ export class Vm {
 
   op_dup2() { // 0x8f
     Debug.instruction();
-    let val1 = this.stack.peek(this.stack.sp - 1); // top of stack
-    let val2 = this.stack.peek(this.stack.sp - 2);
+    let val1 = this.stack.peek(); // top of stack
+    let val2 = this.stack.peek(1);
     this.stack.push(val2);
     this.stack.push(val1);
     // TODO: Probably needs deep copy
@@ -1466,7 +1466,7 @@ export class Vm {
   op_jst() { // 0x9a 
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
-    let val = this.stack.peek(this.stack.sp - 1);
+    let val = this.stack.peek();
     if(val instanceof VmNil || (val instanceof VmInt && val.value == 0)) {
       this.stack.pop();
       this.ip += 2;
@@ -1478,7 +1478,7 @@ export class Vm {
   op_jsf() { // 0x9b
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
-    let val = this.stack.peek(this.stack.sp - 1);
+    let val = this.stack.peek();
     if(val instanceof VmNil || (val instanceof VmInt && val.value == 0)) {
       this.ip += branch_offset;
     } else {
