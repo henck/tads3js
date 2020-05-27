@@ -62,23 +62,23 @@ export class Vm {
     /* OK */ [0x0F, { name: 'PUSHENUM',        func: this.op_pushenum }],
     /* OK */ [0x10, { name: 'PUSHBIFPTR',      func: this.op_pushbifptr }],
              // 0x11..0x1f empty     
-    /*    */ [0x20, { name: 'NEG',             func: this.op_neg }],
-    /*    */ [0x21, { name: 'BNOT',            func: this.op_bnot }],
-    /*    */ [0x22, { name: 'ADD',             func: this.op_add }],
-    /*    */ [0x23, { name: 'SUB',             func: this.op_sub }],
-    /*    */ [0x24, { name: 'MUL',             func: this.op_mul }],
-    /*    */ [0x25, { name: 'BAND',            func: this.op_band }],
-    /*    */ [0x26, { name: 'BOR',             func: this.op_bor }],
-    /*    */ [0x27, { name: 'SHL',             func: this.op_shl }],
-    /*    */ [0x28, { name: 'ASHR',            func: this.op_ashr }],
-    /*    */ [0x29, { name: 'XOR',             func: this.op_xor }],
-    /*    */ [0x2A, { name: 'DIV',             func: this.op_div }],
-    /*    */ [0x2B, { name: 'MOD',             func: this.op_mod }],
+    /* OK */ [0x20, { name: 'NEG',             func: this.op_neg }],
+    /* OK */ [0x21, { name: 'BNOT',            func: this.op_bnot }],
+    /* OK */ [0x22, { name: 'ADD',             func: this.op_add }],
+    /* OK */ [0x23, { name: 'SUB',             func: this.op_sub }],
+    /* OK */ [0x24, { name: 'MUL',             func: this.op_mul }],
+    /* OK */ [0x25, { name: 'BAND',            func: this.op_band }],
+    /* OK */ [0x26, { name: 'BOR',             func: this.op_bor }],
+    /* OK */ [0x27, { name: 'SHL',             func: this.op_shl }],
+    /* OK */ [0x28, { name: 'ASHR',            func: this.op_ashr }],
+    /* OK */ [0x29, { name: 'XOR',             func: this.op_xor }],
+    /* OK */ [0x2A, { name: 'DIV',             func: this.op_div }],
+    /* OK */ [0x2B, { name: 'MOD',             func: this.op_mod }],
     /* OK */ [0x2C, { name: 'NOT',             func: this.op_not }],  
     /* OK */ [0x2D, { name: 'BOOLIZE',         func: this.op_boolize }],
     /* OK */ [0x2E, { name: 'INC',             func: this.op_inc }],
     /* OK */ [0x2F, { name: 'DEC',             func: this.op_dec }],
-    /*    */ [0x30, { name: 'LSHR',            func: this.op_lshr }],
+    /* OK */ [0x30, { name: 'LSHR',            func: this.op_lshr }],
              // 0x31..0x3f empty     
     /*    */ [0x40, { name: 'EQ',              func: this.op_eq }],
     /* OK */ [0x41, { name: 'NE',              func: this.op_ne }],
@@ -737,7 +737,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Negate value on stack.
+   * @done
    */
   op_neg() { // 0x20
     Debug.instruction();
@@ -746,7 +747,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Compute the bitwise NOT of value on stack.
+   * @done
    */
   op_bnot() { // 0x21
     Debug.instruction();
@@ -755,7 +757,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Add values on stack.
+   * @done
    */  
   op_add() { // 0x22
     Debug.instruction();
@@ -765,7 +768,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Subtract values on stack.
+   * @done
    */  
   op_sub() { // 0x23
     Debug.instruction();
@@ -775,7 +779,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Multiply values on stack.
+   * @done
    */  
   op_mul() { // 0x24
     Debug.instruction();
@@ -785,7 +790,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Computer binary AND of values on stack.
+   * @done
    */  
   op_band() { // 0x25 
     Debug.instruction();
@@ -795,7 +801,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Computer binary OR of values on stack.
+   * @done
    */  
   op_bor() { // 0x26
     Debug.instruction();
@@ -805,7 +812,8 @@ export class Vm {
   }  
 
   /**
-   * @todo Needs operator overloading.
+   * Perform logical shift left
+   * @done
    */  
   op_shl() { // 0x27
     Debug.instruction();
@@ -815,7 +823,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Perform arithmetic shift right.
+   * @done
    */  
   op_ashr() { // 0x28
     Debug.instruction();
@@ -825,7 +834,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Compute logical XOR of values on stack.
+   * @done
    */  
   op_xor() { // 0x29
     Debug.instruction();
@@ -835,7 +845,8 @@ export class Vm {
   }
   
   /**
-   * @todo Needs operator overloading.
+   * Divide values on stack.
+   * @done
    */  
   op_div() { // 0x2a
     Debug.instruction();
@@ -845,7 +856,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Calculate modulus of values on stack.
+   * @done
    */  
   op_mod() { // 0x2b
     Debug.instruction();
@@ -895,7 +907,8 @@ export class Vm {
   }
 
   /**
-   * @todo Needs operator overloading.
+   * Perform logical shift right of values on stack.
+   * @done
    */  
   op_lshr() { // 0x30
     Debug.instruction();
