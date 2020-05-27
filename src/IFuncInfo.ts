@@ -4,4 +4,5 @@ export interface IFuncInfo {
   varargs: boolean;
   locals: number;
   slots: number;
+  exceptionTableoffset: number;
 }

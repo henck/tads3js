@@ -176,7 +176,7 @@ export class Vm {
     /*    */ [0xb5, { name: 'BUILTIN1',        func: this.op_builtin1 }],
     /*    */ [0xb6, { name: 'BUILTIN2',        func: this.op_builtin2 }],
     /* -- */ [0xb7, { name: 'CALLEXT',         func: null }], /* CALLEXT not supported in TADS3.1 */
-    /*    */ [0xb8, { name: 'THROW',           func: null }],
+    /*    */ [0xb8, { name: 'THROW',           func: this.op_throw }],
     /*    */ [0xb9, { name: 'SAYVAL',          func: this.op_sayval }],
     /*    */ [0xba, { name: 'INDEX',           func: this.op_index }],
     /*    */ [0xbb, { name: 'IDXLCL1INT8',     func: this.op_idxlcl1int8 }],
@@ -308,22 +308,25 @@ export class Vm {
 
   getFuncInfo(offset: number): IFuncInfo {
     // Get number of parameters
-    let methodParamCount = this.codePool.getByte(offset);
+    let params = this.codePool.getByte(offset);
     // If high bit is set, then a varying parameter list is accepted.
-    let methodVaryingArguments = ((methodParamCount >> 7) == 1);
+    let varargs = ((params >> 7) == 1);
     // .. and the required number of parameters is:
-    if(methodVaryingArguments) methodParamCount = (methodParamCount & 0x7f);
+    if(varargs) params = (params & 0x7f);
 
-    let methodOptParamCount = this.codePool.getByte(offset + 1);
-    let methodLocalCount = this.codePool.getUint2(offset + 2);
-    let methodStackSlots = this.codePool.getUint2(offset + 4);
+    let optParams = this.codePool.getByte(offset + 1);
+    let locals = this.codePool.getUint2(offset + 2);
+    let stackSlots = this.codePool.getUint2(offset + 4);
+    let exceptionTableStart = this.codePool.getUint2(offset + 6);
 
     return {
-      params: methodParamCount,
-      optParams: methodOptParamCount,
-      varargs: methodVaryingArguments,
-      locals: methodLocalCount,
-      slots: methodStackSlots
+      params: params,
+      optParams: optParams,
+      varargs: varargs,
+      locals: locals,
+      slots: stackSlots,
+      // absolute offset in codePool or 0 for no exception table:
+      exceptionTableoffset: exceptionTableStart == 0 ? 0 : exceptionTableStart + offset 
     };
   }
 
@@ -1794,6 +1797,32 @@ export class Vm {
 
   imp_builtin(argc: number, func_index: number, set_index: number) {
     this.r0 = Builtin.call(set_index, func_index, argc);
+  }
+
+  op_throw() { // 0xb8
+    Debug.instruction();
+    let exception_obj = this.stack.pop();
+    if(!(exception_obj instanceof VmObject)) throw('OBJ_VAL_REQD');
+    let funcinfo = this.getFuncInfo(this.ep);
+    console.log(funcinfo);
+    // Do we have an exception table?
+    if(funcinfo.exceptionTableoffset != 0) {
+      let exception_count = this.codePool.getUint2(funcinfo.exceptionTableoffset);
+      console.log("Exception handler count", exception_count);
+      let offset = funcinfo.exceptionTableoffset + 2;
+      for(let i = 0; i < exception_count; i++) {
+        let startPos = this.codePool.getUint2(offset); offset += 2;
+        let endPos = this.codePool.getUint2(offset);   offset += 2;
+        let classID = this.codePool.getUint4(offset);  offset += 4;
+        let pos = this.codePool.getUint2(offset);      offset += 2;
+        console.log("Handler startpos", startPos, "endpos", endPos, "classID", classID, "pos", pos);
+        if(exception_obj.value == classID) { // todo: inheritance
+          this.ip = this.ep + pos;
+          return;
+        }
+      }
+    }
+    throw('HALT');
   }
 
   op_sayval() { // 0xb9 
