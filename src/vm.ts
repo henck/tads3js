@@ -9,7 +9,6 @@ import { MetaclassRegistry } from './metaclass/MetaclassRegistry'
 import { MetaclassFactory } from './metaclass/MetaclassFactory'
 import { Heap } from './Heap'
 import { MetaString, List, Iterator, IntrinsicClass } from './metaimp'
-import { OPCODES } from './Opcodes'
 import { IFuncInfo } from './IFuncInfo'
 
 
@@ -19,6 +18,11 @@ interface IPropInfo {
   targetObject: VmObject,
   definingObject: VmObject,
   data: VmData
+}
+
+interface IOpcode {
+  name: string;
+  func: () => void;
 }
 
 export class Vm {
@@ -34,6 +38,188 @@ export class Vm {
   public stack: Stack;
   public stop = false;
   public varargc: number = undefined;
+
+  private OPCODES: Map<number, IOpcode> = new Map([
+    /* OK */ [0x01, { name: 'PUSH_0',          func: this.op_push_0 }],
+    /* OK */ [0x02, { name: 'PUSH_1',          func: this.op_push_1 }],
+    /* OK */ [0x03, { name: 'PUSHINT8',        func: this.op_pushint8 }],
+    /* OK */ [0x04, { name: 'PUSHINT',         func: this.op_pushint }],
+    /* OK */ [0x05, { name: 'PUSHSTR',         func: this.op_pushstr }],
+    /* OK */ [0x06, { name: 'PUSHLST',         func: this.op_pushlst }],
+    /* OK */ [0x07, { name: 'PUSHOBJ',         func: this.op_pushobj }],
+    /* OK */ [0x08, { name: 'PUSHNIL',         func: this.op_pushnil }],
+    /* OK */ [0x09, { name: 'PUSHTRUE',        func: this.op_pushtrue }],
+    /* OK */ [0x0A, { name: 'PUSHPROPID',      func: this.op_pushpropid }],
+    /* OK */ [0x0B, { name: 'PUSHFNPTR',       func: this.op_pushfuncptr }],
+    /* OK */ [0x0C, { name: 'PUSHSTRI',        func: this.op_no_debug_support }],
+    /* OK */ [0x0D, { name: 'PUSHPARLST',      func: this.op_pushparlst }],
+    /* OK */ [0x0E, { name: 'MAKELSTPAR',      func: this.op_makelistpar }],
+    /* OK */ [0x0F, { name: 'PUSHENUM',        func: this.op_pushenum }],
+    /* OK */ [0x10, { name: 'PUSHBIFPTR',      func: this.op_pushbifptr }],
+             // 0x11..0x1f empty     
+    /*    */ [0x20, { name: 'NEG',             func: this.op_neg }],
+    /*    */ [0x21, { name: 'BNOT',            func: this.op_bnot }],
+    /*    */ [0x22, { name: 'ADD',             func: this.op_add }],
+    /*    */ [0x23, { name: 'SUB',             func: this.op_sub }],
+    /*    */ [0x24, { name: 'MUL',             func: this.op_mul }],
+    /*    */ [0x25, { name: 'BAND',            func: this.op_band }],
+    /*    */ [0x26, { name: 'BOR',             func: this.op_bor }],
+    /*    */ [0x27, { name: 'SHL',             func: this.op_shl }],
+    /*    */ [0x28, { name: 'ASHR',            func: this.op_ashr }],
+    /*    */ [0x29, { name: 'XOR',             func: this.op_xor }],
+    /*    */ [0x2A, { name: 'DIV',             func: this.op_div }],
+    /*    */ [0x2B, { name: 'MOD',             func: this.op_mod }],
+    /* OK */ [0x2C, { name: 'NOT',             func: this.op_not }],  
+    /* OK */ [0x2D, { name: 'BOOLIZE',         func: this.op_boolize }],
+    /* OK */ [0x2E, { name: 'INC',             func: this.op_inc }],
+    /* OK */ [0x2F, { name: 'DEC',             func: this.op_dec }],
+    /*    */ [0x30, { name: 'LSHR',            func: this.op_lshr }],
+             // 0x31..0x3f empty     
+    /*    */ [0x40, { name: 'EQ',              func: this.op_eq }],
+    /* OK */ [0x41, { name: 'NE',              func: this.op_ne }],
+    /*    */ [0x42, { name: 'LT',              func: this.op_lt }],
+    /*    */ [0x43, { name: 'LE',              func: this.op_le }],
+    /* OK */ [0x44, { name: 'GT',              func: this.op_gt }],
+    /* OK */ [0x45, { name: 'GE',              func: this.op_ge }],
+             // 0x46..0x4f empty     
+    /* OK */ [0x50, { name: 'RETVAL',          func: this.op_retval }],
+    /* OK */ [0x51, { name: 'RETNIL',          func: this.op_retnil }],
+    /* OK */ [0x52, { name: 'RETTRUE',         func: this.op_rettrue }],
+             // 0x53 empty   
+    /* OK */ [0x54, { name: 'RET',             func: this.op_ret }],
+             // 0x55 empty   
+    /* DB */ [0x56, { name: 'NAMEDARGPTR',     func: this.op_no_debug_support }],
+    /* DB */ [0x57, { name: 'NAMEDARGTAB',     func: this.op_no_debug_support }],
+    /*    */ [0x58, { name: 'CALL',            func: this.op_call }],
+    /*    */ [0x59, { name: 'PTRCALL',         func: this.op_ptrcall }],
+             // 0x5a..0x5f empty
+    /*    */ [0x60, { name: 'GETPROP',         func: this.op_getprop }],
+    /*    */ [0x61, { name: 'CALLPROP',        func: this.op_callprop }],
+    /*    */ [0x62, { name: 'PTRCALLPROP',     func: this.op_ptrcallprop }],
+    /*    */ [0x63, { name: 'GETPROPSELF',     func: this.op_getpropself }],
+    /*    */ [0x64, { name: 'CALLPROPSELF',    func: this.op_callpropself }],
+    /*    */ [0x65, { name: 'PTRCALLPROPSELF', func: this.op_ptrcallpropself }],
+    /*    */ [0x66, { name: 'OBJGETPROP',      func: this.op_objgetprop }],
+    /*    */ [0x67, { name: 'OBJCALLPROP',     func: this.op_objcallprop }],
+    /* DB */ [0x68, { name: 'GETPROPDATA',     func: this.op_no_debug_support }],
+    /* DB */ [0x69, { name: 'PTRGETPROPDATA',  func: this.op_no_debug_support }],
+    /*    */ [0x6a, { name: 'GETPROPLCL1',     func: this.op_getproplcl1 }],
+    /*    */ [0x6b, { name: 'CALLPROPLCL1',    func: this.op_callproplcl1 }],
+    /*    */ [0x6c, { name: 'GETPROPR0',       func: this.op_getpropr0 }],
+    /*    */ [0x6d, { name: 'CALLPROPR0',      func: this.op_callpropr0 }],
+             // 0x6e..0x71 empty
+    /*    */ [0x72, { name: 'INHERIT',         func: this.op_inherit }],
+    /*    */ [0x73, { name: 'PTRINHERIT',      func: this.op_ptrinherit }],
+    /*    */ [0x74, { name: 'EXPINHERIT',      func: this.op_expinherit }],
+    /*    */ [0x75, { name: 'PTREXPINHERIT',   func: this.op_ptrexpinherit }],
+    /*    */ [0x76, { name: 'VARARGC',         func: this.op_varargc }],
+    /*    */ [0x77, { name: 'DELEGATE',        func: null }],
+    /*    */ [0x78, { name: 'PTRDELEGATE',     func: null }],
+             // 0x79 empty
+    /*    */ [0x7a, { name: 'SWAP2',           func: this.op_swap2 }],
+    /* OK */ [0x7b, { name: 'SWAPN',           func: this.op_swapn }],
+    /* OK */ [0x7c, { name: 'GETARGN0',        func: this.op_getargn0 }],
+    /* OK */ [0x7d, { name: 'GETARGN1',        func: this.op_getargn1 }],
+    /* OK */ [0x7e, { name: 'GETARGN2',        func: this.op_getargn2 }],
+    /* OK */ [0x7f, { name: 'GETARGN3',        func: this.op_getargn3 }],
+    /* OK */ [0x80, { name: 'GETLCL1',         func: this.op_getlcl1 }],
+    /* OK */ [0x81, { name: 'GETLCL2',         func: this.op_getlcl2 }],
+    /* OK */ [0x82, { name: 'GETARG1',         func: this.op_getarg1 }],
+    /* OK */ [0x83, { name: 'GETARG2',         func: this.op_getarg2 }],
+    /* OK */ [0x84, { name: 'PUSHSELF',        func: this.op_pushself }],
+    /* DB */ [0x85, { name: 'GETDBLCL',        func: this.op_no_debug_support }],
+    /* DB */ [0x86, { name: 'GETDBARG',        func: this.op_no_debug_support }],
+    /* OK */ [0x87, { name: 'GETARGC',         func: this.op_getargc }],
+    /* OK */ [0x88, { name: 'DUP',             func: this.op_dup }],
+    /* OK */ [0x89, { name: 'DISC',            func: this.op_disc }],
+    /* OK */ [0x8a, { name: 'DISC1',           func: this.op_disc1 }],
+    /* OK */ [0x8b, { name: 'GETR0',           func: this.op_getr0 }],
+    /* DB */ [0x8c, { name: 'GETDBARGC',       func: this.op_no_debug_support }],
+    /* OK */ [0x8d, { name: 'SWAP',            func: this.op_swap }],
+    /*    */ [0x8e, { name: 'PUSHCTXELE',      func: this.op_pushctxele }],
+    /* OK */ [0x8f, { name: 'DUP2',            func: this.op_dup2 }],
+    /* OK */ [0x90, { name: 'SWITCH',          func: this.op_switch }],
+    /* OK */ [0x91, { name: 'JMP',             func: this.op_jmp }],
+    /* OK */ [0x92, { name: 'JT',              func: this.op_jt }],
+    /* OK */ [0x93, { name: 'JF',              func: this.op_jf }],
+    /* OK */ [0x94, { name: 'JE',              func: this.op_je }],
+    /* OK */ [0x95, { name: 'JNE',             func: this.op_jne }],
+    /* OK */ [0x96, { name: 'JGT',             func: this.op_jgt }],
+    /* OK */ [0x97, { name: 'JGE',             func: this.op_jge }],
+    /* OK */ [0x98, { name: 'JLT',             func: this.op_jlt }],
+    /* OK */ [0x99, { name: 'JLE',             func: this.op_jle }],
+    /* OK */ [0x9a, { name: 'JST',             func: this.op_jst }],
+    /* OK */ [0x9b, { name: 'JSF',             func: this.op_jsf }],
+    /* OK */ [0x9c, { name: 'LJSR',            func: this.op_ljsr }],
+    /* OK */ [0x9d, { name: 'LRET',            func: this.op_lret }],
+    /* OK */ [0x9e, { name: 'JNIL',            func: this.op_jnil }],
+    /* OK */ [0x9f, { name: 'JNOTNIL',         func: this.op_jnotnil }],
+    /* OK */ [0xa0, { name: 'JR0T',            func: this.op_jr0t }],
+    /* OK */ [0xa1, { name: 'JR0F',            func: this.op_jr0f }],
+    /*    */ [0xa2, { name: 'ITERNEXT',        func: this.op_iternext }],
+    /* OK */ [0xa3, { name: 'GETSETLCL1R0',    func: this.op_getsetlcl1r0 }],
+    /* OK */ [0xa4, { name: 'GETSETLCL1',      func: this.op_getsetlcl1 }],
+    /* OK */ [0xa5, { name: 'DUPR0',           func: this.op_dupr0 }],
+    /* OK */ [0xa6, { name: 'GETSPN',          func: this.op_getspn }],
+             // 0xa7..0xa9 empty
+    /* OK */ [0xaa, { name: 'GETLCLN0',        func: this.op_getlcln0 }],
+    /* OK */ [0xab, { name: 'GETLCLN1',        func: this.op_getlcln1 }],
+    /* OK */ [0xac, { name: 'GETLCLN2',        func: this.op_getlcln2 }],
+    /* OK */ [0xad, { name: 'GETLCLN3',        func: this.op_getlcln3 }],
+    /* OK */ [0xae, { name: 'GETLCLN4',        func: this.op_getlcln4 }],
+    /* OK */ [0xaf, { name: 'GETLCLN5',        func: this.op_getlcln5 }],
+    /*    */ [0xb0, { name: 'SAY',             func: this.op_say }],
+    /*    */ [0xb1, { name: 'BUILTIN_A',       func: this.op_builtin_a }],
+    /*    */ [0xb2, { name: 'BUILTIN_B',       func: this.op_builtin_b }],
+    /*    */ [0xb3, { name: 'BUILTIN_C',       func: this.op_builtin_c }],
+    /*    */ [0xb4, { name: 'BUILTIN_D',       func: this.op_builtin_d }],
+    /*    */ [0xb5, { name: 'BUILTIN1',        func: this.op_builtin1 }],
+    /*    */ [0xb6, { name: 'BUILTIN2',        func: this.op_builtin2 }],
+    /*    */ [0xb7, { name: 'CALLEXT',         func: null }],
+    /*    */ [0xb8, { name: 'THROW',           func: null }],
+    /*    */ [0xb9, { name: 'SAYVAL',          func: null }],
+    /*    */ [0xba, { name: 'INDEX',           func: this.op_index }],
+    /*    */ [0xbb, { name: 'IDXLCL1INT8',     func: this.op_idxlcl1int8 }],
+    /*    */ [0xbc, { name: 'IDXINT8',         func: this.op_idxint8 }],
+             // 0xbd..0xbf empty
+    /*    */ [0xc0, { name: 'NEW1',            func: this.op_new1 }],
+    /*    */ [0xc1, { name: 'NEW2',            func: this.op_new2 }],
+    /*    */ [0xc2, { name: 'TRNEW1',          func: this.op_trnew1 }],
+    /*    */ [0xc3, { name: 'TRNEW2',          func: this.op_trnew2 }], 
+             // 0xc4..0xcf empty
+    /* OK */ [0xd0, { name: 'INCLCL',          func: this.op_inclcl }],
+    /* OK */ [0xd1, { name: 'DECLCL',          func: this.op_declcl }],
+    /* OK */ [0xd2, { name: 'ADDILCL1',        func: this.op_addilcl1 }],
+    /* OK */ [0xd3, { name: 'ADDILCL4',        func: this.op_addilcl4 }],
+    /* OK */ [0xd4, { name: 'ADDTOLCL',        func: this.op_addtolcl }],
+    /* OK */ [0xd5, { name: 'SUBFROMLCL',      func: this.op_subfromlcl }],
+    /* OK */ [0xd6, { name: 'ZEROLCL1',        func: this.op_zerolcl1 }],
+    /* OK */ [0xd7, { name: 'ZEROLCL2',        func: this.op_zerolcl2 }],
+    /* OK */ [0xd8, { name: 'NILLCL1',         func: this.op_nillcl1 }],
+    /* OK */ [0xd9, { name: 'NILLCL2',         func: this.op_nillcl2 }],
+    /* OK */ [0xda, { name: 'ONELCL1',         func: this.op_onelcl1 }],
+    /* OK */ [0xdb, { name: 'ONELCL2',         func: this.op_onelcl2 }],
+             // 0xdc..0xdf empty
+    /* OK */ [0xe0, { name: 'SETLCL1',         func: this.op_setlcl1 }],
+    /* OK */ [0xe1, { name: 'SETLCL2',         func: this.op_setlcl2 }],
+    /* OK */ [0xe2, { name: 'SETARG1',         func: this.op_setarg1 }],
+    /* OK */ [0xe3, { name: 'SETARG2',         func: this.op_setarg2 }],
+    /*    */ [0xe4, { name: 'SETIND',          func: this.op_setind }],
+    /*    */ [0xe5, { name: 'SETPROP',         func: this.op_setprop }],
+    /*    */ [0xe6, { name: 'PTRSETPROP',      func: this.op_ptrsetprop }],
+    /*    */ [0xe7, { name: 'SETPROPSELF',     func: this.op_setpropself }],
+    /*    */ [0xe8, { name: 'OBJSETPROP',      func: this.op_objsetprop }],
+    /* DB */ [0xe9, { name: 'SETDBLCL',        func: this.op_no_debug_support }],
+    /* DB */ [0xea, { name: 'SETDBARG',        func: this.op_no_debug_support }],
+    /*    */ [0xeb, { name: 'SETSELF',         func: this.op_setself }],
+    /*    */ [0xec, { name: 'LOADCTX',         func: this.op_loadctx }],
+    /*    */ [0xed, { name: 'STORECTX',        func: this.op_storectx }],
+    /*    */ [0xee, { name: 'SETLCL1R0',       func: this.op_setlcl1r0 }],
+    /*    */ [0xef, { name: 'SETINDLCL1I8',    func: this.op_setindlcl1i8 }],
+             // 0xf0 empty
+    /*    */ [0xf1, { name: 'BP',              func: this.op_bp }],
+    /*    */ [0xf2, { name: 'NOP',             func: this.op_nop }]
+  ]);
 
   constructor() {
   }
@@ -269,210 +455,23 @@ export class Vm {
         vmProp,                   // property
         propInfo.targetObject,    // target object
         propInfo.definingObject,  // defining object
-        propInfo.targetObject,    //  self object
+        propInfo.targetObject,    // self object
         propInfo.data);           // invokee
     }
 
     else {
       throw('CALLPROP: Don\'t know what to do with this property.');
     }
-    
-
-    // For a string, use the string metaclass constant string property evaluator.
-    /* if(data instanceof VmSstring) {
-      let s = new MetaString(data.value);
-      let args = this.stack.popMany(argc);
-      let { prop, object } = s.findProp(vmProp.value);
-      this.r0 = s.callNativeMethod((prop as any), ...args);
-    }
-
-    // For a list, use the string metaclass:
-    if(data instanceof VmList) {
-      let lst = new List(data.value);
-      let args = this.stack.popMany(argc);
-      let { prop, object } = lst.findProp(vmProp.value);
-      this.r0 = lst.callNativeMethod((prop as any), ...args);
-    } */
-  }
-
-  executeInstruction(byte: number) {
-    switch(byte) {
-      case 0x01: this.op_push_0(); break;
-      case 0x02: this.op_push_1(); break;
-      case 0x03: this.op_pushint8(); break;
-      case 0x04: this.op_pushint(); break;
-      case 0x05: this.op_pushstr(); break;
-      case 0x06: this.op_pushlst(); break;
-      case 0x07: this.op_pushobj(); break;
-      case 0x08: this.op_pushnil(); break;
-      case 0x09: this.op_pushtrue(); break;
-      case 0x0a: this.op_pushpropid(); break;
-      case 0x0b: this.op_pushfuncptr(); break;
-      case 0x0c: this.op_no_debug_support(); break; // PUSHSTRI
-      case 0x0d: this.op_pushparlst(); break;
-      case 0x0e: this.op_makelistpar(); break;
-      case 0x0f: this.op_pushenum(); break;
-      case 0x10: this.op_pushbifptr(); break;
-      case 0x20: this.op_neg(); break;
-      case 0x21: this.op_bnot(); break;
-      case 0x22: this.op_add(); break;
-      case 0x23: this.op_sub(); break;
-      case 0x24: this.op_mul(); break;
-      case 0x25: this.op_band(); break;
-      case 0x26: this.op_bor(); break;
-      case 0x27: this.op_shl(); break;
-      case 0x28: this.op_ashr(); break;
-      case 0x29: this.op_xor(); break;
-      case 0x2a: this.op_div(); break;
-      case 0x2b: this.op_mod(); break;
-      case 0x2c: this.op_not(); break;
-      case 0x2d: this.op_boolize(); break;
-      case 0x2e: this.op_inc(); break;
-      case 0x2f: this.op_dec(); break;
-      case 0x30: this.op_lshr(); break;
-      case 0x40: this.op_eq(); break;
-      case 0x41: this.op_ne(); break;
-      case 0x42: this.op_lt(); break;
-      case 0x43: this.op_le(); break;
-      case 0x44: this.op_gt(); break;
-      case 0x45: this.op_ge(); break;
-      case 0x50: this.op_retval(); break;
-      case 0x51: this.op_retnil(); break;
-      case 0x52: this.op_rettrue(); break;
-      case 0x54: this.op_ret(); break;
-      case 0x56: this.op_no_debug_support(); break; // NAMEDARGPTR
-      case 0x57: this.op_no_debug_support(); break; // NAMEDARGTAB
-      case 0x58: this.op_call(); break;
-      case 0x59: this.op_ptrcall(); break;
-      case 0x60: this.op_getprop(); break;
-      case 0x61: this.op_callprop(); break;
-      case 0x62: this.op_ptrcallprop(); break;
-      case 0x63: this.op_getpropself(); break;
-      case 0x64: this.op_callpropself(); break;
-      case 0x65: this.op_ptrcallpropself(); break;
-      case 0x66: this.op_objgetprop(); break;
-      case 0x67: this.op_objcallprop(); break;
-      case 0x68: this.op_no_debug_support(); break;    // GETPROPDATA
-      case 0x69: this.op_no_debug_support(); break; // PTRGETPROPDATA
-      case 0x6a: this.op_getproplcl1(); break;
-      case 0x6b: this.op_callproplcl1(); break;
-      case 0x6c: this.op_getpropr0(); break;
-      case 0x6d: this.op_callpropr0(); break;
-      case 0x72: this.op_inherit(); break;
-      case 0x73: this.op_ptrinherit(); break;
-      case 0x74: this.op_expinherit(); break;
-      case 0x75: this.op_ptrexpinherit(); break;
-      case 0x76: this.op_varargc(); break;
-      // case 0x77: DELEGATE
-      // case 0x78: PTRDELEGATE
-      case 0x7a: this.op_swap2(); break;
-      case 0x7b: this.op_swapn(); break;
-      case 0x7c: this.op_getargn0(); break;
-      case 0x7d: this.op_getargn1(); break;
-      case 0x7e: this.op_getargn2(); break;
-      case 0x7f: this.op_getargn3(); break;
-      case 0x80: this.op_getlcl1(); break;
-      case 0x81: this.op_getlcl2(); break;
-      case 0x82: this.op_getarg1(); break;
-      case 0x83: this.op_getarg2(); break;
-      case 0x84: this.op_pushself(); break;
-      case 0x85: this.op_no_debug_support(); break; // GETDBLCL
-      case 0x86: this.op_no_debug_support; break; // GETDBARG
-      case 0x87: this.op_getargc(); break;
-      case 0x88: this.op_dup(); break;
-      case 0x89: this.op_disc(); break;
-      case 0x8a: this.op_disc1(); break;
-      case 0x8b: this.op_getr0(); break;
-      case 0x8c: this.op_no_debug_support(); break; // GETDBARGC
-      case 0x8d: this.op_swap(); break;
-      case 0x8e: this.op_pushctxele(); break;
-      case 0x8f: this.op_dup2(); break;
-      case 0x90: this.op_switch(); break;
-      case 0x91: this.op_jmp(); break;
-      case 0x92: this.op_jt(); break;
-      case 0x93: this.op_jf(); break;
-      case 0x94: this.op_je(); break;
-      case 0x95: this.op_jne(); break;
-      case 0x96: this.op_jgt(); break;
-      case 0x97: this.op_jge(); break;
-      case 0x98: this.op_jlt(); break;
-      case 0x99: this.op_jle(); break;
-      case 0x9a: this.op_jst(); break;
-      case 0x9b: this.op_jsf(); break;
-      case 0x9c: this.op_ljsr(); break;
-      case 0x9d: this.op_lret(); break;
-      case 0x9e: this.op_jnil(); break;
-      case 0x9f: this.op_jnotnil(); break;
-      case 0xa0: this.op_jr0t(); break;
-      case 0xa1: this.op_jr0f(); break;
-      case 0xa2: this.op_iternext(); break;
-      case 0xa3: this.op_getsetlcl1r0(); break;
-      case 0xa4: this.op_getsetlcl1(); break;
-      case 0xa5: this.op_dupr0(); break;
-      case 0xa6: this.op_getspn(); break;
-      case 0xaa: this.op_getlclnx(0); break;
-      case 0xab: this.op_getlclnx(1); break;
-      case 0xac: this.op_getlclnx(2); break;
-      case 0xad: this.op_getlclnx(3); break;
-      case 0xae: this.op_getlclnx(4); break;
-      case 0xaf: this.op_getlclnx(5); break;
-      case 0xb0: this.op_say(); break;
-      case 0xb1: this.op_builtin_a(); break;
-      case 0xb2: this.op_builtin_b(); break;
-      case 0xb3: this.op_builtin_c(); break;
-      case 0xb4: this.op_builtin_d(); break;
-      case 0xb5: this.op_builtin1(); break;
-      case 0xb6: this.op_builtin2(); break;
-      case 0xba: this.op_index(); break;
-      case 0xbb: this.op_idxlcl1int8(); break;
-      case 0xbc: this.op_idxint8(); break;
-      case 0xc0: this.op_new1(); break;
-      case 0xc1: this.op_new2(); break;
-      case 0xc2: this.op_trnew1(); break;
-      case 0xc3: this.op_trnew2(); break;
-      case 0xd0: this.op_inclcl(); break;
-      case 0xd1: this.op_declcl(); break;
-      case 0xd2: this.op_addilcl1(); break;
-      case 0xd3: this.op_addilcl4(); break;
-      case 0xd4: this.op_addtolcl(); break;
-      case 0xd5: this.op_subfromlcl(); break;
-      case 0xd6: this.op_zerolcl1(); break;
-      case 0xd7: this.op_zerolcl2(); break;
-      case 0xd8: this.op_nillcl1(); break;
-      case 0xd9: this.op_nillcl2(); break;
-      case 0xda: this.op_onelcl1(); break;
-      case 0xdb: this.op_onelcl2(); break;
-      case 0xe0: this.op_setlcl1(); break;
-      case 0xe1: this.op_setlcl2(); break;
-      case 0xe2: this.op_setarg1(); break;
-      case 0xe3: this.op_setarg2(); break;
-      case 0xe4: this.op_setind(); break;
-      case 0xe5: this.op_setprop(); break;
-      case 0xe6: this.op_ptrsetprop(); break;
-      case 0xe7: this.op_setpropself(); break;
-      case 0xe8: this.op_objsetprop(); break;
-      case 0xe9: this.op_no_debug_support(); break; // SETDBLCL
-      case 0xea: this.op_no_debug_support(); break; // SETDBARG
-      case 0xeb: this.op_setself(); break;
-      case 0xec: this.op_loadctx(); break;
-      case 0xed: this.op_storectx(); break;
-      case 0xee: this.op_setlcl1r0(); break;
-      case 0xef: this.op_setindlcl1i8(); break;
-      case 0xf1: this.op_bp(); break;
-      case 0xf2: this.op_nop(); break;
-      default:
-        throw('UNKNOWN INSTRUCTION 0x' + byte.toString(16));
-    }
   }
 
   private execute() {
     let byte = this.codePool.getByte(this.ip++); 
+    let opcode = this.OPCODES.get(byte);
+    if(!opcode) throw('Unknown instruction: ' + '0x' + byte.toString(16));
     Debug.opcode = byte;
     Debug.ip = this.ip;
-    if(OPCODES[byte] == null) throw('Unknown instruction: ' + '0x' + byte.toString(16));
-    Debug.opname = OPCODES[byte].name;
-    let size = OPCODES[byte].size;
-    this.executeInstruction(byte);
+    Debug.opname = opcode.name;
+    opcode.func.bind(this)();
   }
 
   //
@@ -1257,10 +1256,13 @@ export class Vm {
     this.stack.push(new VmInt(argcount));
   }
 
+  /**
+   * Re-push item at top of stack
+   * @done
+   */
   op_dup() { // 0x88
     Debug.instruction();
     this.stack.push(this.stack.peek());
-    // TODO: Probably needs deep copy
   }
 
   /**
@@ -1318,13 +1320,18 @@ export class Vm {
     }
   }
 
+  /** 
+   * Duplicate the top two elements: first push the
+   * second-from-top, then push the old top (which will now
+   * be the second-from-top, thanks to our first push) 
+   * @done
+   */  
   op_dup2() { // 0x8f
     Debug.instruction();
     let val1 = this.stack.peek(); // top of stack
     let val2 = this.stack.peek(1);
     this.stack.push(val2);
     this.stack.push(val1);
-    // TODO: Probably needs deep copy
   }
 
   /**
@@ -1672,10 +1679,62 @@ export class Vm {
     this.ip++;
   }
 
-  op_getlclnx(index: number) { // 0xaa ... 0xaf
+  /**
+   * Push local at index 0 onto stack.
+   * @done
+   */
+  op_getlcln0() { // 0xaa
     Debug.instruction();
-    this.stack.push(this.stack.getLocal(index));
+    this.stack.push(this.stack.getLocal(0));
   }
+
+  /**
+   * Push local at index 1 onto stack.
+   * @done
+   */  
+  op_getlcln1() { // 0xab
+    Debug.instruction();
+    this.stack.push(this.stack.getLocal(1));
+  }
+
+  /**
+   * Push local at index 2 onto stack.
+   * @done
+   */  
+  op_getlcln2() { // 0xac
+    Debug.instruction();
+    this.stack.push(this.stack.getLocal(2));
+  }
+
+  /**
+   * Push local at index 3 onto stack.
+   * @done
+   */  
+  op_getlcln3() { // 0xad
+    Debug.instruction();
+    this.stack.push(this.stack.getLocal(3));
+  }
+
+  /**
+   * Push local at index 4 onto stack.
+   * @done
+   */  
+  op_getlcln4() { // 0xae
+    Debug.instruction();
+    this.stack.push(this.stack.getLocal(4));
+  }
+
+  /**
+   * Push local at index 5 onto stack.
+   * @done
+   */  
+  op_getlcln5() { // 0xaf
+    Debug.instruction();
+    this.stack.push(this.stack.getLocal(5));
+  }
+
+
+
 
   op_say() { // 0xb0
     Debug.instruction();
@@ -1801,134 +1860,225 @@ export class Vm {
     this.r0 = new VmObject(instance);
   }
 
+  /**
+   * Adds the integer 1 to the local variable at index local_number.
+   * @done
+   */
   op_inclcl() { // 0xd0 
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction({ local: localNum});
-    let val = this.stack.getLocal(localNum);
-    val = val.add(new VmInt(1));
-    this.stack.setLocal(localNum, val);
+    Debug.instruction({ local: localNum });
+    let local = this.stack.getLocal(localNum);
+    // Optimize for primitive integer value:
+    if(local instanceof VmInt) {
+      local.value++;
+    } 
+    // Do full add for other types:
+    else {
+      local = local.add(new VmInt(1));
+      this.stack.setLocal(localNum, local);
+    }
     this.ip += 2;
   }
 
+  /**
+   * Subtracts the integer 1 from the local variable at index local_number.
+   * @done
+   */
   op_declcl() { // 0xd1
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction({ local: localNum});
-    let val = this.stack.getLocal(localNum);
-    val = val.sub(new VmInt(1));
-    this.stack.setLocal(localNum, val);
+    Debug.instruction({ local: localNum });
+    let local = this.stack.getLocal(localNum);
+    // Optimize for primitive integer value:
+    if(local instanceof VmInt) {
+      local.value--;
+    }
+    // Do full subtract for other types:
+    else {
+      local = local.sub(new VmInt(1));
+      this.stack.setLocal(localNum, local);
+    }
     this.ip += 2;
   }
 
+  /**
+   * Add a signed integer (int8) to a local variable.
+   * @done
+   */
   op_addilcl1() { // 0xd2
     let localNum = this.codePool.getByte(this.ip);
     let val = this.codePool.getSbyte(this.ip + 1);
-    Debug.instruction({local: localNum, val: val});
-    let loc = this.stack.getLocal(localNum);
-    this.stack.setLocal(localNum, loc.add(new VmInt(val)));
+    Debug.instruction({ local: localNum, val: val });
+    let local = this.stack.getLocal(localNum);
+    // Optimize for primitive integer value:
+    if(local instanceof VmInt) {
+      local.value += val;
+    }
+    // Do full add for other types:
+    else {
+      this.stack.setLocal(localNum, local.add(new VmInt(val)));
+    }
     this.ip += 2;
   }
 
+  /**
+   * Add a signed integer (int32) to a local variable.
+   * @done
+   */
   op_addilcl4() { // 0xd3
     let localNum = this.codePool.getByte(this.ip);
     let val = this.codePool.getInt4(this.ip + 1);
-    let loc = this.stack.getLocal(localNum);
-    Debug.instruction({local: localNum, val: val});
-    this.stack.setLocal(localNum, loc.add(new VmInt(val)));
+    Debug.instruction({ local: localNum, val: val });
+    let local = this.stack.getLocal(localNum);
+    // Optimize for primitive integer value:
+    if(local instanceof VmInt) {
+      local.value += val;
+    } 
+    // Do full add for other types:
+    else {
+      this.stack.setLocal(localNum, local.add(new VmInt(val)));
+    }
     this.ip += 5;
   }
 
+  /**
+   * Add value from stack to local variable
+   * @done
+   */
   op_addtolcl() { // 0xd4
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction({local: localNum});
+    Debug.instruction({ local: localNum });
     let val = this.stack.pop();
-    let loc = this.stack.getLocal(localNum);
-    this.stack.setLocal(localNum, loc.add(val));
+    let local = this.stack.getLocal(localNum);
+    this.stack.setLocal(localNum, local.add(val));
     this.ip += 2;
   }
 
+  /**
+   * Subtract value from stack from local variable
+   * @done
+   */
   op_subfromlcl() { // 0xd5
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction({local: localNum});
+    Debug.instruction({ local: localNum });
     let val = this.stack.pop();
-    let loc = this.stack.getLocal(localNum);
-    this.stack.setLocal(localNum, loc.sub(val));
+    let local = this.stack.getLocal(localNum);
+    this.stack.setLocal(localNum, local.sub(val));
     this.ip += 2;
   }  
 
+  /**
+   * Set a local variable to zero
+   * @done
+   */
   op_zerolcl1() { // 0xd6
     let localNum = this.codePool.getByte(this.ip);
-    Debug.instruction( {local: localNum});
+    Debug.instruction({ local: localNum });
     this.stack.setLocal(localNum, new VmInt(0));
     this.ip++;
   }
 
+  /**
+   * Set a local variable to zero.
+   * @done
+   */
   op_zerolcl2() { // 0xd7
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction({local: localNum});
+    Debug.instruction({ local: localNum });
     this.stack.setLocal(localNum, new VmInt(0));
     this.ip += 2;
   }
 
+  /**
+   * Set a local variable to one.
+   * @done
+   */
   op_onelcl1() { // 0xda
     let localNum = this.codePool.getByte(this.ip);
-    Debug.instruction({local: localNum});
+    Debug.instruction({ local: localNum });
     this.stack.setLocal(localNum, new VmInt(1));
     this.ip++;
   }
 
+  /**
+   * Set a local variable to one.
+   * @done
+   */  
   op_onelcl2() { // 0xdb
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction({local: localNum});
+    Debug.instruction({ local: localNum });
     this.stack.setLocal(localNum, new VmInt(1));
     this.ip += 2;
   }
 
+  /**
+   * Set a local variable to nil.
+   * @done
+   */  
   op_nillcl1() { // 0xd8
     let localNum = this.codePool.getByte(this.ip);
-    Debug.instruction({local: localNum});
+    Debug.instruction({ local: localNum });
     this.stack.setLocal(localNum, new VmNil());
     this.ip++;
   }
 
+  /**
+   * Set a local variable to nil.
+   * @done
+   */    
   op_nillcl2() { // 0xd9
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction( {local: localNum});
+    Debug.instruction({ local: localNum });
     this.stack.setLocal(localNum, new VmNil());
     this.ip += 2;
   }
 
+  /**
+   * Set a local variable to a value from the stack.
+   * @done
+   */
   op_setlcl1() { // 0xe0
     let localNum = this.codePool.getByte(this.ip);
-    Debug.instruction({local: localNum});
-    let val = this.stack.pop();
-    this.stack.setLocal(localNum, val);
+    Debug.instruction({ local: localNum });
+    this.stack.setLocal(localNum, this.stack.pop());
     this.ip++;
   }
 
+  /**
+   * Set a local variable to a value from the stack.
+   * @done
+   */
   op_setlcl2() { // 0xe1
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction({local: localNum});
-    let val = this.stack.pop();
-    this.stack.setLocal(localNum, val);
+    Debug.instruction({ local: localNum });
+    this.stack.setLocal(localNum, this.stack.pop());
     this.ip += 2;
   }
 
+  /** 
+   * Set a function argument to a value from the stack.
+   * @done
+   */
   op_setarg1() { // 0xe2 
     let argNum = this.codePool.getByte(this.ip);
-    Debug.instruction({arg: argNum});
-    let val = this.stack.pop();
-    this.stack.setArg(argNum, val);
+    Debug.instruction({ arg: argNum });
+    this.stack.setArg(argNum, this.stack.pop());
     this.ip++;
   }
 
+  /** 
+   * Set a function argument to a value from the stack.
+   * @done
+   */  
   op_setarg2() { // 0xe3
     let argNum = this.codePool.getUint2(this.ip);
-    Debug.instruction( {arg: argNum});
-    let val = this.stack.pop();
-    this.stack.setArg(argNum, val);
+    Debug.instruction({ arg: argNum });
+    this.stack.setArg(argNum, this.stack.pop());
     this.ip += 2;
   }  
 
+  /**
+   * @todo Operator overloading
+   */
   op_setind() { // 0xe4
     Debug.instruction();
     let idx = this.stack.pop();
