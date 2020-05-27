@@ -10,7 +10,7 @@ import { MetaclassFactory } from './metaclass/MetaclassFactory'
 import { Heap } from './Heap'
 import { MetaString, List, Iterator, IntrinsicClass } from './metaimp'
 import { IFuncInfo } from './IFuncInfo'
-
+import { Symbols } from './Symbols'
 
 const fs = require('fs');
 
@@ -38,7 +38,6 @@ export class Vm {
   public stack: Stack;
   public stop = false;
   public varargc: number = undefined;
-  public symbols: Map<string, VmData>;
 
   private OPCODES: Map<number, IOpcode> = new Map([
     /* OK */ [0x01, { name: 'PUSH_0',          func: this.op_push_0 }],
@@ -270,11 +269,11 @@ export class Vm {
     MetaclassRegistry.parseMCLD(this.image, mcld);
 
     // Load symbols:
-    let symbols = new Map<string, VmData>();
+    Symbols.clear();
     // There may be more than one SYMD block:    
     this.blocks.filter((b) => b instanceof SYMD).forEach((symd:SYMD) => {;
       symd.processEntries(this.image, this.dataPool, (name, value) => {
-        symbols.set(name, value);
+        Symbols.set(name, value);
       });
     });
 

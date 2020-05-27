@@ -4,6 +4,7 @@ import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
 import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp } from '../types';
 import { Vm } from '../Vm';
+import { Symbols } from '../Symbols';
 
 class TadsObject extends RootObject
 {
@@ -24,9 +25,10 @@ class TadsObject extends RootObject
       console.log("NEW superclass=", args[0].value);
       this.superClasses = [args[0].value];
       // See if there is a constructor.
-      let propLocation = this.findProp(1, false);
+      let constructorProp: VmProp = Symbols.get('Constructor');
+      let propLocation = this.findProp(constructorProp.value, false);
       if(propLocation) {
-        Vm.getInstance().runContext(propLocation.prop.value, new VmProp(1), new VmObject(this), new VmObject(this), new VmObject(this), new VmNil(), ...args.slice(1));
+        Vm.getInstance().runContext(propLocation.prop.value, constructorProp, new VmObject(this), new VmObject(this), new VmObject(this), new VmNil(), ...args.slice(1));
       }
     }
 
