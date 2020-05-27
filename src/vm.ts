@@ -175,9 +175,9 @@ export class Vm {
     /*    */ [0xb4, { name: 'BUILTIN_D',       func: this.op_builtin_d }],
     /*    */ [0xb5, { name: 'BUILTIN1',        func: this.op_builtin1 }],
     /*    */ [0xb6, { name: 'BUILTIN2',        func: this.op_builtin2 }],
-    /*    */ [0xb7, { name: 'CALLEXT',         func: null }],
+    /* -- */ [0xb7, { name: 'CALLEXT',         func: null }], /* CALLEXT not supported in TADS3.1 */
     /*    */ [0xb8, { name: 'THROW',           func: null }],
-    /*    */ [0xb9, { name: 'SAYVAL',          func: null }],
+    /*    */ [0xb9, { name: 'SAYVAL',          func: this.op_sayval }],
     /*    */ [0xba, { name: 'INDEX',           func: this.op_index }],
     /*    */ [0xbb, { name: 'IDXLCL1INT8',     func: this.op_idxlcl1int8 }],
     /*    */ [0xbc, { name: 'IDXINT8',         func: this.op_idxint8 }],
@@ -467,7 +467,8 @@ export class Vm {
   private execute() {
     let byte = this.codePool.getByte(this.ip++); 
     let opcode = this.OPCODES.get(byte);
-    if(!opcode) throw('Unknown instruction: ' + '0x' + byte.toString(16));
+    if(!opcode) throw(`Unknown instruction: 0x${byte.toString(16)}`);
+    if(!opcode.func) throw(`Unimplemented instruction: 0x${byte.toString(16)} (${opcode.name})`);
     Debug.opcode = byte;
     Debug.ip = this.ip;
     Debug.opname = opcode.name;
@@ -1793,6 +1794,11 @@ export class Vm {
 
   imp_builtin(argc: number, func_index: number, set_index: number) {
     this.r0 = Builtin.call(set_index, func_index, argc);
+  }
+
+  op_sayval() { // 0xb9 
+    let val = this.stack.pop();
+    console.log(val);
   }
 
   op_index() { // 0xba
