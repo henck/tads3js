@@ -78,7 +78,7 @@ export class Vm {
     /*    */ [0x40, { name: 'EQ',              func: this.op_eq }],
     /* OK */ [0x41, { name: 'NE',              func: this.op_ne }],
     /*    */ [0x42, { name: 'LT',              func: this.op_lt }],
-    /*    */ [0x43, { name: 'LE',              func: this.op_le }],
+    /* OK */ [0x43, { name: 'LE',              func: this.op_le }],
     /* OK */ [0x44, { name: 'GT',              func: this.op_gt }],
     /* OK */ [0x45, { name: 'GE',              func: this.op_ge }],
              // 0x46..0x4f empty     
@@ -218,7 +218,7 @@ export class Vm {
     /*    */ [0xef, { name: 'SETINDLCL1I8',    func: this.op_setindlcl1i8 }],
              // 0xf0 empty
     /*    */ [0xf1, { name: 'BP',              func: this.op_bp }],
-    /*    */ [0xf2, { name: 'NOP',             func: this.op_nop }]
+    /* OK */ [0xf2, { name: 'NOP',             func: this.op_nop }]
   ]);
 
   constructor() {
@@ -2172,15 +2172,21 @@ export class Vm {
     return container.setind(idx, val);
   }
 
-  op_bp() { //x 0f1
+  /**
+   * Breakpoint
+   * @done
+   */
+  op_bp() { // 0xf1
     Debug.instruction();
     // Breakpoint instruction is ignored.
-    return ['BP'];
   }
 
+  /**
+   * No-op
+   * @done
+   */
   op_nop() { // 0xf2 
     Debug.instruction();
-    return ['NOP'];
   }
 
   op_no_debug_support() {
