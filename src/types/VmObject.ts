@@ -7,6 +7,11 @@ import { VmProp } from "./VmProp";
 
 export class VmObject extends VmData {
   constructor(value: number | RootObject) {
+    // If an object instance was passed, put it on the heap
+    // to get an ID, and save that ID.
+    if(value instanceof RootObject) {
+      value = Heap.addObj(value);
+    }
     super(value);
   }
 

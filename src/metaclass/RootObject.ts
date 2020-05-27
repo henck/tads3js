@@ -81,7 +81,7 @@ class RootObject {
    * @param obj Ancestor class
    * @returns true if descendant
    */
-  protected derivesFromSuperclass(objID: number): boolean {
+  public derivesFromSuperclass(objID: number): boolean {
     if(this.superClasses.includes(objID)) return true;
     return this.superClasses.reduce((prev:boolean, x:number) => 
       prev || Heap.getObj(x).derivesFromSuperclass(objID), false);
