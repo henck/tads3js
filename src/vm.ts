@@ -20,6 +20,7 @@ interface IPropInfo {
   data: VmData
 }
 
+// Opcode list entry (name and VM method to call)
 interface IOpcode {
   name: string;
   func: () => void;
@@ -30,14 +31,17 @@ export class Vm {
 
   private image: SourceImage;
   private blocks: DataBlock[] = [];
-  public codePool: Pool;
+  private codePool: Pool;
   private dataPool: Pool;
-  public r0: VmData = null;
-  public ip: number = 0;
+  private ip: number = 0;
   private ep: number = 0;
+  public r0: VmData = null;
   public stack: Stack;
   public stop = false;
-  public varargc: number = undefined;
+  private varargc: number = undefined;
+
+  // We keep track of whether we're running inside a "finally" block. When "finally"
+  // throws an exception, we'll have to unwind the stack to the previous method frame.
   private inFinally: boolean = false;
 
   private OPCODES: Map<number, IOpcode> = new Map([
