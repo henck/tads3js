@@ -1027,7 +1027,7 @@ export class Vm {
   }
 
   op_call() { // 0x58
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let func_offset = this.codePool.getUint4(this.ip + 1);
     Debug.instruction({ 'argc': argc, 'func_offset': func_offset });
     this.ip += 5;
@@ -1037,7 +1037,7 @@ export class Vm {
   }
 
   op_ptrcall() { // 0x59
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     Debug.instruction({ argc: argc });
     this.ip++;
     let val = this.stack.pop();
@@ -1063,7 +1063,7 @@ export class Vm {
   }
 
   op_callprop() { // 0x61
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let propID = this.codePool.getUint2(this.ip + 1);
     let data  = this.stack.pop();
     Debug.instruction({'obj': data, 'propID': propID, 'argc': argc});
@@ -1072,7 +1072,7 @@ export class Vm {
   }
 
   op_ptrcallprop() { // 0x62
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let vmProp = this.stack.pop();
     let data  = this.stack.pop();
     Debug.instruction({'obj': data, 'propID': vmProp, 'argc': argc});
@@ -1088,7 +1088,7 @@ export class Vm {
   }
 
   op_callpropself() { // 0x64 
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let propID = this.codePool.getUint2(this.ip + 1);
     Debug.instruction({ propID: propID, argc: argc });
     this.ip += 3;
@@ -1096,7 +1096,7 @@ export class Vm {
   }
 
   op_ptrcallpropself() { // 0x65
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let vmProp = this.stack.pop();
     let data = this.stack.getSelf();
     Debug.instruction({'obj': data, 'propID': vmProp, 'argc': argc});
@@ -1113,7 +1113,7 @@ export class Vm {
   }
 
   op_objcallprop() { // 0x67 
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let objID = this.codePool.getUint4(this.ip + 1);
     let propID = this.codePool.getUint2(this.ip + 5);
     Debug.instruction({ objID: objID, propID: propID, argc: argc});
@@ -1154,7 +1154,7 @@ export class Vm {
   }
 
   op_inherit() { // 0x72
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let propID = this.codePool.getUint2(this.ip + 1);
     Debug.instruction({'propID': propID, 'argc': argc});
     this.ip += 3;
@@ -1162,7 +1162,7 @@ export class Vm {
   }
 
   op_ptrinherit() { // 0x73
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let vmProp = this.stack.pop();
     Debug.instruction({'prop': vmProp, argc: argc});
     this.ip++;
@@ -1775,7 +1775,7 @@ export class Vm {
   }
 
   op_builtin_a() { // 0xb1
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let func_index = this.codePool.getByte(this.ip + 1);
     Debug.instruction({ argc: argc, func_index: func_index});
     this.ip += 2;
@@ -1783,7 +1783,7 @@ export class Vm {
   }
 
   op_builtin_b() { // 0xb2
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let func_index = this.codePool.getByte(this.ip + 1);
     Debug.instruction({ argc: argc, func_index: func_index});
     this.ip += 2;
@@ -1791,7 +1791,7 @@ export class Vm {
   }
 
   op_builtin_c() { // 0xb3
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let func_index = this.codePool.getByte(this.ip + 1);
     Debug.instruction( { argc: argc, func_index: func_index});
     this.ip += 2;
@@ -1799,7 +1799,7 @@ export class Vm {
   }
 
   op_builtin_d() { // 0xb4
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let func_index = this.codePool.getByte(this.ip + 1);
     Debug.instruction({ argc: argc, func_index: func_index});
     this.ip += 2;
@@ -1807,7 +1807,7 @@ export class Vm {
   }
 
   op_builtin1() { // 0xb5
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let func_index = this.codePool.getByte(this.ip + 1);
     let set_index = this.codePool.getByte(this.ip + 2);
     Debug.instruction({argc: argc, func_index: func_index, set_index: set_index});
@@ -1816,7 +1816,7 @@ export class Vm {
   }
 
   op_builtin2() { // 0xb6
-    let argc = this.codePool.getByte(this.ip);
+    let argc = this.maybe_varargc(this.codePool.getByte(this.ip));
     let func_index = this.codePool.getUint2(this.ip + 1);
     let set_index = this.codePool.getByte(this.ip + 3);
     Debug.instruction({argc: argc, func_index: func_index, set_index: set_index});
