@@ -57,6 +57,15 @@ class Stack {
   }
 
   /**
+   * 
+   * Push many values onto the stack.
+   * @param values Values to push
+   */
+  public pushMany(...values: VmData[]): void {
+    values.forEach((v) => { this.push(v); });
+  }
+
+  /**
    * Remove a value from the top of the stack.
    * @returns Wrapped value
    * @throws Stack underflow if stack is empty.

@@ -116,7 +116,7 @@ export class Vm {
     /*    */ [0x77, { name: 'DELEGATE',        func: null }],
     /*    */ [0x78, { name: 'PTRDELEGATE',     func: null }],
              // 0x79 empty
-    /*    */ [0x7a, { name: 'SWAP2',           func: this.op_swap2 }],
+    /* OK */ [0x7a, { name: 'SWAP2',           func: this.op_swap2 }],
     /* OK */ [0x7b, { name: 'SWAPN',           func: this.op_swapn }],
     /* OK */ [0x7c, { name: 'GETARGN0',        func: this.op_getargn0 }],
     /* OK */ [0x7d, { name: 'GETARGN1',        func: this.op_getargn1 }],
@@ -211,13 +211,13 @@ export class Vm {
     /*    */ [0xe8, { name: 'OBJSETPROP',      func: this.op_objsetprop }],
     /* DB */ [0xe9, { name: 'SETDBLCL',        func: this.op_no_debug_support }],
     /* DB */ [0xea, { name: 'SETDBARG',        func: this.op_no_debug_support }],
-    /*    */ [0xeb, { name: 'SETSELF',         func: this.op_setself }],
-    /*    */ [0xec, { name: 'LOADCTX',         func: this.op_loadctx }],
-    /*    */ [0xed, { name: 'STORECTX',        func: this.op_storectx }],
-    /*    */ [0xee, { name: 'SETLCL1R0',       func: this.op_setlcl1r0 }],
+    /* OK */ [0xeb, { name: 'SETSELF',         func: this.op_setself }],
+    /* OK */ [0xec, { name: 'LOADCTX',         func: this.op_loadctx }],
+    /* OK */ [0xed, { name: 'STORECTX',        func: this.op_storectx }],
+    /* OK */ [0xee, { name: 'SETLCL1R0',       func: this.op_setlcl1r0 }],
     /*    */ [0xef, { name: 'SETINDLCL1I8',    func: this.op_setindlcl1i8 }],
              // 0xf0 empty
-    /*    */ [0xf1, { name: 'BP',              func: this.op_bp }],
+    /* OK */ [0xf1, { name: 'BP',              func: this.op_bp }],
     /* OK */ [0xf2, { name: 'NOP',             func: this.op_nop }]
   ]);
 
@@ -1166,16 +1166,14 @@ export class Vm {
   op_getargn2() { Debug.instruction(); this.stack.push(this.stack.getArg(2)); } // 0x7e
   op_getargn3() { Debug.instruction(); this.stack.push(this.stack.getArg(3)); } // 0x7f
 
+  /**
+   * Swap the top pair of elements with the next pair of elements on the stack. 
+   * @done
+   */
   op_swap2() { // 0x7a
     Debug.instruction();
-    let val1 = this.stack.pop();
-    let val2 = this.stack.pop();
-    let val3 = this.stack.pop();
-    let val4 = this.stack.pop();
-    this.stack.push(val2);
-    this.stack.push(val1);
-    this.stack.push(val4);
-    this.stack.push(val3);
+    let [ val1, val2, val3, val4 ] = this.stack.popMany(4);
+    this.stack.pushMany(val2, val1, val4, val3);
   }
 
   /**
@@ -2128,31 +2126,48 @@ export class Vm {
     this.ip + 6;
   }
   
+  /**
+   * Set self value in method context from stack
+   * @done
+   */
   op_setself() { // 0xeb
     let vmVal = this.stack.pop();
-    Debug.instruction({value: vmVal});
+    Debug.instruction({ value: vmVal });
     if(!(vmVal instanceof VmNil) && !(vmVal instanceof VmObject)) throw('OBJ_VAL_REQD');
     this.stack.setSelf(vmVal);
   }
 
+  /**
+   * Load method context from stack
+   * @done
+   */
   op_loadctx() { // 0xec 
     Debug.instruction();
+    if(!(this.stack.peek() instanceof VmList)) throw('LIST_VAL_REQD');
     let lst = this.stack.pop().unpack();
     this.stack.setSelf(lst[0]);
-    this.stack.setTargetObject(lst[1]);
-    this.stack.setDefiningObject(lst[2]);
-    this.stack.setTargetProperty(lst[3]);
+    this.stack.setTargetProperty(lst[1]);
+    this.stack.setTargetObject(lst[2]);
+    this.stack.setDefiningObject(lst[3]);
   }
 
+  /**
+   * Store method context and push on stack
+   * @done
+   */
   op_storectx() { // 0xed
     Debug.instruction();
-    let lst = new VmList([this.stack.getSelf(), this.stack.getTargetObject(), this.stack.getDefiningObject(), this.stack.getTargetProperty()]);
+    let lst = new VmList([this.stack.getSelf(), this.stack.getTargetProperty(), this.stack.getTargetObject(), this.stack.getDefiningObject()]);
     this.stack.push(lst);
   }
 
+  /**
+   * Set local from R0
+   * @done
+   */
   op_setlcl1r0() { // 0xee 
     let localNum = this.codePool.getByte(this.ip);
-    Debug.instruction({local: localNum});
+    Debug.instruction({ local: localNum });
     this.stack.setLocal(localNum, this.r0);
     this.ip++;
   }
