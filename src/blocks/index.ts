@@ -6,3 +6,4 @@ export { CPPG } from './CPPG';
 export { ENTP } from './ENTP';
 export { MCLD } from './MCLD';
 export { OBJS } from './OBJS';
+export { SYMD } from './SYMD';

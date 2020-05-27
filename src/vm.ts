@@ -1,5 +1,5 @@
 import { SourceImage } from './SourceImage'
-import { DataBlock, DataBlockFactory, CPDF, CPPG, ENTP, MCLD, OBJS } from './blocks/'
+import { DataBlock, DataBlockFactory, CPDF, CPPG, ENTP, MCLD, OBJS, SYMD } from './blocks/'
 import { VmData, VmNil, VmTrue, VmInt, VmSstring, VmList, VmCodeOffset, VmObject, VmProp, VmFuncPtr, VmDstring, VmNativeCode, VmBifPtr, VmEnum, DataFactory } from './types/'
 import { Stack } from './Stack'
 import { Pool } from './Pool'
@@ -38,6 +38,7 @@ export class Vm {
   public stack: Stack;
   public stop = false;
   public varargc: number = undefined;
+  public symbols: Map<string, VmData>;
 
   private OPCODES: Map<number, IOpcode> = new Map([
     /* OK */ [0x01, { name: 'PUSH_0',          func: this.op_push_0 }],
@@ -267,6 +268,15 @@ export class Vm {
     let mcld = this.blocks.find((b) => b instanceof MCLD) as MCLD;
     //mcld.dump(this.image);
     MetaclassRegistry.parseMCLD(this.image, mcld);
+
+    // Load symbols:
+    let symbols = new Map<string, VmData>();
+    // There may be more than one SYMD block:    
+    this.blocks.filter((b) => b instanceof SYMD).forEach((symd:SYMD) => {;
+      symd.processEntries(this.image, this.dataPool, (name, value) => {
+        symbols.set(name, value);
+      });
+    });
 
     // Load static objects:
     Heap.clear();
