@@ -38,6 +38,7 @@ export class Vm {
   public stack: Stack;
   public stop = false;
   public varargc: number = undefined;
+  private inFinally: boolean = false;
 
   private OPCODES: Map<number, IOpcode> = new Map([
     /* OK */ [0x01, { name: 'PUSH_0',          func: this.op_push_0 }],
@@ -502,8 +503,9 @@ export class Vm {
   runContext(offset: number, prop: VmProp, targetObject: VmObject, definingObject: VmObject, selfObject: VmObject, invokee: VmData, ...args: VmData[]): VmData {
     // Push all arguments on the stack (in reverse)
     args.reverse().forEach((a) => this.stack.push(a));
-    // Save old IP, so we can return to it when context ends:
+    // Save old IP/EP, so we can return to it when context ends:
     let oldIP = this.ip;
+    let oldEP = this.ep;
     // Set IP/EP to -1 to detect end of context (will be detected by RETxxx):
     this.ip = -1;
     this.ep = -1;
@@ -519,8 +521,9 @@ export class Vm {
       this.execute();
     } while (!this.stop);
     this.stop = false;
-    // Go back to previous context's IP:
+    // Go back to previous context's IP/EP:
     this.ip = oldIP;
+    this.ep = oldEP;
     return this.r0;
   }
 
@@ -1810,27 +1813,51 @@ export class Vm {
     Debug.instruction();
     let exception_obj = this.stack.pop();
     if(!(exception_obj instanceof VmObject)) throw('OBJ_VAL_REQD');
-    let funcinfo = this.getFuncInfo(this.ep);
-    //console.log(exception_obj);
-    //console.log(funcinfo);
-    // Do we have an exception table?
-    if(funcinfo.exceptionTableoffset != 0) {
-      let exception_count = this.codePool.getUint2(funcinfo.exceptionTableoffset);
-      let offset = funcinfo.exceptionTableoffset + 2;
-      for(let i = 0; i < exception_count; i++) {
-        let startPos = this.codePool.getUint2(offset); offset += 2;
-        let endPos = this.codePool.getUint2(offset);   offset += 2;
-        let classID = this.codePool.getUint4(offset);  offset += 4;
-        let pos = this.codePool.getUint2(offset);      offset += 2;
-        console.log("Handler startpos", startPos, "endpos", endPos, "classID", classID, "pos", pos);
-        if (exception_obj.getInstance().derivesFromSuperclass(classID)) {
-          this.stack.push(exception_obj);
-          this.ip = this.ep + pos;
-          return;
+    if(this.inFinally) {
+      this.ret();
+      if(this.stop) throw('No handler found for exception.');
+    }
+    this.inFinally = false;
+    
+    // Find a handler for the exception in the current frame.
+    do {
+      let funcinfo = this.getFuncInfo(this.ep);
+      let handler = 0;
+      let isFinally = false;
+      // Do we have an exception table?
+      if(funcinfo.exceptionTableoffset != 0) {
+        let exception_count = this.codePool.getUint2(funcinfo.exceptionTableoffset);
+        let offset = funcinfo.exceptionTableoffset + 2;
+        // Go through handlers:
+        for(let i = 0; i < exception_count; i++) {
+          let startPos = this.codePool.getUint2(offset); offset += 2; // protected code start offset
+          let endPos = this.codePool.getUint2(offset);   offset += 2; // protected code end offset
+          let classID = this.codePool.getUint4(offset);  offset += 4; // ID of exception class handled
+          let pos = this.codePool.getUint2(offset);      offset += 2; // handler code offset
+          console.log("Handler startpos", startPos, "endpos", endPos, "classID", classID, "pos", pos);
+          // See if exception object is handled by handler's class (class 0 (finally) handles all exceptions)
+          if (classID == 0 || exception_obj.getInstance().derivesFromSuperclass(classID)) {
+            if(classID == 0) isFinally = true;
+            handler = this.ep + pos;
+            break;
+          }
         }
       }
-    }
-    throw('HALT');
+
+      // Did we find a handler? Then put exception on stack and go to handler.
+      if(handler) {
+        if(isFinally) this.inFinally = true;
+        this.stack.push(exception_obj);
+        this.ip = handler;
+        return;
+      }
+
+      // If a handler wasn't found, we must restore the enclosing frame
+      // and try again.
+      this.ret();
+    } while(!this.stop);
+
+    throw('No handler found for exception.');
   }
 
   op_sayval() { // 0xb9 
@@ -2079,8 +2106,9 @@ export class Vm {
    */
   op_setlcl1() { // 0xe0
     let localNum = this.codePool.getByte(this.ip);
-    Debug.instruction({ local: localNum });
-    this.stack.setLocal(localNum, this.stack.pop());
+    let val = this.stack.pop();
+    Debug.instruction({ local: localNum, val: val });
+    this.stack.setLocal(localNum, val);
     this.ip++;
   }
 
