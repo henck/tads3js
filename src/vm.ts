@@ -406,6 +406,10 @@ export class Vm {
       case 0xa0: this.op_jr0t(); break;
       case 0xa1: this.op_jr0f(); break;
       case 0xa2: this.op_iternext(); break;
+      case 0xa3: this.op_getsetlcl1r0(); break;
+      case 0xa4: this.op_getsetlcl1(); break;
+      case 0xa5: this.op_dupr0(); break;
+      case 0xa6: this.op_getspn(); break;
       case 0xaa: this.op_getlclnx(0); break;
       case 0xab: this.op_getlclnx(1); break;
       case 0xac: this.op_getlclnx(2); break;
@@ -1501,14 +1505,22 @@ export class Vm {
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
     let val = this.stack.peek();
-    if(val instanceof VmNil || (val instanceof VmInt && val.value == 0)) {
-      this.stack.pop();
-      this.ip += 2;
-    } else {
+    // Must be true, enum or non-zero number to jump:
+    if(val instanceof VmTrue || val instanceof VmEnum || (val instanceof VmInt && val.value != 0)) {
       this.ip += branch_offset;
+    } else {
+      // Value must still be a valid logical value:
+      if(val instanceof VmNil || val instanceof VmInt) {
+        this.stack.pop();
+        this.ip += 2;
+      } else throw('LOG_VAL_REQD');
     }
   }
 
+  /** 
+   * Jump and save if false 
+   * @done
+   */
   op_jsf() { // 0x9b
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1521,6 +1533,11 @@ export class Vm {
     }
   }
 
+
+  /**
+   * Local Jump to Subroutine
+   * @done
+   */
   op_ljsr() { // 0x9c
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1528,24 +1545,35 @@ export class Vm {
     this.ip += branch_offset;
   }
 
+  /**
+   * Local Return
+   * @done
+   */
   op_lret() { // 0x9d
     let localNum = this.codePool.getUint2(this.ip);
-    Debug.instruction({ local: localNum});
-    this.ip = this.stack.getLocal(localNum).value;
+    Debug.instruction({ local: localNum });
+    this.ip = this.stack.getLocal(localNum).value; // Stored on stack as VM_CODEOFFSET
   }
 
+  /**
+   * Jump if NIL
+   * @done
+   */
   op_jnil() { // 0x9e
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
     let val = this.stack.pop();
     if(val instanceof VmNil) {
       this.ip += branch_offset;
-      
     } else {
       this.ip += 2;
     }
   }
 
+  /**
+   * Jump if not NIL (and only NIL)
+   * @done
+   */
   op_jnotnil() { // 0x9f
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1557,6 +1585,10 @@ export class Vm {
     }
   }
 
+  /**
+   * Jump if R0 is anything other than nil or the integer value 0.
+   * @done
+   */
   op_jr0t() { // 0xa0
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1567,6 +1599,10 @@ export class Vm {
     }
   }
 
+  /**
+   * Jump if R0 is nil or the integer value 0.
+   * @done
+   */
   op_jr0f() { // 0xa1
     let branch_offset = this.codePool.getInt2(this.ip);
     Debug.instruction({ offset: branch_offset});
@@ -1590,6 +1626,50 @@ export class Vm {
     else {
       this.ip += branch_offset + 2;
     }
+  }
+
+  /**
+   * Set local from R0 and leave value on stack
+   * @done
+   */
+  op_getsetlcl1r0() { // 0xa3
+    let index = this.codePool.getByte(this.ip);
+    Debug.instruction({ index: index });
+    this.stack.push(this.r0);
+    this.stack.setLocal(index, this.r0);
+    this.ip++;
+  }
+
+  /**
+   * Set local and leave value on stack
+   * @done
+   */
+  op_getsetlcl1() { // 0xa4
+    let index = this.codePool.getByte(this.ip);
+    Debug.instruction({ index: index });
+    this.stack.setLocal(index, this.stack.peek());
+    this.ip++;
+  }
+
+  /**
+   * Push the value of R0 onto the stack twice.
+   * @done
+   */
+  op_dupr0() { // 0xa5
+    Debug.instruction();
+    this.stack.push(this.r0);
+    this.stack.push(this.r0);
+  }
+
+  /**
+   * Copy stack element at index onto top of stack.
+   * @done
+   */
+  op_getspn() { // 0xa6
+    let index = this.codePool.getByte(this.ip);
+    Debug.instruction({ index: index });
+    this.stack.push(this.stack.peek(index));
+    this.ip++;
   }
 
   op_getlclnx(index: number) { // 0xaa ... 0xaf
