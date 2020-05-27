@@ -228,15 +228,15 @@ class RootObject {
   //
 
   negate(): VmData {
-    throw('CANNOT_NEGATE_TYPE');
+    return null;
   }
 
   add(data: VmData): VmData {
-    throw('CANNOT_ADD_TYPE');
+    return null;
   }
 
   subtract(data: VmData): VmData {
-    throw('CANNOT_SUBTRACT_TYPE');
+    return null;
   }
 
   equals(data: VmData, depth?: number): boolean {
@@ -248,11 +248,11 @@ class RootObject {
   }
 
   getindex(vmIndex: VmData): VmData {
-    throw('CANNOT_INDEX_TYPE');
+    return null;
   }
 
-  setindex(vmIndex: VmData, data: VmData): VmObject {
-    throw('CANNOT_INDEX_TYPE');
+  setindex(vmIndex: VmData, data: VmData): VmData {
+    return null;
   }  
 
   setprop(propID: number, data: VmData) {

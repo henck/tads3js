@@ -407,8 +407,10 @@ export class Vm {
    */
   getprop(data: VmData, vmProp: VmProp, onlyInherited: boolean): IPropInfo {
     // "data" can be an object, a constant string or a constant list.
-    if(!(data instanceof VmObject) && !(data instanceof VmSstring) && !(data instanceof VmList)) 
+    if(!(data instanceof VmObject) && !(data instanceof VmSstring) && !(data instanceof VmList)) {
+      console.log(data);
       throw('CALLPROP: OBJ_VAL_REQD');
+    }
 
     // For a constant string or list, create a temporary MetaString/List with the same value.
     if(data instanceof VmSstring) data = new VmObject(new MetaString(data.value));

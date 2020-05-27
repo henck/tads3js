@@ -107,7 +107,7 @@ class Vector extends ListBase {
     return new VmObject(new Vector(this.value.filter((v) => !values.find((w) => w.eq(v)))));
   }
   
-  public setindex(vmIndex: VmData, data: VmData): VmObject {
+  public setindex(vmIndex: VmData, data: VmData): VmData {
     if(!(vmIndex instanceof VmInt)) throw('NUM_VAL_REQD');
     let idx = vmIndex.unpack();
     if(idx < 1) throw('INDEX_OUT_OF_RANGE');
