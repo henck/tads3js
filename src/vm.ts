@@ -1804,11 +1804,11 @@ export class Vm {
     let exception_obj = this.stack.pop();
     if(!(exception_obj instanceof VmObject)) throw('OBJ_VAL_REQD');
     let funcinfo = this.getFuncInfo(this.ep);
-    console.log(funcinfo);
+    //console.log(exception_obj);
+    //console.log(funcinfo);
     // Do we have an exception table?
     if(funcinfo.exceptionTableoffset != 0) {
       let exception_count = this.codePool.getUint2(funcinfo.exceptionTableoffset);
-      console.log("Exception handler count", exception_count);
       let offset = funcinfo.exceptionTableoffset + 2;
       for(let i = 0; i < exception_count; i++) {
         let startPos = this.codePool.getUint2(offset); offset += 2;
@@ -1816,7 +1816,8 @@ export class Vm {
         let classID = this.codePool.getUint4(offset);  offset += 4;
         let pos = this.codePool.getUint2(offset);      offset += 2;
         console.log("Handler startpos", startPos, "endpos", endPos, "classID", classID, "pos", pos);
-        if(exception_obj.value == classID) { // todo: inheritance
+        if (exception_obj.getInstance().derivesFromSuperclass(classID)) {
+          this.stack.push(exception_obj);
           this.ip = this.ep + pos;
           return;
         }
