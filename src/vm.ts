@@ -240,14 +240,12 @@ export class Vm {
     this.blocks = [];
     let unknownBlocks = 0;
     while(pos <= this.image.length()) {
-      let oldPos = pos;
       let type = this.image.getString(pos, 4);
       let block = DataBlockFactory.create(type, this.image, pos);
       if(block.toString() == null) {
         unknownBlocks++;
       } else {
         this.blocks.push(block);
-        //console.log(block.toString());
       }
       pos += block.length + 10;
     }
