@@ -210,7 +210,7 @@ abstract class ListBase extends Collection {
    */
   protected join(vmSep?: VmData) : VmObject {
     let sep = vmSep ? vmSep.unpack() : '';
-    let str = this.value.map((x) => x.value.toString()).join(sep);
+    let str = this.value.map((x) => x.toStr()).join(sep);
     return new VmObject(new MetaString(str));
   }
 
