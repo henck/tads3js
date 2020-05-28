@@ -361,6 +361,13 @@ class RootObject {
   }
 
   /**
+   * Am I an instanceof IntrinsicClass?
+   */
+  protected isIntrinsicClass() {
+    return false;
+  }
+
+  /**
    * Determines if the object is an instance of the class cls, or an instance 
    * of any subclass of cls. Returns true if so, nil if not. This method always 
    * returns true if cls is Object, since every object ultimately derives from the Object intrinsic class. 
@@ -368,6 +375,7 @@ class RootObject {
    * @returns true if descendent, nil if not
    */
   protected ofKind(vmClass: VmObject): VmData {
+    //if(vmClass.getInstance().isIntrinsicClass()) return new VmNil();
     let obj = vmClass.getInstance();
     return obj.isAncestor(this) ? new VmTrue() : new VmNil();
   }

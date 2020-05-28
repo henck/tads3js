@@ -4,7 +4,6 @@ import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { VmNativeCode, VmData, VmObject, VmNil, VmTrue, VmList } from '../types';
-import { MetaclassFactory } from '../metaclass/MetaclassFactory';
 import { Heap } from '../Heap';
 
 class IntrinsicClass extends RootObject {
@@ -51,13 +50,17 @@ class IntrinsicClass extends RootObject {
     return new VmList([new VmObject(objID)]);
   }  
 
+  protected isIntrinsicClass() {
+    return true;
+  }
+
   public getValue() {
     return `metaclass=${MetaclassRegistry.indexToName(this.modifierObjID)}`;
   }    
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.isIntrinsicClass, 1);
+      case 0: return new VmNativeCode(this.metaIsIntrinsicClass, 1);
     }
     return null;
   }  
@@ -72,7 +75,7 @@ class IntrinsicClass extends RootObject {
     * @param vmVal val to check
     * @returns VmTrue or VmNil
     */
-   protected isIntrinsicClass(vmVal: VmData): VmData {
+   protected metaIsIntrinsicClass(vmVal: VmData): VmData {
      if(!(vmVal instanceof VmObject)) return new VmNil();
      if(vmVal.getInstance() instanceof IntrinsicClass) return new VmTrue();
      return new VmNil();
