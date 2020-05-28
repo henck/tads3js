@@ -243,18 +243,18 @@ export class Vm {
 
     let pos = SourceImage.HEADER_SIZE;
     this.blocks = [];
-    let unknownBlocks = 0;
-    while(pos <= this.image.length()) {
+    let unknownBlocks = [];
+    while(pos < this.image.length()) {
       let type = this.image.getString(pos, 4);
       let block = DataBlockFactory.create(type, this.image, pos);
       if(block.toString() == null) {
-        unknownBlocks++;
+        unknownBlocks.push(type);
       } else {
         this.blocks.push(block);
       }
       pos += block.length + 10;
     }
-    Debug.info("Unknown blocks", unknownBlocks);
+    Debug.info(`Unknown blocks (${unknownBlocks.length}):`, unknownBlocks.join(','));
 
     // Create code pool:
     let cpdf = this.blocks.find((b) => b instanceof CPDF && b.identifier == 'code') as CPDF;
