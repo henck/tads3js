@@ -67,8 +67,6 @@ class IntrinsicClass extends RootObject {
    * directly by other code, only when a property is evaluated.
    */
 
-   // @todo: Needs implementations for ofKind, getSuperclassList WITH TESTS
-
    /**
     * Returns true if val is an IntrinsicClass object, nil if not. 
     * @param vmVal val to check
