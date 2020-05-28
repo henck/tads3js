@@ -94,12 +94,30 @@ class TadsObject extends RootObject
     return new VmList(this.superClasses.map((sc) => new VmObject(sc)));
   }  
 
+
+
   /*
    * Meta methods - all private as they should not be called
    * directly by other code, only when a property is evaluated.
    */
 
-   protected setSuperclassList(vmClasses: VmData): VmData {
+  /**
+   * Creates a new object that is an identical copy of this object.
+   * @returns TadsObject instance
+   */
+  protected createClone(): VmData {
+    let instance = new TadsObject();
+    instance._isClass = this._isClass;
+    // Copy superclass list:
+    instance.superClasses = this.superClasses.slice();
+    // Copy properties map:
+    instance.props = new Map(this.props);
+    // Copy transient state:
+    instance._isTransient = this._isTransient;
+    return new VmObject(instance);
+  }   
+
+  protected setSuperclassList(vmClasses: VmData): VmData {
      let lst = vmClasses.unpack();
      // Check that argument is a list
      if(!Array.isArray(lst)) throw('setSuperclassList: list expected');
@@ -122,20 +140,6 @@ class TadsObject extends RootObject
      // Create list of object IDs:
      this.superClasses = objs.map((x) => x.value);
      return new VmNil();
-   }
-
-   /**
-    * Creates a new object that is an identical copy of this object.
-    * @returns TadsObject instance
-    */
-   protected createClone(): VmData {
-     let instance = new TadsObject();
-     instance._isClass = this._isClass;
-     // Copy superclass list:
-     instance.superClasses = this.superClasses.slice();
-     // Copy properties map:
-     instance.props = new Map(this.props);
-     return new VmObject(instance);
    }
 
 

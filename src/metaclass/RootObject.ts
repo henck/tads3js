@@ -21,7 +21,7 @@ class RootObject {
   public id: number;
   protected superClasses: number[];
   protected props: Map<number, VmData>;
-  private _isTransient: boolean;
+  protected _isTransient: boolean;
 
   constructor() {
     this.props = new Map<number, VmData>();
