@@ -1,4 +1,5 @@
 import { RootObject } from "./metaclass/RootObject";
+import { IntrinsicClass } from "./metaimp";
 
 export class Heap {
   private static objects: Map<number, RootObject> = new Map<number, RootObject>([]);
@@ -14,6 +15,13 @@ export class Heap {
   static setObj(objID: number, obj: RootObject) {
     obj.setID(objID);
     Heap.objects.set(objID, obj);
+  }
+
+  static forEach(callback: (id: number, value: RootObject, isIntrinsic: boolean) => void) {
+    for(let key of Heap.objects.keys()) {
+      let obj = Heap.getObj(key);
+      callback(key, Heap.getObj(key), obj instanceof IntrinsicClass);
+    }
   }
 
   /*

@@ -2,9 +2,10 @@ import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 import { RootObject } from '../metaclass/RootObject';
 import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
-import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp } from '../types';
+import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp, VmList } from '../types';
 import { Vm } from '../Vm';
 import { Symbols } from '../Symbols';
+import { Heap } from '../Heap';
 
 class TadsObject extends RootObject
 {
@@ -84,6 +85,13 @@ class TadsObject extends RootObject
     return this._isClass ? new VmTrue() : new VmNil();
   }
 
+  /**
+   * Returns a list containing the immediate superclasses of the object. 
+   * A TadsObject implements this by looking at its superClasses array.
+   */
+  protected getSuperclassList(): VmData {
+    return new VmList(this.superClasses.map((sc) => new VmObject(sc)));
+  }  
 
   /*
    * Meta methods - all private as they should not be called

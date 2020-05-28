@@ -118,8 +118,8 @@ export class Vm {
     /*    */ [0x74, { name: 'EXPINHERIT',      func: this.op_expinherit }],
     /*    */ [0x75, { name: 'PTREXPINHERIT',   func: this.op_ptrexpinherit }],
     /*    */ [0x76, { name: 'VARARGC',         func: this.op_varargc }],
-    /*    */ [0x77, { name: 'DELEGATE',        func: null }],
-    /*    */ [0x78, { name: 'PTRDELEGATE',     func: null }],
+    /*    */ [0x77, { name: 'DELEGATE',        func: null }], // NEEDS VARARGC!
+    /*    */ [0x78, { name: 'PTRDELEGATE',     func: null }], // NEEDS VARARGC!
              // 0x79 empty
     /* OK */ [0x7a, { name: 'SWAP2',           func: this.op_swap2 }],
     /* OK */ [0x7b, { name: 'SWAPN',           func: this.op_swapn }],
@@ -416,16 +416,21 @@ export class Vm {
     if(data instanceof VmSstring) data = new VmObject(new MetaString(data.value));
     if(data instanceof VmList) data = new VmObject(new List(data.value));
 
-    // For an IntrinsicClass, create a temporay instance of the class it represents.
-    if(data instanceof VmObject && data.getInstance() instanceof IntrinsicClass) {
-      let intrinsicClass = data.getInstance() as IntrinsicClass;
-      let klass = MetaclassRegistry.getClass(intrinsicClass.modifierObjID);
-      data = new VmObject(new klass());
-    }
-
     // Find the requested property on data, which is now always a VmObject.
     let obj = (data as VmObject).getInstance();
     let res = obj.findProp(vmProp.value, onlyInherited); // This will go through superclasses, as well
+
+    // If the object was an IntrinsicClass, and the property wasn't found because
+    // it's unavaible on IntrinsicClass itself, then we must be calling a method of 
+    // the class it represents. Create a temporary instance and use getprop on it:
+    if(!res && obj instanceof IntrinsicClass) {
+      let klass = MetaclassRegistry.getClass(obj.modifierObjID);
+      data = new VmObject(new klass());
+      return this.getprop(data, vmProp, onlyInherited);
+      // @todo: Delete temporary instance?
+    }
+
+    // Property not found
     if(!res) return null;
 
     return {

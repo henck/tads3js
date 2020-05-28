@@ -19,7 +19,6 @@ interface IPropAndDistance {
 
 class RootObject {
   public id: number;
-  public metaclassID: number;
   protected superClasses: number[];
   protected props: Map<number, VmData>;
   private _isTransient: boolean;
@@ -53,7 +52,7 @@ class RootObject {
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
       case 0: return new VmNativeCode(this.ofKind, 1);
-      case 1: return new VmNativeCode(this.getSuperclassList, 0);
+      case 1: return new VmNativeCode(this.metaGetSuperclassList, 0);
       case 2: return new VmNativeCode(this.propDefined, 1, 1);
       case 3: return new VmNativeCode(this.propType, 1);
       case 4: return new VmNativeCode(this.getPropList, 0);
@@ -72,6 +71,31 @@ class RootObject {
 
   protected isClass(): VmData {
     return new VmNil();
+  }
+
+  /** 
+   * Find the IntrinsicClass instance of this object. 
+   */
+  private getIntrinsicClass(): VmObject {
+    let res = null;
+    Heap.forEach((id, object, isIntrinsic) => {
+      if(isIntrinsic && (this.constructor as any).metaclassID == (object as any).modifierObjID) {
+          res = new VmObject(id);
+      }
+    });
+    return res;
+  }
+
+  /**
+   * Get the superclasses list of this object. This returns
+   * its IntrinsicClass instance. (A TadsObject will override
+   * this to return a list of superclasses).
+   */
+  protected getSuperclassList(): VmData {
+    // Forced to use VmList here rather than List, to avoid a
+    // circular reference: List imports RootObject, so RootObject
+    // cannot import List.
+    return new VmList([this.getIntrinsicClass()]);
   }
 
 
@@ -312,11 +336,8 @@ class RootObject {
   /**
    * Returns a list containing the immediate superclasses of the object. 
    */
-  protected getSuperclassList(): VmData {
-    // Forced to use VmList here rather than List, to avoid a
-    // circular reference: List imports RootObject, so RootObject
-    // cannot import List.
-    return new VmList(this.superClasses.map((sc) => Heap.getObj(sc)));
+  protected metaGetSuperclassList(): VmData {
+    return this.getSuperclassList();
   }
 
   /**

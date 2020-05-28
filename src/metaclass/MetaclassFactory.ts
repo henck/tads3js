@@ -8,13 +8,11 @@ import { RootObject } from "./RootObject";
 class MetaclassFactory {
   //
   // Create an instance of the metaclass with the specified ID.
-  // The metaclassID field of the instance is set to the metaclass ID for later reference.
   // The contructor is called with the arguments provided.
   // 
   public static create(id: number, ...args: any[]): RootObject {
     let klass = MetaclassFactory.getClass(id);
     let instance = new (klass as any)(...args);
-    instance.metaclassID = (klass as any).metaclassID;
     return instance;
   }
 
@@ -22,7 +20,6 @@ class MetaclassFactory {
     let klass = MetaclassFactory.getClass(metaclassID);
     if(!klass) return null;
     let instance = (klass as any).loadFromImage(image, dataPool, dataOffset)
-    instance.metaclassID = (klass as any).metaclassID;
     return instance;
   }
 

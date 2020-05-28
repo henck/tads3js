@@ -11,3 +11,5 @@ export { builtin_randomize } from './randomize'
 export { builtin_sgn } from './sgn'
 export { builtin_toInteger } from './toInteger'
 export { builtin_toString } from './toString'
+
+export { builtin_tadsSay } from './tadsSay'
