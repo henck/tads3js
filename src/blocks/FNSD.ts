@@ -30,6 +30,7 @@ class FNSD extends DataBlock {
     let count = image.getUInt16(offset); offset += 2;
 
     // Read name of each set and store it.
+    this.sets = [];
     for(let i = 0; i < count; i++) {
       let len = image.getUInt8(offset++);
       let name = '';

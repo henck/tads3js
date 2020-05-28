@@ -13,6 +13,7 @@ import { OBJS } from './OBJS';
 import { SRCF } from './SRCF';
 import { SYMD } from './SYMD';
 import { FNSD } from './FNSD';
+import { SINI } from './SINI';
 
 class DataBlockFactory {
   public static create(type: string, image: SourceImage, offset: number) {
@@ -28,6 +29,7 @@ class DataBlockFactory {
       case 'MACR': return new MACR(image, offset);
       case 'MHLS': return new MHLS(image, offset);
       case 'FNSD': return new FNSD(image, offset);
+      case 'SINI': return new SINI(image, offset);
       case 'EOF ': return new EOF(image, offset);
       default:
         return new DataBlock(image, offset);

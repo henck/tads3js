@@ -12,4 +12,5 @@ export { GSYM } from './GSYM';
 export { MACR } from './MACR';
 export { MHLS } from './MHLS';
 export { FNSD } from './FNSD';
+export { SINI } from './SINI';
 export { EOF } from './EOF';
