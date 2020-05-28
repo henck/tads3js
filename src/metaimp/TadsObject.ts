@@ -6,6 +6,7 @@ import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp, VmL
 import { Vm } from '../Vm';
 import { Symbols } from '../Symbols';
 import { Heap } from '../Heap';
+import { IntrinsicClass } from './IntrinsicClass';
 
 class TadsObject extends RootObject
 {
@@ -100,7 +101,26 @@ class TadsObject extends RootObject
 
    protected setSuperclassList(vmClasses: VmData): VmData {
      let lst = vmClasses.unpack();
-     this.superClasses = lst.map((vmObj: VmObject) => vmObj.getInstance().id);
+     // Check that argument is a list
+     if(!Array.isArray(lst)) throw('setSuperclassList: list expected');
+     // Check that list contains only VmObject instances
+     if(lst.find((x) => !(x instanceof VmObject))) throw('setSuperclassList: List must contain objects');
+     let objs: VmObject[] = lst;
+
+     // Special case: list may be [TadsObject]
+     if(objs.length == 1 && objs[0].getInstance() instanceof IntrinsicClass) {
+       let obj = objs[0].unpack();
+       if(obj == TadsObject) {
+         this.superClasses = [];
+         return new VmNil();
+       }
+     }
+
+     // Verify that all list elements are TadsObject instances:
+     if (objs.find((x) => !(x.getInstance() instanceof TadsObject))) throw('setSuperclassList: Only TadsObject instances allowed.');
+
+     // Create list of object IDs:
+     this.superClasses = objs.map((x) => x.value);
      return new VmNil();
    }
 

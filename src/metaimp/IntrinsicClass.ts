@@ -5,10 +5,12 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { VmNativeCode, VmData, VmObject, VmNil, VmTrue, VmList } from '../types';
 import { Heap } from '../Heap';
+import { Debug } from '../Debug';
 
 class IntrinsicClass extends RootObject {
   public metaclassDependencyTableIndex: number;
   public modifierObjID: number;
+  public klass: any;
 
   constructor(metaclassDependencyTableIndex: number, modifierObjID: number) {
     super();
@@ -17,12 +19,23 @@ class IntrinsicClass extends RootObject {
     //  "modifier object ID", modifierObjID);
     this.metaclassDependencyTableIndex = metaclassDependencyTableIndex;
     this.modifierObjID = modifierObjID;
+
+    // Get the class that this IntrinsicClass represents:
+    this.klass = MetaclassRegistry.getClass(this.modifierObjID);
+    if(!this.klass) {
+      Debug.info(`IntrinsicClass implementation class not found: ${this.modifierObjID}.`);
+    }
+
     // Modifier object ID is not the object's ID, because other objects are loaded
     // by the VM which overlap some of these IDs. It could very well be the 
     // metaclass index, though, because there are exactly 0..22 of them (same
     // as metaclasses, it seems).
 
     // The value 8 is metaclass root-object.
+  }
+
+  public unpack() {
+    return this.klass;
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {

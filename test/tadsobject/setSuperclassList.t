@@ -4,7 +4,6 @@
 #include <bignum.h> 
 #include "strbuf.h"
 #include "dict.h"
-    
 
 class A: object
     v1 = 0
@@ -28,7 +27,11 @@ class C: A, B
 
 _main(args)
 {
-    return C.propDefined(&v5) == true
-        && C.propDefined(&v4) == true;
-        
+    C.setSuperclassList([TadsObject]);
+    local b1 = C.getSuperclassList() == [];
+    C.setSuperclassList([A,B]);
+    local b2 = C.getSuperclassList() == [A,B];
+    C.setSuperclassList([A]);
+    local b3 = C.getSuperclassList() == [A];
+    return b1 && b2 && b3;
 }
