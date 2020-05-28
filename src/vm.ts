@@ -284,12 +284,13 @@ export class Vm {
     Heap.clear();
     let unknownObjects: string[] = [];
     (this.blocks.filter((b) => b instanceof OBJS) as OBJS[]).forEach((objs) => {
-      objs.load(this.image, (id: number, metaclass: number, dataOffset: number) => {
+      objs.load(this.image, (id: number, metaclass: number, dataOffset: number, isTransient: boolean) => {
         // Find name and implementation class of object's metaclass.
         let name = MetaclassRegistry.indexToName(metaclass);
         let instance = MetaclassFactory.load(metaclass, this.image, this.dataPool, dataOffset);
         if(instance) {
           Heap.setObj(id, instance);
+          if(isTransient) instance.setTransient(true);
         }
         // if implementation class doesn't exist, report.
         else {

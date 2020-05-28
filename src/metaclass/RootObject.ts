@@ -26,6 +26,7 @@ class RootObject {
   constructor() {
     this.props = new Map<number, VmData>();
     this.superClasses = [];
+    // By default, objects are persistent:
     this._isTransient = false;
   }
 

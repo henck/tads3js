@@ -19,19 +19,19 @@ class OBJS extends DataBlock {
     this.objsOffset = this.offset + 6;
   }
 
-  load(image: SourceImage, callback: (id: number, metaclassID: number, dataOffset: number) => void) {
+  load(image: SourceImage, callback: (id: number, metaclassID: number, dataOffset: number, isTransient: boolean) => void) {
     let offset = this.offset + 6; // Skip numentries, metaclass, flags
     for(let i = 0; i < this.numEntries; i++) {
       let id = image.getUInt32(offset);
       let size = this.isLarge ? image.getUInt32(offset + 4) : image.getUInt16(offset + 4);
       offset += 4 + (this.isLarge ? 4 : 2);
-      callback(id, this.metaclass, offset);
+      callback(id, this.metaclass, offset, this.isTransient);
       offset += size;
     }
   }
 
   toString() {
-    return '[OBJS] entries ' + this.numEntries.toString() + ' class ' + this.metaclass.toString();
+    return `[OBJS] entries ${this.numEntries}, class ${this.metaclass}, transient ${this.isTransient ? 'yes' : 'no'}`;
   }
 }
 
