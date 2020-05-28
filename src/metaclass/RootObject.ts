@@ -264,8 +264,11 @@ class RootObject {
     return null;
   }
 
+  // Comparing two objects is done by ID, unless
+  // the metaclass implementation overrides equals()
   equals(data: VmData, depth?: number): boolean {
-    throw('CANNOT_COMPARE_TYPE');
+    if(!(data instanceof VmObject)) return false;
+    return this.id == data.getInstance().id;
   }
 
   compare(data: VmData): boolean {
