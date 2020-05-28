@@ -5,7 +5,6 @@ import { Pool } from '../Pool';
 import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp, VmList } from '../types';
 import { Vm } from '../Vm';
 import { Symbols } from '../Symbols';
-import { Heap } from '../Heap';
 import { IntrinsicClass } from './IntrinsicClass';
 
 class TadsObject extends RootObject
@@ -74,8 +73,13 @@ class TadsObject extends RootObject
     return obj;
   }
 
+  getValue() {
+    return `superclasses=[${this.superClasses}]`;
+  }
+
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
+      case 0: return new VmNativeCode(this.createInstance, 0, 0, true);
       case 1: return new VmNativeCode(this.createClone, 0);
       case 5: return new VmNativeCode(this.setSuperclassList, 1);
     }
@@ -116,6 +120,20 @@ class TadsObject extends RootObject
     instance._isTransient = this._isTransient;
     return new VmObject(instance);
   }   
+
+  /**
+   * Creates a new instance of the target object. This method's arguments are 
+   * passed directly to the constructor, if any, of the new object; this method 
+   * doesn't make any other use of the arguments. The method creates the object,
+   * invokes the new object's constructor, then returns the new object.
+   * @param args 
+   */
+  protected createInstance(...args: VmData[]): VmData {
+    // Create a new TadsObject instance, using the current object's ID 
+    // as the superclass.
+    let instance = new TadsObject(new VmObject(this.id), ...args);
+    return new VmObject(instance);
+  }
 
   protected setSuperclassList(vmClasses: VmData): VmData {
      let lst = vmClasses.unpack();
