@@ -39,9 +39,11 @@ class IntrinsicClass extends RootObject {
 
   /**
    * Get the superclasses list of this object. For an IntrinsicClass,
-   * this will return [Object].
+   * this will return [Object]. For Object, this will return the
+   * empty list.
    */
   protected getSuperclassList(): VmData {
+    if(MetaclassRegistry.indexToName(this.modifierObjID) == 'root-object/030004') return new VmList([]);
     let objID = 0;
     Heap.forEach((id, value, isIntrinsic) =>  {
       if(isIntrinsic && MetaclassRegistry.indexToName((value as any).modifierObjID) == 'root-object/030004') objID = id;
