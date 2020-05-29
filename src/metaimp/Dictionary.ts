@@ -52,16 +52,15 @@ class Dictionary extends RootObject {
     this.value = [];
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     let dict = new Dictionary();
 
     // Read comparator object ID.
     let comparatorObjID = image.getUInt32(offset); offset += 4;
-    console.log(comparatorObjID);
+    // TODO: Do something with comparator ID
 
     // Read entry count:
     let entryCount = image.getUInt16(offset); offset += 2;
-    console.log(entryCount);
 
     // For each entry:
     for(let i = 0; i < entryCount; i++) {
