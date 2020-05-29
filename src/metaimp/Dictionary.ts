@@ -7,6 +7,7 @@ import { VmObject, VmData, VmProp, VmNil, VmTrue, VmList, VmSstring, VmInt, VmNa
 import { List } from './List';
 import { MetaString } from './MetaString';
 import { levenshtein } from '../util/Levenshtein';
+import { UTF8 } from '../utf8';
 
 
 class DictionaryEntry {
@@ -52,7 +53,37 @@ class Dictionary extends RootObject {
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
-    throw('Dictionary: Cannot load from image');
+    let dict = new Dictionary();
+
+    // Read comparator object ID.
+    let comparatorObjID = image.getUInt32(offset); offset += 4;
+    console.log(comparatorObjID);
+
+    // Read entry count:
+    let entryCount = image.getUInt16(offset); offset += 2;
+    console.log(entryCount);
+
+    // For each entry:
+    for(let i = 0; i < entryCount; i++) {
+      // Read the obfuscated key string
+      let len = image.getUInt8(offset); offset++;
+      let bytes = [];
+      for(let j = 0; j < len; j++) {
+        bytes.push(image.getUInt8(offset++) ^ 0xbd);
+      }
+      let key = new VmSstring(UTF8.decode(bytes));
+      
+      // Read subentries:
+      let subEntryCount = image.getUInt16(offset); offset += 2;
+      for(let j = 0; j < subEntryCount; j++) {
+        let objID = image.getUInt32(offset); offset += 4;
+        let propID = image.getUInt16(offset); offset += 2;
+        // Add key/obj/prop combination to dictionary.
+        dict.addWord(new VmObject(objID), key, new VmProp(propID));
+      }
+    }
+
+    return dict;
   }  
 
   getMethodByIndex(idx: number): VmNativeCode {
