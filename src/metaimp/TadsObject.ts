@@ -41,7 +41,7 @@ class TadsObject extends RootObject
     }
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     let obj = new TadsObject();
 
     // Get # superclasses

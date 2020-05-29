@@ -50,7 +50,7 @@ class ByteArray extends RootObject {
     }
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     throw('ByteArray: Cannot load from image');
   }  
 

@@ -5,6 +5,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { List } from "./List";
 import { ListBase } from "./ListBase";
+import { RootObject } from '../metaclass/RootObject';
 
 class Vector extends ListBase {
 
@@ -44,7 +45,7 @@ class Vector extends ListBase {
     }
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     return new Vector();    
   }  
 

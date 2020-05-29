@@ -69,7 +69,7 @@ class MetaString extends RootObject {
     return null;
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     throw('MetaString: Cannot load from image');
   }  
 

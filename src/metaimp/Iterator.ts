@@ -14,7 +14,7 @@ abstract class Iterator extends RootObject {
     super();
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     throw('Iterator: Cannot load from image');
   }  
 

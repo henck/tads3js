@@ -5,6 +5,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { ListBase } from "./ListBase";
 import { VmType } from '../types/VmType';
+import { RootObject } from '../metaclass/RootObject';
 
 class List extends ListBase {
   
@@ -66,7 +67,7 @@ class List extends ListBase {
     return null;
   }  
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     throw('List: Cannot load from image');
   }  
 

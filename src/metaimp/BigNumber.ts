@@ -24,7 +24,7 @@ class BigNumber extends RootObject
     this.zero = zero ?? true;
   } 
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     // Read num digits, exponent:
     let numdigits = image.getUInt16(offset);
     let exponent = image.getInt16(offset + 2);

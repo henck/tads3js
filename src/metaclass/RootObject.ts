@@ -30,7 +30,7 @@ class RootObject {
     this._isTransient = false;
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     throw('Cannot load meta object from image.');
   }
 

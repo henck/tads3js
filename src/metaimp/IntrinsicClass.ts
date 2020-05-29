@@ -38,7 +38,7 @@ class IntrinsicClass extends RootObject {
     return this.klass;
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     let metaclassDependencyTableIndex = image.getUInt16(offset);
     let modifiedObjID = image.getUInt32(offset + 2);
     return new IntrinsicClass(metaclassDependencyTableIndex, modifiedObjID);

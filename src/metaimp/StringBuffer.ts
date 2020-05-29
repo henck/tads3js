@@ -39,7 +39,7 @@ class StringBuffer extends RootObject {
     return null;
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     throw('StringBuffer: Cannot load from image');
   }  
 

@@ -79,7 +79,7 @@ class RexPattern extends RootObject {
     this.regexp = new RegExp(parsedValue);
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     let magic = image.getUInt8(offset);
     let strOffset = image.getUInt32(offset + 1);
     let value = dataPool.getString(strOffset);    

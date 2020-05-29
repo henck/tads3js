@@ -19,7 +19,7 @@ class MetaclassFactory {
   public static load(metaclassID: number, image: SourceImage, dataPool: Pool, dataOffset: number): RootObject {
     let klass = MetaclassFactory.getClass(metaclassID);
     if(!klass) return null;
-    let instance = (klass as any).loadFromImage(image, dataPool, dataOffset)
+    let instance = (klass as any).loadFromImage(image, dataPool, dataOffset);
     return instance;
   }
 
