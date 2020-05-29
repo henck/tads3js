@@ -2,7 +2,7 @@ import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 import { RootObject } from '../metaclass/RootObject';
 import { SourceImage } from '../SourceImage'
 import { Pool } from '../Pool';
-import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp, VmList } from '../types';
+import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp, VmList, VmDstring, VmSstring, VmCodeOffset, VmFuncPtr } from '../types';
 import { Vm } from '../Vm';
 import { Symbols } from '../Symbols';
 import { IntrinsicClass } from './IntrinsicClass';
@@ -12,28 +12,33 @@ class TadsObject extends RootObject
   private _isClass: boolean;
 
   constructor(...args: any[]) {
-    // 1st arg = superclass
-    // other args: constructor arguments
-
     super();
 
     // If this is called with any arguments, then it's been called through bytecode.
     // The first argument is the superclass object.
     // The rest of the arguments are constructor arguments.
-    // The constructor is always property #1 (if one exists).
     if(args.length >= 1) {
+      let superClass = args.shift();
       // Set the superclass.
-      console.log("NEW superclass=", args[0].value);
-      this.superClasses = [args[0].value];
-      // See if there is a constructor.
-      let constructorProp: VmProp = Symbols.get('Constructor');
-      let propLocation = this.findProp(constructorProp.value, false);
-      if(propLocation) {
-        Vm.getInstance().runContext(propLocation.prop.value, constructorProp, new VmObject(this), new VmObject(this), new VmObject(this), new VmNil(), ...args.slice(1));
-      }
+      console.log("NEW superclass=", superClass.value);
+      this.superClasses = [superClass.value];
+      // Call constructor, if any:
+      this.callConstructor(...args);
     }
 
+    // By default, this instance is not a class:
     this._isClass = false;
+  }
+
+  public callConstructor(...args: VmData[]) {
+    // We get the 'Constructor' symbol to find the number of the constructor property.
+    let constructorProp: VmProp = Symbols.get('Constructor');
+    // See if there is a constructor.
+    let propLocation = this.findProp(constructorProp.value, false);
+    if(propLocation) {
+      // Call it:
+      Vm.getInstance().runContext(propLocation.prop.value, constructorProp, new VmObject(this), new VmObject(this), new VmObject(this), new VmNil(), ...args);
+    }
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number) {
@@ -81,7 +86,12 @@ class TadsObject extends RootObject
     switch(idx) {
       case 0: return new VmNativeCode(this.createInstance, 0, 0, true);
       case 1: return new VmNativeCode(this.createClone, 0);
+      case 2: return new VmNativeCode(this.createTransientInstance, 0, 0, true);
+      case 3: return new VmNativeCode(this.createInstanceOf, 0, 0, true);
+      case 4: return new VmNativeCode(this.createTransientInstanceOf, 0, 0, true);
       case 5: return new VmNativeCode(this.setSuperclassList, 1);
+      case 6: return new VmNativeCode(this.getMethod, 1);
+      case 7: return new VmNativeCode(this.setMethod, 2);
     }
     return null;
   }    
@@ -128,13 +138,101 @@ class TadsObject extends RootObject
    * invokes the new object's constructor, then returns the new object.
    * @param args 
    */
-  protected createInstance(...args: VmData[]): VmData {
+  protected createInstance(...args: VmData[]): VmObject {
     // Create a new TadsObject instance, using the current object's ID 
     // as the superclass.
     let instance = new TadsObject(new VmObject(this.id), ...args);
     return new VmObject(instance);
   }
 
+  /**
+   * Creates a new instance based on multiple superclasses. Each
+   * superclass may be a list containing constructor arguments.
+   * @param args Superclass list.
+   * @returns new TadsObject instance
+   */
+  protected createInstanceOf(...args: VmData[]) : VmObject {
+    // Create a new TadsObject with no superclasses:
+    let instance = new TadsObject();
+    instance.superClasses = [];
+
+    // For each argument:
+    args.forEach((arg) => {
+      let arr = arg.unpack();
+      // Is the argument a list?
+      if(Array.isArray(arr)) {
+        // Then the first element is a superclass, 
+        instance.superClasses.push(arr[0].value);
+        // and we call its constructor with the remaining elements:
+        instance.callConstructor(...arr.slice(1));
+      }
+      // Not a list - just add element as superclass:
+      else {
+        instance.superClasses.push(arg.value);
+      }
+    });
+
+    // Return new instance as an object:
+    return new VmObject(instance);
+  }
+
+  protected createTransientInstance(...args: VmData[]): VmObject {
+    let vmObj: VmObject = this.createInstance(...args);
+    vmObj.getInstance().setTransient(true);
+    return vmObj;
+  }
+
+  protected createTransientInstanceOf(...args: VmData[]) : VmObject {
+    let vmObj: VmObject = this.createInstanceOf(...args);
+    vmObj.getInstance().setTransient(true);
+    return vmObj;    
+  }
+
+  /**
+   * Gets a function pointer to one of the object's methods. 
+   * @param vmProp Property to retrieve
+   * @todo anonymous functions, floating methods...
+   * @ignore "adv3" doesn't use this method.
+   */
+  protected getMethod(vmProp: VmProp): VmData {
+    // Find prop on myself.
+    let propFound = this.findProp(vmProp.value, false);
+    // Not found? Return nil.
+    if(!propFound) return new VmNil();
+    let data = propFound.prop;
+
+    // If it's a DSTRING, return it as an SSTRING:
+    if(data instanceof VmDstring) return new VmSstring(data.value);
+    
+    // If it's a function, return it:
+    if(data instanceof VmCodeOffset) return data;
+
+    // Return nil.
+    return new VmNil();
+  }
+
+  /**
+   * Assigns the function func as a method of the object, using the property prop.
+   * @param vmProp Property to assign function to
+   * @param func Function to assign
+   * @todo What to do with anonymous functions, methods, DynamicFunc?
+   * @ignore Doesn't properly deal with anonymous methods, but then "adv3" doesn't even use "setMethod"
+   */
+  protected setMethod(vmProp: VmProp, func: VmData): VmData {
+    // A function pointer becomes a code offset, so that is is callable.
+    if(func instanceof VmFuncPtr) func = new VmCodeOffset(func.value);
+    // A single-quoted string becomes a double-quoted string.
+    if(func instanceof VmSstring) func = new VmDstring(func.value);
+
+    // Set my property:
+    this.setprop(vmProp.value, func);
+    return new VmNil();
+  }
+
+  /**
+   * Sets the object's superclasses to the values in lst.
+   * @param vmClasses Class list
+   */
   protected setSuperclassList(vmClasses: VmData): VmData {
      let lst = vmClasses.unpack();
      // Check that argument is a list
