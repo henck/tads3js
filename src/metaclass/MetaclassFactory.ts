@@ -1,9 +1,9 @@
 import { MetaclassRegistry, IMetaclass } from "./MetaclassRegistry";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
-import { AnonFunc, BigNumber, ByteArray, IntrinsicClass, List, RexPattern, MetaString, 
-         StringBuffer, TadsObject, Vector, LookupTable, Dictionary } from "../metaimp";
 import { RootObject } from "./RootObject";
+import { AnonFunc, BigNumber, ByteArray, IntrinsicClass, List, RexPattern, MetaString, 
+         StringBuffer, TadsObject, Vector, LookupTable, Dictionary, GrammarProd } from "../metaimp";
 
 class MetaclassFactory {
   //
@@ -45,6 +45,7 @@ class MetaclassFactory {
       case 'dictionary2/030001': return Dictionary;
       case 'anon-func-ptr/000000': return AnonFunc;
       case 'root-object/030004': return RootObject;
+      case 'grammar-production/030002': return GrammarProd;
       default:
         console.error('MetaclassFactory.getClass: Unknown metaclass ID ' + id.toString() + ': ' + metaclass.name);
         return null;
