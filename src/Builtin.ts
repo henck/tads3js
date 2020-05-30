@@ -29,7 +29,7 @@ export class Builtin {
       /* 07 */ B.builtin_toInteger,
       /* 08 */ B.builtin_getTime,
       /* 09 */ null, // rexMatch
-      /* 10 */ null, // rexSearch
+      /* 10 */ B.builtin_rexSearch,
       /* 11 */ null, // rexGroup
       /* 12 */ null, // rexReplace
       /* 13 */ null, // savepoint

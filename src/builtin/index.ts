@@ -18,6 +18,7 @@ export { builtin_toInteger } from './gen/toInteger'
 export { builtin_toString } from './gen/toString'
 export { builtin_firstObj, builtin_nextObj } from './gen/firstObj'
 export { builtin_getFuncParams } from './gen/getFuncParams'
+export { builtin_rexSearch } from './gen/rexSearch'
 
 export { builtin_bannerClear } from './io/bannerClear'
 export { builtin_bannerCreate } from './io/bannerCreate'
