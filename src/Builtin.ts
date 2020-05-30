@@ -50,7 +50,40 @@ export class Builtin {
       /* 28 */ null // rexSearchLast
     ],
     [
-      /* 00 */ B.builtin_tadsSay
+      /* 00 */ B.builtin_tadsSay,
+      /* 01 */ null, // setLogFile
+      /* 02 */ null, // clearScreen
+      /* 03 */ null, // morePrompt
+      /* 04 */ null, // inputLine
+      /* 05 */ null, // inputKey
+      /* 06 */ null, // inputEvent
+      /* 07 */ null, // inputDialog
+      /* 08 */ null, // inputFile
+      /* 09 */ null, // timeDelay
+      /* 10 */ null, // systemInfo
+      /* 11 */ null, // statusMode
+      /* 12 */ null, // statusRight
+      /* 13 */ null, // resExists
+      /* 14 */ null, // setScriptFile
+      /* 15 */ null, // getLocalCharSet
+      /* 16 */ null, // flushOutput
+      /* 17 */ null, // inputLineTimeout
+      /* 18 */ null, // inputLineCancel
+      /* 19 */ null, // bannerCreate
+      /* 20 */ null, // bannerDelete
+      /* 21 */ null, // bannerClear
+      /* 22 */ null, // bannerSay
+      /* 23 */ null, // bannerFlush
+      /* 24 */ null, // banerSizeToContents
+      /* 25 */ null, // bannerGoTo
+      /* 26 */ null, // bannerSetTextColor
+      /* 27 */ null, // bannerSetScreenColor
+      /* 28 */ null, // bannerGetInfo
+      /* 29 */ null, // bannerSetSize
+      /* 30 */ null, // logConsoleCreate
+      /* 31 */ null, // logConsoleClose
+      /* 32 */ null, // logConsoleSay
+
     ]
   ]
 
