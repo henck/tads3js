@@ -3,7 +3,7 @@ import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { RootObject } from "./RootObject";
 import { AnonFunc, BigNumber, ByteArray, IntrinsicClass, List, RexPattern, MetaString, 
-         StringBuffer, TadsObject, Vector, LookupTable, Dictionary, GrammarProd } from "../metaimp";
+         StringBuffer, TadsObject, Vector, LookupTable, Dictionary, GrammarProd, File } from "../metaimp";
 
 class MetaclassFactory {
   //
@@ -46,6 +46,7 @@ class MetaclassFactory {
       case 'anon-func-ptr/000000': return AnonFunc;
       case 'root-object/030004': return RootObject;
       case 'grammar-production/030002': return GrammarProd;
+      case 'file/030003': return File;
       default:
         console.error('MetaclassFactory.getClass: Unknown metaclass ID ' + id.toString() + ': ' + metaclass.name);
         return null;
