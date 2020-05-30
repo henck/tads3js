@@ -178,7 +178,7 @@ class RootObject {
     if(index !== null) {
       let vmNativeCode = prototype.getMethodByIndex(index) as VmNativeCode;
       if(vmNativeCode == null) {
-        throw("CANNOT FIND METAPROP " + index.toString());
+        throw("CANNOT FIND METAPROP " + index.toString() + " ON " + MetaclassRegistry.indexToName((this.constructor as any).metaclassID));
       }
       return vmNativeCode;
     }
