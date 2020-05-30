@@ -1,7 +1,7 @@
 import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmObject, VmNativeCode } from "../types";
+import { VmObject, VmNativeCode, VmSstring, VmData } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { MetaString } from "./MetaString";
@@ -51,10 +51,9 @@ class RexPattern extends RootObject {
   private value: string;
   private regexp: RegExp;
 
-  constructor(magic: number, value: string) {
+  constructor(value: VmData) {
     super();
-    this.magic = magic;
-    this.value = value;
+    this.value = value.unpack();
 
     // In T3, % is used as a backslash.
     this.value = this.value.replace('%', '\\');
@@ -83,8 +82,8 @@ class RexPattern extends RootObject {
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
     let magic = image.getUInt8(offset);
     let strOffset = image.getUInt32(offset + 1);
-    let value = dataPool.getString(strOffset);    
-    return new RexPattern(magic, value);
+    let value = new VmSstring(dataPool.getString(strOffset));    
+    return new RexPattern(value);
   }
 
   getMethodByIndex(idx: number): VmNativeCode {
