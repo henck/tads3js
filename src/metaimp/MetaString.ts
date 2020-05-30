@@ -40,7 +40,7 @@ class MetaString extends RootObject {
       case 7: return new VmNativeCode(this.startsWith, 1);
       case 8: return new VmNativeCode(this.endsWith, 1);
       case 9: return new VmNativeCode(this.mapToByteArray, 0, 1);
-      // case 10: return new VmNativeCode(this.findReplace, 2, 3, 0);
+      case 10: return new VmNativeCode(this.findReplace, 2, 3);
       case 11: return new VmNativeCode(this.splice, 2, 1);
       case 12: return new VmNativeCode(this.split, 0, 2);
       // case 13: return VmNativeCode(this.specialsToHTML, 0, 1);
@@ -377,6 +377,11 @@ class MetaString extends RootObject {
 
   private urlEncode() {
     return new VmObject(new MetaString(encodeURIComponent(this.value)));
+  }
+
+  protected findReplace(vmOldStr: VmData, vmNewStr: VmData, vmFlags?: VmInt, vmIndex?: VmInt, vmLimit?: VmInt): VmData {
+    // TODO: Actually do something; currently just copies old str.
+    return new VmObject(new MetaString(vmOldStr.unpack()));
   }
 
   getValue() {
