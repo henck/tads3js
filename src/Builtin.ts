@@ -40,7 +40,7 @@ export class Builtin {
       /* 18 */ B.builtin_max,
       /* 19 */ B.builtin_min,
       /* 20 */ B.builtin_makeString,
-      /* 21 */ null, // B.getFuncParams,
+      /* 21 */ B.builtin_getFuncParams,
       /* 22 */ null, // B.toNumber
       /* 23 */ null, // B.sprintf
       /* 24 */ B.builtin_makeList,

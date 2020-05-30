@@ -17,6 +17,7 @@ export { builtin_sgn } from './gen/sgn'
 export { builtin_toInteger } from './gen/toInteger'
 export { builtin_toString } from './gen/toString'
 export { builtin_firstObj, builtin_nextObj } from './gen/firstObj'
+export { builtin_getFuncParams } from './gen/getFuncParams'
 
 export { builtin_bannerCreate } from './io/bannerCreate'
 export { builtin_tadsSay } from './io/tadsSay'
