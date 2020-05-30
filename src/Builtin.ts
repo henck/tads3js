@@ -60,7 +60,7 @@ export class Builtin {
       /* 07 */ null, // inputDialog
       /* 08 */ null, // inputFile
       /* 09 */ null, // timeDelay
-      /* 10 */ null, // systemInfo
+      /* 10 */ B.builtin_systemInfo,
       /* 11 */ null, // statusMode
       /* 12 */ null, // statusRight
       /* 13 */ null, // resExists
