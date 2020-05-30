@@ -167,7 +167,6 @@ class Dictionary extends RootObject {
       // Does string match?
       if(entry.compare(str, propID)) {
         entry.objects.forEach((obj) => {
-          console.log(obj);
           // Do not include object if already in matches
           let found = matches.find((o) => o.value == obj.value);
           if(!found) {

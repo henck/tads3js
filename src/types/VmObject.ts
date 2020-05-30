@@ -216,7 +216,6 @@ export class VmObject extends VmData {
   }
 
   setprop(propID: number, data: VmData) {
-    console.log(this);
     let obj: RootObject = this.getInstance();
     obj.setprop(propID, data);
   }
