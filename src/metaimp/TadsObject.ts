@@ -9,8 +9,6 @@ import { IntrinsicClass } from './IntrinsicClass';
 
 class TadsObject extends RootObject
 {
-  private _isClass: boolean;
-
   constructor(...args: any[]) {
     super();
 
@@ -25,9 +23,6 @@ class TadsObject extends RootObject
       // Call constructor, if any:
       this.callConstructor(...args);
     }
-
-    // By default, this instance is not a class:
-    this._isClass = false;
   }
 
   public callConstructor(...args: VmData[]) {
@@ -95,10 +90,6 @@ class TadsObject extends RootObject
     }
     return null;
   }    
-
-  protected isClass(): VmData {
-    return this._isClass ? new VmTrue() : new VmNil();
-  }
 
   /**
    * Returns a list containing the immediate superclasses of the object. 
