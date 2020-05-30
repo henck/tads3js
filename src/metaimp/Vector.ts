@@ -399,7 +399,7 @@ class Vector extends ListBase {
     startIdx--;
     let count = vmCount ? vmCount.unpack() : null;
     let lst = new List(this.value.slice(startIdx, count ? (startIdx + count) : undefined));
-    return new VmObject(this.id);
+    return new VmObject(lst);
   }
 }
 
