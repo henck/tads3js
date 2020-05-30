@@ -484,7 +484,7 @@ export class Vm {
 
     // If a double-quoted string, print it.
     else if(propInfo.data instanceof VmDstring) {
-      Debug.info("[PRINT]", propInfo.data.value);
+      console.log('OUTPUT', propInfo.data.value);
     }
 
     // If a code offset, call function
@@ -1795,7 +1795,7 @@ export class Vm {
   op_say() { // 0xb0
     Debug.instruction();
     let arg = this.codePool.getUint4(this.ip);
-    Debug.info('OUTPUT', this.dataPool.getString(arg));
+    console.log('OUTPUT', this.dataPool.getString(arg));
     this.ip += 4;
   }
 
@@ -1914,7 +1914,7 @@ export class Vm {
 
   op_sayval() { // 0xb9 
     let val = this.stack.pop();
-    console.log(val);
+    console.log('OUTPUT', val.toStr());
   }
 
   op_index() { // 0xba

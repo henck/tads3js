@@ -6,7 +6,7 @@ import { VmData } from "../../types";
  * @todo: Bignumber support
  */
 export function builtin_tadsSay(...args: VmData[]): VmData {
-  args.forEach((a) => console.log(a.toStr()));
+  args.forEach((a) => console.log('OUTPUT', a.toStr()));
   return null;
 }
 

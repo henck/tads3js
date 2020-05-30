@@ -3,7 +3,7 @@ import { Vm } from "./Vm";
 const colors = require('colors');
 
 export class Debug {
-  static SHOW: boolean = true;
+  static SHOW: boolean = false;
   static opname: string;
   static ip: number;
   static opcode: number;
@@ -26,7 +26,6 @@ export class Debug {
         final.push(key+'='+JSON.stringify(value));
       }
     }
-
     console.log(ipstr, opcodestr, opname, ...final);
   }
 }
