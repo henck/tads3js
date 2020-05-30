@@ -71,7 +71,7 @@ export class Builtin {
       /* 18 */ null, // inputLineCancel
       /* 19 */ B.builtin_bannerCreate,
       /* 20 */ null, // bannerDelete
-      /* 21 */ null, // bannerClear
+      /* 21 */ B.builtin_bannerClear,
       /* 22 */ null, // bannerSay
       /* 23 */ null, // bannerFlush
       /* 24 */ null, // banerSizeToContents
