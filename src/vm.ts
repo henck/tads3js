@@ -55,7 +55,7 @@ export class Vm {
     /* OK */ [0x08, { name: 'PUSHNIL',         func: this.op_pushnil }],
     /* OK */ [0x09, { name: 'PUSHTRUE',        func: this.op_pushtrue }],
     /* OK */ [0x0A, { name: 'PUSHPROPID',      func: this.op_pushpropid }],
-    /* OK */ [0x0B, { name: 'PUSHFNPTR',       func: this.op_pushfuncptr }],
+    /* OK */ [0x0B, { name: 'PUSHFNPTR',       func: this.op_pushfnptr }],
     /* OK */ [0x0C, { name: 'PUSHSTRI',        func: this.op_no_debug_support }],
     /* OK */ [0x0D, { name: 'PUSHPARLST',      func: this.op_pushparlst }],
     /* OK */ [0x0E, { name: 'MAKELSTPAR',      func: this.op_makelistpar }],
@@ -239,7 +239,7 @@ export class Vm {
   load(path : string) {
     let buffer = fs.readFileSync(path);
     this.image = new SourceImage(buffer);
-    //console.info('Loaded', this.image.length(), 'bytes');
+    // console.info('Loaded', this.image.length(), 'bytes');
 
     let pos = SourceImage.HEADER_SIZE;
     this.blocks = [];
@@ -259,11 +259,13 @@ export class Vm {
     // Create code pool:
     let cpdf = this.blocks.find((b) => b instanceof CPDF && b.identifier == 'code') as CPDF;
     let pages = this.blocks.filter((b) => b instanceof CPPG && b.identifier == 'code') as CPPG[];
+    pages = pages.sort((a,b) => a.index - b.index);
     this.codePool = new Pool(this.image, cpdf, pages);
 
     // Create data pool:
     cpdf = this.blocks.find((b) => b instanceof CPDF && b.identifier == 'data') as CPDF;
     pages = this.blocks.filter((b) => b instanceof CPPG && b.identifier == 'data') as CPPG[];
+    pages = pages.sort((a,b) => a.index - b.index);
     this.dataPool = new Pool(this.image, cpdf, pages);
 
     // Load metaclass dependencies:
@@ -488,7 +490,9 @@ export class Vm {
   }
 
   private execute() {
-    let byte = this.codePool.getByte(this.ip++); 
+    let byte = this.codePool.getByte(this.ip); 
+    Debug.ip = this.ip;
+    this.ip++;
     let opcode = this.OPCODES.get(byte);
     if(!opcode) throw(`Unknown instruction: 0x${byte.toString(16)}`);
     if(!opcode.func) throw(`Unimplemented instruction: 0x${byte.toString(16)} (${opcode.name})`);
@@ -672,7 +676,7 @@ export class Vm {
    * Push function pointer onto the stack.
    * @done
    */
-  op_pushfuncptr() { // 0x0b
+  op_pushfnptr() { // 0x0b
     let funcPtr = this.codePool.getUint4(this.ip);
     Debug.instruction({ funcPtr: funcPtr });
     this.stack.push(new VmFuncPtr(funcPtr));
@@ -1054,7 +1058,8 @@ export class Vm {
     } else if(val instanceof VmProp) {
       throw('TODO: PTRCALL NOT IMPLEMENTED FOR PROPID');
     } else if(val instanceof VmObject) {
-      throw('TODO: PTRCALL NOT IMPLEMENTED FOR OBJECT');
+      console.log('TODO: PTRCALL NOT IMPLEMENTED FOR OBJECT');
+      console.log('ignoring');
     } else {
       throw('PTRCALL: FUNCPTR_VAL_REQD');
     }
@@ -1950,7 +1955,7 @@ export class Vm {
     Debug.instruction({'metaclassID': metaclass_id, 'argc': argc, 'class': name });
     let instance = MetaclassFactory.create(metaclass_id, ...args);
     instance.setTransient(transient);
-    this.r0 = new VmObject(instance);
+    this.r0 = new VmObject(instance.id);
   }
 
   /**
@@ -2219,7 +2224,7 @@ export class Vm {
     let val = this.stack.pop();
     let obj = Heap.getObj(objID);
     obj.setprop(propID, val);
-    this.ip + 6;
+    this.ip += 6;
   }
   
   /**
