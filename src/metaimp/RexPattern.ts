@@ -76,7 +76,8 @@ class RexPattern extends RootObject {
       return `[${negate ? '^' : ''}${parts.join('')}]`;
     });
 
-    this.regexp = new RegExp(parsedValue);
+    // TODO: parse regexps correctly
+    // this.regexp = new RegExp(parsedValue);
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
