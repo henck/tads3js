@@ -32,6 +32,9 @@ class IntrinsicClass extends RootObject {
     // as metaclasses, it seems).
 
     // The value 8 is metaclass root-object.
+
+    // IntrinsicClasses are classes:
+    this._isClass = true;
   }
 
   public unpack() {
@@ -44,7 +47,7 @@ class IntrinsicClass extends RootObject {
     return new IntrinsicClass(metaclassDependencyTableIndex, modifiedObjID);
   }  
 
-  protected isAncestor(obj: RootObject) {
+  public isAncestor(obj: RootObject) {
     let classes = obj.getMetaChain();
     return classes.includes(this.modifierObjID);
   }
