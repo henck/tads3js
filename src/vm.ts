@@ -455,7 +455,19 @@ export class Vm {
     // If it's native code on an intrinsic class, call it:
     if(propInfo.data instanceof VmNativeCode) {
       let args = this.stack.popMany(argc);
-      this.r0 = propInfo.targetObject.getInstance().callNativeMethod(propInfo.data, ...args);
+      try {
+        this.r0 = propInfo.targetObject.getInstance().callNativeMethod(propInfo.data, ...args);
+      } catch(e) {
+        // Native code may raise an exception.
+        // If this is a TADS exception, let the VM handle it:
+        if(e instanceof VmObject) {
+          this.throw(e);
+        } 
+        // If this is a JS exception, rethrow it:
+        else {
+          throw(e);
+        }
+      }
       return;
     }
 
@@ -467,6 +479,7 @@ export class Vm {
       || propInfo.data instanceof VmInt
       || propInfo.data instanceof VmSstring
       || propInfo.data instanceof VmFuncPtr
+      || propInfo.data instanceof VmEnum
       || propInfo.data instanceof VmList) this.r0 = propInfo.data;
 
     // If a double-quoted string, print it.
@@ -485,6 +498,7 @@ export class Vm {
     }
 
     else {
+      console.log(propInfo);
       throw('CALLPROP: Don\'t know what to do with this property.');
     }
   }
@@ -1839,9 +1853,17 @@ export class Vm {
     this.r0 = Builtin.call(set_index, func_index, argc);
   }
 
+  public throw(vmObject: VmObject) {
+    this.imp_throw(vmObject);
+  }
+
   op_throw() { // 0xb8
     Debug.instruction();
     let exception_obj = this.stack.pop();
+    this.imp_throw(exception_obj);
+  }
+
+  imp_throw(exception_obj: VmData) {
     if(!(exception_obj instanceof VmObject)) throw('OBJ_VAL_REQD');
     if(this.inFinally) {
       this.ret();
