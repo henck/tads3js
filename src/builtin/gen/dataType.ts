@@ -7,6 +7,6 @@ import { VmData, VmInt } from "../../types";
  * @returns Datatype value (TypeXXX)
  */
 export function builtin_dataType(val: VmData): VmInt {
-  throw('dataType: not implemented');
+  return new VmInt(val.getType());
 }
 
