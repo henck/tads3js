@@ -1,12 +1,16 @@
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject, VmNil, VmTrue, VmList, VmNativeCode } from "../types"
+import { VmData, VmInt, VmObject, VmNil, VmTrue, VmList, VmNativeCode, VmEmpty } from "../types"
 import { Collection } from "./Collection"
 import { Iterator } from "./Iterator"
 import { ListBase } from "./ListBase"
 import { List } from "./List"
 import { VmMap } from "./VmMap"
 import { LookupTableIterator } from './LookupTableIterator'
+import { SourceImage } from '../SourceImage'
+import { Pool } from '../Pool'
+import { RootObject } from '../metaclass/RootObject'
+import { DataFactory } from '../types'
 
 class LookupTable extends Collection  {
   private value: VmMap;
@@ -42,6 +46,30 @@ class LookupTable extends Collection  {
       this.value.set(list[i], list[i+1]);
     }
   }
+
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
+    let table = new LookupTable();
+    let bucket_count = image.getUInt16(offset); offset += 2;
+    let value_count = image.getUInt16(offset); offset += 2;
+    let first_free_index = image.getUInt16(offset); offset += 2;
+    // Skip bucket indices:
+    for(let i = 0; i < bucket_count; i++) offset += 2;
+    // Read values:
+    for(let i = 0; i < value_count; i++) {
+      let type = image.getUInt8(offset); offset++;
+      let offsetOrValue = image.getUInt32(offset); offset += 4;
+      let key = DataFactory.load(type, dataPool, offsetOrValue);
+      type = image.getUInt8(offset); offset++;
+      offsetOrValue = image.getUInt32(offset); offset += 4;
+      let value = DataFactory.load(type, dataPool, offsetOrValue);
+      offset += 2; // Skip next_index
+      if(key instanceof VmEmpty) continue;
+      table.value.set(key, value);
+    }
+
+    return table;
+  }
+
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
