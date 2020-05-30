@@ -32,7 +32,14 @@ class TadsObject extends RootObject
     let propLocation = this.findProp(constructorProp.value, false);
     if(propLocation) {
       // Call it:
-      Vm.getInstance().runContext(propLocation.prop.value, constructorProp, new VmObject(this), new VmObject(this), new VmObject(this), new VmNil(), ...args);
+      Vm.getInstance().runContext(
+        propLocation.prop.value,                  // offset
+        constructorProp,                          // property
+        new VmObject(this.id),                    // targetObject
+        new VmObject(propLocation.object.value),  // definingObject
+        new VmObject(this.id),                    // selfObject
+        new VmNil(),                              // Invokee
+        ...args);
     }
   }
 
