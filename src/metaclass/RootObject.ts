@@ -22,12 +22,15 @@ class RootObject {
   protected superClasses: number[];
   protected props: Map<number, VmData>;
   protected _isTransient: boolean;
+  protected _isClass: boolean;
 
   constructor() {
     this.props = new Map<number, VmData>();
     this.superClasses = [];
     // By default, objects are persistent:
     this._isTransient = false;
+    // By default, this is an instance, not a class.
+    this._isClass = false;
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
@@ -50,6 +53,10 @@ class RootObject {
     return this;
   }
 
+  public isClass(): boolean {
+    return this._isClass;
+  }
+
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
       case 0: return new VmNativeCode(this.ofKind, 1);
@@ -68,10 +75,6 @@ class RootObject {
   public callNativeMethod(data: VmNativeCode, ...args: any[]) {
     // Bind prop to self, then call it with args.
     return data.value.bind(this)(...args);
-  }
-
-  protected isClass(): VmData {
-    return new VmNil();
   }
 
   /** 
@@ -118,7 +121,7 @@ class RootObject {
    * @param obj Descendant class
    * @returns true if ancestor
    */
-  protected isAncestor(obj: RootObject) {
+  public isAncestor(obj: RootObject) {
     return obj.derivesFromSuperclass(this.id);
   }
 
@@ -208,7 +211,7 @@ class RootObject {
     // If I have this property, add myself to the list with the current distance
     // from the original caller. 
     let prop = this.getProp(propID);
-    if(prop) lst.push({prop: {object: new VmObject(this), prop: prop}, dist: dist ?? 0});
+    if(prop) lst.push({prop: {object: new VmObject(this.id), prop: prop}, dist: dist ?? 0});
     // Go through my superclasses, and call findProp on them (increasing the distance
     // by 1).
     for(let i = 0; i < this.superClasses.length; i++) {
@@ -349,7 +352,7 @@ class RootObject {
    * @returns true if object is class
    */
   protected metaIsClass(): VmData {
-    return this.isClass();
+    return this.isClass() ? new VmTrue() : new VmNil();
   }
 
   /**
