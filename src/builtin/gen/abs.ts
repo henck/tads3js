@@ -1,4 +1,4 @@
-import { VmInt, VmData } from "../types";
+import { VmInt, VmData } from "../../types";
 
 /**
  * Returns the absolute value of the given number. 

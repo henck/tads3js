@@ -1,5 +1,5 @@
-import { VmData, VmInt, VmObject } from "../types";
-import { MetaString } from "../metaimp";
+import { VmData, VmInt, VmObject } from "../../types";
+import { MetaString } from "../../metaimp";
 
 /**
  * Convert the value given by val to a string.

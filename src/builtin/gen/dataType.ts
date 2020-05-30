@@ -1,4 +1,4 @@
-import { VmData, VmInt } from "../types";
+import { VmData, VmInt } from "../../types";
 
 /**
  * Returns the datatype of the given value. 

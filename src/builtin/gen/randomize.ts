@@ -1,4 +1,4 @@
-import { VmData, VmNil } from "../types";
+import { VmData, VmNil } from "../../types";
 
 /**
  * Initialize the random number generator (RNG). 

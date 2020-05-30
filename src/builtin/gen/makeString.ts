@@ -1,5 +1,5 @@
-import { VmInt, VmData, VmObject } from "../types";
-import { MetaString } from "../metaimp";
+import { VmInt, VmData, VmObject } from "../../types";
+import { MetaString } from "../../metaimp";
 
 /**
  * Constructs a string by repeating the given value the given number of times.

@@ -1,4 +1,4 @@
-import { VmData } from "../types";
+import { VmData } from "../../types";
 
 /**
  * Display one or more values

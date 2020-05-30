@@ -1,5 +1,5 @@
-import { VmInt, VmData, VmObject } from "../types";
-import { List } from "../metaimp";
+import { VmInt, VmData, VmObject } from "../../types";
+import { List } from "../../metaimp";
 
 /**
  * Constructs a list by repeating the given value the given number of times. 

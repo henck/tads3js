@@ -1,5 +1,5 @@
-import { VmData, VmObject, VmNil } from "../types";
-import { MetaString } from "../metaimp";
+import { VmData, VmObject, VmNil } from "../../types";
+import { MetaString } from "../../metaimp";
 
 /**
  * Returns a string with the concatenation of the argument values, in the order given. 

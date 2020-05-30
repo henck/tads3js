@@ -8,32 +8,33 @@ export class Builtin {
     [
       /* 00 */ B.builtin_dataType,
       /* 01 */ B.builtin_getArg,
-      /* 02 */ null,
-      /* 03 */ null,
+      /* 02 */ null, // B.builtin_firstObj
+      /* 03 */ null, // B.builtin_nextObj
       /* 04 */ B.builtin_randomize,
-      /* 05 */ null,
+      /* 05 */ null, // rand
       /* 06 */ B.builtin_toString,
       /* 07 */ B.builtin_toInteger,
       /* 08 */ B.builtin_getTime,
-      /* 09 */ null,
-      /* 10 */ null,
-      /* 11 */ null,
-      /* 12 */ null,
-      /* 13 */ null,
-      /* 14 */ null,
-      /* 15 */ null,
-      /* 16 */ null,
-      /* 17 */ null,
+      /* 09 */ null, // rexMatch
+      /* 10 */ null, // rexSearch
+      /* 11 */ null, // rexGroup
+      /* 12 */ null, // rexReplace
+      /* 13 */ null, // savepoint
+      /* 14 */ null, // undo
+      /* 15 */ null, // saveGame
+      /* 16 */ null, // restoreGame
+      /* 17 */ null, // restartGame
       /* 18 */ B.builtin_max,
       /* 19 */ B.builtin_min,
       /* 20 */ B.builtin_makeString,
-      /* 21 */ null,
-      /* 22 */ null,
-      /* 23 */ null,
+      /* 21 */ null, // B.getFuncParams,
+      /* 22 */ null, // B.toNumber
+      /* 23 */ null, // B.sprintf
       /* 24 */ B.builtin_makeList,
       /* 25 */ B.builtin_abs,
       /* 26 */ B.builtin_sgn,
-      /* 27 */ B.builtin_concat
+      /* 27 */ B.builtin_concat,
+      /* 28 */ null // rexSearchLast
     ],
     [
       /* 00 */ B.builtin_tadsSay

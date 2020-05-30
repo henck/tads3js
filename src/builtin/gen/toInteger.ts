@@ -1,5 +1,5 @@
-import { VmData, VmInt, VmNil, VmTrue, VmObject, VmSstring } from "../types";
-import { MetaString, BigNumber } from "../metaimp";
+import { VmData, VmInt, VmNil, VmTrue, VmObject, VmSstring } from "../../types";
+import { MetaString, BigNumber } from "../../metaimp";
 
 /**
  * Convert the value given by val to an integer.

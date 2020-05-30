@@ -1,5 +1,5 @@
-import { VmInt, VmData } from "../types";
-import { Vm } from "../Vm";
+import { VmInt, VmData } from "../../types";
+import { Vm } from "../../Vm";
 
 /**
  * Retrieve the given argument to the current function.

@@ -1,4 +1,4 @@
-import { VmData } from "../types";
+import { VmData } from "../../types";
 
 /**
  * Returns the least argument value

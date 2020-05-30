@@ -1,5 +1,5 @@
-import { VmData, VmObject, VmInt } from "../types";
-import { List } from "../metaimp";
+import { VmData, VmObject, VmInt } from "../../types";
+import { List } from "../../metaimp";
 
 /**
  * Returns the current system time, according to timeType. 

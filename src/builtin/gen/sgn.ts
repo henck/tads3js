@@ -1,4 +1,4 @@
-import { VmInt, VmData } from "../types";
+import { VmInt, VmData } from "../../types";
 
 /**
  * Returns the sign of the given number. 
