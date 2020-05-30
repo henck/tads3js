@@ -40,7 +40,18 @@ class StringBuffer extends RootObject {
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
-    throw('StringBuffer: Cannot load from image');
+    let strbuf = new StringBuffer();
+    offset += 4; // Skip buffer_length
+    offset += 4; // Skip buffer_increment
+    // Read length of string
+    let string_length = image.getUInt32(offset); offset += 4;
+    // String is encoded in 2-byte UTF-16 codes:
+    for(let i = 0; i < string_length; i++) {
+      let code = image.getUInt16(offset); offset += 2;
+      // Add UTF-16 characters to string buffre:
+      strbuf.value.push(String.fromCharCode(code));
+    }
+    return strbuf;
   }  
 
   public getValue() {
