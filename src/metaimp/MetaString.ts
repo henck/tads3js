@@ -40,31 +40,24 @@ class MetaString extends RootObject {
       case 7: return new VmNativeCode(this.startsWith, 1);
       case 8: return new VmNativeCode(this.endsWith, 1);
       case 9: return new VmNativeCode(this.mapToByteArray, 0, 1);
-      
+      // case 10: return new VmNativeCode(this.findReplace, 2, 3, 0);
       case 11: return new VmNativeCode(this.splice, 2, 1);
       case 12: return new VmNativeCode(this.split, 0, 2);
-      
-
+      // case 13: return VmNativeCode(this.specialsToHTML, 0, 1);
+      // case 14: return VmNativeCode(this.specialsToText, 0, 1);
       case 15: return new VmNativeCode(this.urlEncode, 0);
       case 16: return new VmNativeCode(this.urlDecode, 0);
       case 17: return new VmNativeCode(this.sha256, 0);
       case 18: return new VmNativeCode(this.digestMD5, 0);
-      
-
+      // case 19: return new VmNativeCode(this.packBytes, 1, 0, true);
+      // case 20: return new VmNativeCode(this.unpackBytes, 1);
       case 21: return new VmNativeCode(this.toTitleCase, 0);
       case 22: return new VmNativeCode(this.toFoldedCase, 0);
       case 23: return new VmNativeCode(this.compareTo, 1);
       case 24: return new VmNativeCode(this.compareIgnoreCase, 1);
-      
+      // case 25: return new VmNativeCode(this.findLast, 1, 1);
       case 26: return new VmNativeCode(this.findAll, 1, 0);
       case 27: return new VmNativeCode(this.match, 1, 0);
-  
-      // findLast
-      // findReplace
-      // packBytes
-      // specialsToHtml (WebUI only)
-      // specialsToText (WebUI only)
-      // unpackBytes
     }
     return null;
   }
