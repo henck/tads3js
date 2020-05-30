@@ -9,7 +9,7 @@ import { SourceImage } from '../SourceImage';
  * the image file uses in byte code to invoke intrinsic functions) to the 
  * corresponding function entrypoint vectors in the VM. 
  * 
- * This implementation contains all functions set, so the FNSD isn't really
+ * This implementation contains all function sets, so the FNSD isn't really
  * needed.
  */
 class FNSD extends DataBlock {
