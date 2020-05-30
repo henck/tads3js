@@ -4,7 +4,20 @@ import { Vm } from "./Vm";
 
 export class Builtin {
   private static funcs: ((...args: any[]) => any)[][] = [
-    [ ],
+    [ 
+      /* 00 */ null, // t3RunGC
+      /* 01 */ null, // t3SetSay
+      /* 02 */ null, // t3GetVMVsn
+      /* 03 */ null, // t3GetVMID
+      /* 04 */ null, // t3GetVMBanner
+      /* 05 */ null, // t3GetVMPreinitMode
+      /* 06 */ null, // t3DebugTrace
+      /* 07 */ null, // t3GetGlobalSymbols
+      /* 08 */ null, // t3AllocProp
+      /* 09 */ null, // t3GetStackTrace
+      /* 10 */ null, // t3GetNamedArg
+      /* 11 */ null  // t3GetNamedArgList
+    ],
     [
       /* 00 */ B.builtin_dataType,
       /* 01 */ B.builtin_getArg,
