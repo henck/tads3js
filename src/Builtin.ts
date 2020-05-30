@@ -79,7 +79,7 @@ export class Builtin {
       /* 26 */ null, // bannerSetTextColor
       /* 27 */ null, // bannerSetScreenColor
       /* 28 */ null, // bannerGetInfo
-      /* 29 */ null, // bannerSetSize
+      /* 29 */ B.builtin_bannerSetSize, // bannerSetSize
       /* 30 */ null, // logConsoleCreate
       /* 31 */ null, // logConsoleClose
       /* 32 */ null, // logConsoleSay
