@@ -39,9 +39,11 @@ class Vector extends ListBase {
       for(let i = 0; i < a.value; i++) {
         this.value.push(new VmNil());
       }
+    } else if (a == undefined) {
+      // No second argument. Do nothing.
     } else {
       // Disallowed constructor parameter:
-      throw('Cannot instantiate Vector with parameter: ' + a.toString());
+      throw('Cannot instantiate Vector with parameter: ' + a);
     }
   }
 
