@@ -20,8 +20,29 @@ export class Heap {
   static forEach(callback: (id: number, value: RootObject, isIntrinsic: boolean) => void) {
     for(let key of Heap.objects.keys()) {
       let obj = Heap.getObj(key);
-      callback(key, Heap.getObj(key), obj instanceof IntrinsicClass);
+      callback(key, obj, obj instanceof IntrinsicClass);
     }
+  }
+
+  static findFromKey(fromKey: number, comparator: (id: number, value: RootObject, isIntrinsic: boolean) => boolean): {key: number, obj: RootObject} {
+    let index = 0;
+    let keyfound = fromKey == null;
+    for(let key of Heap.objects.keys()) {
+      if(keyfound) {
+        let obj = Heap.getObj(key);
+        if(comparator(key, obj, obj instanceof IntrinsicClass)) {
+          return { key: key, obj: obj };
+        }
+      } else {
+        keyfound = key == fromKey;
+      }
+      index++;
+    }
+    return null;
+  }
+
+  static find(comparator: (id: number, value: RootObject, isIntrinsic: boolean) => boolean): { key: number, obj: RootObject} {
+    return Heap.findFromKey(null, comparator);
   }
 
   /*
