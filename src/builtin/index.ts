@@ -1,3 +1,4 @@
+export { builtin_t3RunGC } from './t3vm/t3RunGC'
 export { builtin_t3SetSay } from './t3vm/t3SetSay'
 export { builtin_t3GetVMPreinitMode } from './t3vm/t3GetVMPreinitMode'
 export { builtin_t3GetVMVsn } from './t3vm/t3GetVMVsn'
@@ -17,4 +18,5 @@ export { builtin_toInteger } from './gen/toInteger'
 export { builtin_toString } from './gen/toString'
 export { builtin_firstObj, builtin_nextObj } from './gen/firstObj'
 
+export { builtin_bannerCreate } from './io/bannerCreate'
 export { builtin_tadsSay } from './io/tadsSay'

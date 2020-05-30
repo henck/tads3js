@@ -5,7 +5,7 @@ import { Vm } from "./Vm";
 export class Builtin {
   private static funcs: ((...args: any[]) => any)[][] = [
     [ 
-      /* 00 */ null, // t3RunGC
+      /* 00 */ B.builtin_t3RunGC,
       /* 01 */ B.builtin_t3SetSay,
       /* 02 */ B.builtin_t3GetVMVsn,
       /* 03 */ null, // t3GetVMID
@@ -69,7 +69,7 @@ export class Builtin {
       /* 16 */ null, // flushOutput
       /* 17 */ null, // inputLineTimeout
       /* 18 */ null, // inputLineCancel
-      /* 19 */ null, // bannerCreate
+      /* 19 */ B.builtin_bannerCreate,
       /* 20 */ null, // bannerDelete
       /* 21 */ null, // bannerClear
       /* 22 */ null, // bannerSay
