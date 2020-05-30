@@ -25,6 +25,8 @@ export { builtin_rexReplace } from './gen/rexReplace'
 export { builtin_bannerClear } from './io/bannerClear'
 export { builtin_bannerCreate } from './io/bannerCreate'
 export { builtin_bannerSetSize } from './io/bannerSetSize'
+export { builtin_bannerSay } from './io/bannerSay'
+export { builtin_bannerSizeToContents } from './io/bannerSizeToContents'
 export { builtin_systemInfo } from './io/systemInfo'
 export { builtin_tadsSay } from './io/tadsSay'
 

@@ -72,9 +72,9 @@ export class Builtin {
       /* 19 */ B.builtin_bannerCreate,
       /* 20 */ null, // bannerDelete
       /* 21 */ B.builtin_bannerClear,
-      /* 22 */ null, // bannerSay
+      /* 22 */ B.builtin_bannerSay,
       /* 23 */ null, // bannerFlush
-      /* 24 */ null, // banerSizeToContents
+      /* 24 */ B.builtin_bannerSizeToContents,
       /* 25 */ null, // bannerGoTo
       /* 26 */ null, // bannerSetTextColor
       /* 27 */ null, // bannerSetScreenColor
