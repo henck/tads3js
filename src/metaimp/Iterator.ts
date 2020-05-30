@@ -30,7 +30,7 @@ abstract class Iterator extends RootObject {
   }
 
   iter_next(): VmData {
-    if(this.isNextAvailable()) {
+    if(this.isNextAvailable() instanceof VmTrue) {
       return this.getNext();
     }
     return null;

@@ -33,7 +33,6 @@ class LookupTableIterator extends Iterator {
   }
 
   protected isNextAvailable(): VmData {
-    if(this.index == null) this.index = 0;
     return this.hasValidIndex() ? new VmTrue() : new VmNil();
   }
 
