@@ -10,8 +10,8 @@ class MetaclassFactory {
   // Create an instance of the metaclass with the specified ID.
   // The contructor is called with the arguments provided.
   // 
-  public static create(id: number, ...args: any[]): RootObject {
-    let klass = MetaclassFactory.getClass(id);
+  public static create(metaclassID: number, ...args: any[]): RootObject {
+    let klass = MetaclassFactory.getClass(metaclassID);
     let instance = new (klass as any)(...args);
     return instance;
   }

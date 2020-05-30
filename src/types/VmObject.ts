@@ -3,18 +3,16 @@ import { VmNil } from "./VmNil";
 import { Heap } from "../Heap";
 import { IFuncInfo } from "../IFuncInfo";
 import { RootObject } from "../metaclass/RootObject";
-import { VmProp } from "./VmProp";
 import { Symbols, TSymbol } from "../Symbols";
 import { Vm } from "../Vm";
 
 export class VmObject extends VmData {
   constructor(value: number | RootObject) {
-    // If an object instance was passed, put it on the heap
-    // to get an ID, and save that ID.
     if(value instanceof RootObject) {
-      value = Heap.addObj(value);
+      super(value.id);
+    } else {
+      super(value);
     }
-    super(value);
   }
 
   getName() {
@@ -218,6 +216,7 @@ export class VmObject extends VmData {
   }
 
   setprop(propID: number, data: VmData) {
+    console.log(this);
     let obj: RootObject = this.getInstance();
     obj.setprop(propID, data);
   }

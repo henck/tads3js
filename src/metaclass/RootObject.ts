@@ -25,6 +25,7 @@ class RootObject {
   protected _isClass: boolean;
 
   constructor() {
+    this.id = Heap.addObj(this);
     this.props = new Map<number, VmData>();
     this.superClasses = [];
     // By default, objects are persistent:

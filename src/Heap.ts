@@ -44,20 +44,25 @@ export class Heap {
   static find(comparator: (id: number, value: RootObject, isIntrinsic: boolean) => boolean): { key: number, obj: RootObject} {
     return Heap.findFromKey(null, comparator);
   }
-
-  /*
-   * Add an object to the Heap, then return the key
-   * that was attributed to it.
-   */
-  static addObj(obj: RootObject): number {
+  
+  private static getNewKey(): number {
     // Determine max key that exists in objects map:
     let maxkey = 0;
     Heap.objects.forEach((obj: RootObject, key: number) => {
       if(key > maxkey) maxkey = key;
     });
     let key = maxkey + 1;
+    return key;    
+  }
+
+  /*
+   * Add an object to the Heap, then return the key
+   * that was attributed to it.
+   */
+  static addObj(obj: RootObject): number {
+    let newKey = Heap.getNewKey();
     // Add the new object with a key above the max key:
-    Heap.objects.set(key, obj);
-    return key;
+    Heap.setObj(newKey, obj);
+    return newKey;
   }
 }
