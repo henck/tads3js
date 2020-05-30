@@ -6,11 +6,11 @@ export class Builtin {
   private static funcs: ((...args: any[]) => any)[][] = [
     [ 
       /* 00 */ null, // t3RunGC
-      /* 01 */ null, // t3SetSay
-      /* 02 */ null, // t3GetVMVsn
+      /* 01 */ B.builtin_t3SetSay,
+      /* 02 */ B.builtin_t3GetVMVsn,
       /* 03 */ null, // t3GetVMID
       /* 04 */ null, // t3GetVMBanner
-      /* 05 */ null, // t3GetVMPreinitMode
+      /* 05 */ B.builtin_t3GetVMPreinitMode,
       /* 06 */ null, // t3DebugTrace
       /* 07 */ null, // t3GetGlobalSymbols
       /* 08 */ null, // t3AllocProp
@@ -21,8 +21,8 @@ export class Builtin {
     [
       /* 00 */ B.builtin_dataType,
       /* 01 */ B.builtin_getArg,
-      /* 02 */ null, // B.builtin_firstObj
-      /* 03 */ null, // B.builtin_nextObj
+      /* 02 */ B.builtin_firstObj,
+      /* 03 */ B.builtin_nextObj,
       /* 04 */ B.builtin_randomize,
       /* 05 */ null, // rand
       /* 06 */ B.builtin_toString,
