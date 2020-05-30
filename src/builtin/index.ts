@@ -19,9 +19,12 @@ export { builtin_toString } from './gen/toString'
 export { builtin_firstObj, builtin_nextObj } from './gen/firstObj'
 export { builtin_getFuncParams } from './gen/getFuncParams'
 export { builtin_rexSearch } from './gen/rexSearch'
+export { builtin_rexMatch } from './gen/rexMatch'
+export { builtin_rexReplace } from './gen/rexReplace'
 
 export { builtin_bannerClear } from './io/bannerClear'
 export { builtin_bannerCreate } from './io/bannerCreate'
 export { builtin_bannerSetSize } from './io/bannerSetSize'
 export { builtin_systemInfo } from './io/systemInfo'
 export { builtin_tadsSay } from './io/tadsSay'
+

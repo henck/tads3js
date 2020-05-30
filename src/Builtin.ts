@@ -28,10 +28,10 @@ export class Builtin {
       /* 06 */ B.builtin_toString,
       /* 07 */ B.builtin_toInteger,
       /* 08 */ B.builtin_getTime,
-      /* 09 */ null, // rexMatch
+      /* 09 */ B.builtin_rexMatch,
       /* 10 */ B.builtin_rexSearch,
       /* 11 */ null, // rexGroup
-      /* 12 */ null, // rexReplace
+      /* 12 */ B.builtin_rexReplace,
       /* 13 */ null, // savepoint
       /* 14 */ null, // undo
       /* 15 */ null, // saveGame
