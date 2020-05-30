@@ -115,7 +115,7 @@ class Vector extends ListBase {
     // If vector isn't big enough, add nil elements to the end:
     while(this.value.length < idx) this.value.push(new VmNil());
     this.value[idx - 1] = data;
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /*
@@ -131,7 +131,7 @@ class Vector extends ListBase {
    */
   private append(vmValue: VmData): VmObject {
     this.value.push(vmValue);
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -148,7 +148,7 @@ class Vector extends ListBase {
     } else {
       this.value.push(vmValue);
     }
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -161,7 +161,7 @@ class Vector extends ListBase {
     let lst = vmList.unpack();
     let values = (lst instanceof ListBase) ? lst.getValue() : lst; 
     this.value = this.makeUnique([...this.value, ...values]);
-    return new VmObject(this);    
+    return new VmObject(this.id); 
   }
 
   /**
@@ -172,7 +172,7 @@ class Vector extends ListBase {
    */
   private applyAll(vmFunc: VmData) {
     this.value = this.value.map((x) => vmFunc.invoke(x));
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -197,7 +197,7 @@ class Vector extends ListBase {
       this.value[destStart + i] = other[sourceStart + i];
     }
 
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -217,7 +217,7 @@ class Vector extends ListBase {
       this.value[i + start] = vmVal;
     }
    
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -258,7 +258,7 @@ class Vector extends ListBase {
   private insertAt(vmIndex: VmInt, ...args: VmData[]): VmObject {
     let idx = this.unpackIndex(vmIndex);
     this.value.splice(idx, 0, ...args);
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -278,7 +278,7 @@ class Vector extends ListBase {
    */
   private prepend(vmVal: VmData): VmObject {
     this.value.unshift(vmVal);
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -288,7 +288,7 @@ class Vector extends ListBase {
    */
   private removeElement(vmVal: VmData): VmObject {
     this.value = this.value.filter((x) => !x.eq(vmVal));
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -300,7 +300,7 @@ class Vector extends ListBase {
     let idx = this.unpackIndex(vmIdx);
     if(idx < 0 || idx > this.value.length-1) throw('index out of range');
     this.value.splice(idx, 1);
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -318,7 +318,7 @@ class Vector extends ListBase {
     if(endIdx < startIdx) throw('End index must be greater than or equal to start index');
     let count = endIdx - startIdx + 1;
     this.value.splice(startIdx, count);
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -332,7 +332,7 @@ class Vector extends ListBase {
     while(this.value.length < length) this.value.push(new VmNil());
     // Discard values if longer than requested length.
     this.value.length = length;
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -358,7 +358,7 @@ class Vector extends ListBase {
     // If descending, reverse result in place.
     if(descending) this.value.reverse();
 
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -373,7 +373,7 @@ class Vector extends ListBase {
     let idx = this.unpackIndex(vmStartIndex);
     let deleteCount = vmDeleteCount.unpack();
     this.value.splice(idx, deleteCount, ...args);
-    return new VmObject(this);
+    return new VmObject(this.id);
   }
 
   /**
@@ -384,7 +384,7 @@ class Vector extends ListBase {
    */
   private subset(vmFunc: VmData): VmObject {
     this.value = this.value.filter((x) => vmFunc.invoke(x).isTruthy());
-    return new VmObject(this);
+    return new VmObject(this.id);
   } 
 
   /**
@@ -399,7 +399,7 @@ class Vector extends ListBase {
     startIdx--;
     let count = vmCount ? vmCount.unpack() : null;
     let lst = new List(this.value.slice(startIdx, count ? (startIdx + count) : undefined));
-    return new VmObject(lst);
+    return new VmObject(this.id);
   }
 }
 
