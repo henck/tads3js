@@ -443,14 +443,9 @@ export class Vm {
     }
   }
 
-  callprop(data: VmData, vmProp: VmProp, argc: number, onlyInherited: boolean, explicitTargetObject?: VmObject) {
+  callprop(data: VmData, selfObject: VmObject | VmNil, vmProp: VmProp, argc: number, onlyInherited: boolean) {
     let propInfo: IPropInfo = this.getprop(data, vmProp, onlyInherited);
     if(!propInfo) throw(`callprop: Cannot find property ${vmProp.value} on object`);
-
-    // If an explicit target object was given (through EXPINHERIT and friends), use it:
-    if(explicitTargetObject) {
-      propInfo.targetObject = explicitTargetObject;
-    }
 
     // If it's native code on an intrinsic class, call it:
     if(propInfo.data instanceof VmNativeCode) {
@@ -493,7 +488,7 @@ export class Vm {
         vmProp,                   // property
         propInfo.targetObject,    // target object
         propInfo.definingObject,  // defining object
-        propInfo.targetObject,    // self object
+        (selfObject as VmObject) ?? propInfo.targetObject,    // self object
         propInfo.data);           // invokee
     }
 
@@ -1089,7 +1084,7 @@ export class Vm {
     Debug.instruction({ propID: propID});
     this.ip += 2;
     let data  = this.stack.pop();
-    this.callprop(data, new VmProp(propID), 0, false);
+    this.callprop(data, null, new VmProp(propID), 0, false);
   }
 
   op_callprop() { // 0x61
@@ -1098,7 +1093,7 @@ export class Vm {
     let data  = this.stack.pop();
     Debug.instruction({'obj': data, 'propID': propID, 'argc': argc});
     this.ip += 3;
-    this.callprop(data, new VmProp(propID), argc, false);
+    this.callprop(data, null, new VmProp(propID), argc, false);
   }
 
   op_ptrcallprop() { // 0x62
@@ -1107,14 +1102,14 @@ export class Vm {
     let data  = this.stack.pop();
     Debug.instruction({'obj': data, 'propID': vmProp, 'argc': argc});
     this.ip++;
-    this.callprop(data, vmProp, argc, false);
+    this.callprop(data, null, vmProp, argc, false);
   }
 
   op_getpropself() { // 0x63
     let propID = this.codePool.getUint2(this.ip);
     Debug.instruction({ propID: propID });
     this.ip += 2;
-    this.callprop(this.stack.getSelf(), new VmProp(propID), 0, false);
+    this.callprop(this.stack.getSelf(), null, new VmProp(propID), 0, false);
   }
 
   op_callpropself() { // 0x64 
@@ -1122,7 +1117,7 @@ export class Vm {
     let propID = this.codePool.getUint2(this.ip + 1);
     Debug.instruction({ propID: propID, argc: argc });
     this.ip += 3;
-    this.callprop(this.stack.getSelf(), new VmProp(propID), argc, false);
+    this.callprop(this.stack.getSelf(), null, new VmProp(propID), argc, false);
   }
 
   op_ptrcallpropself() { // 0x65
@@ -1131,7 +1126,7 @@ export class Vm {
     let data = this.stack.getSelf();
     Debug.instruction({'obj': data, 'propID': vmProp, 'argc': argc});
     this.ip++;
-    this.callprop(data, vmProp, argc, false);
+    this.callprop(data, null, vmProp, argc, false);
   }
 
   op_objgetprop() { // 0x66
@@ -1139,7 +1134,7 @@ export class Vm {
     let propID = this.codePool.getUint2(this.ip + 4);
     Debug.instruction({ objID: objID, propID: propID});
     this.ip += 6;
-    this.callprop(new VmObject(objID), new VmProp(propID), 0, false);
+    this.callprop(new VmObject(objID), null, new VmProp(propID), 0, false);
   }
 
   op_objcallprop() { // 0x67 
@@ -1148,7 +1143,7 @@ export class Vm {
     let propID = this.codePool.getUint2(this.ip + 5);
     Debug.instruction({ objID: objID, propID: propID, argc: argc});
     this.ip += 7;
-    this.callprop(new VmObject(objID), new VmProp(propID), argc, false);
+    this.callprop(new VmObject(objID), null, new VmProp(propID), argc, false);
   }
 
   op_getproplcl1() { // 0x6a 
@@ -1156,7 +1151,7 @@ export class Vm {
     let propID = this.codePool.getUint2(this.ip + 1);
     Debug.instruction({'local': localNum, 'propID': propID});
     this.ip += 3;
-    this.callprop(this.stack.getLocal(localNum), new VmProp(propID), 0, false);
+    this.callprop(this.stack.getLocal(localNum), null, new VmProp(propID), 0, false);
   }
 
   op_callproplcl1() { // 0x6b
@@ -1165,14 +1160,14 @@ export class Vm {
     let propID = this.codePool.getUint2(this.ip + 2);
     Debug.instruction({'local': localNum, 'propID': propID, 'argc': argc});
     this.ip += 4;
-    this.callprop(this.stack.getLocal(localNum), new VmProp(propID), argc, false);
+    this.callprop(this.stack.getLocal(localNum), null, new VmProp(propID), argc, false);
   }
 
   op_getpropr0() { // 0x6c 
     let propID = this.codePool.getUint2(this.ip);
     Debug.instruction({'propID': propID});
     this.ip += 2;
-    this.callprop(this.r0, new VmProp(propID), 0, false);
+    this.callprop(this.r0, null, new VmProp(propID), 0, false);
   }
 
   op_callpropr0() { // 0x6d
@@ -1180,7 +1175,7 @@ export class Vm {
     let propID = this.codePool.getUint2(this.ip + 1);
     Debug.instruction({'propID': propID, 'argc': argc});
     this.ip += 3;
-    this.callprop(this.r0, new VmProp(propID), argc, false);
+    this.callprop(this.r0, null, new VmProp(propID), argc, false);
   }
 
   op_inherit() { // 0x72
@@ -1188,7 +1183,7 @@ export class Vm {
     let propID = this.codePool.getUint2(this.ip + 1);
     Debug.instruction({'propID': propID, 'argc': argc});
     this.ip += 3;
-    this.callprop(this.stack.getDefiningObject(), new VmProp(propID), argc, true);
+    this.callprop(this.stack.getDefiningObject(), this.stack.getSelf(), new VmProp(propID), argc, true);
   }
 
   op_ptrinherit() { // 0x73
@@ -1196,7 +1191,7 @@ export class Vm {
     let vmProp = this.stack.pop();
     Debug.instruction({'prop': vmProp, argc: argc});
     this.ip++;
-    this.callprop(this.stack.getDefiningObject(), vmProp, argc, true);
+    this.callprop(this.stack.getDefiningObject(), this.stack.getSelf(), vmProp, argc, true);
   }
 
   op_expinherit() { // 0x74
@@ -1205,7 +1200,7 @@ export class Vm {
     let objID = this.codePool.getUint4(this.ip + 3);
     Debug.instruction({ argc: argc, propID: propID, objID: objID });
     this.ip += 7;
-    this.callprop(new VmObject(Heap.getObj(objID)), new VmProp(propID), argc, false, this.stack.getSelf() as VmObject); 
+    this.callprop(new VmObject(Heap.getObj(objID)), this.stack.getSelf(), new VmProp(propID), argc, false); 
   }
 
   op_ptrexpinherit() { // 0x75
@@ -1214,7 +1209,7 @@ export class Vm {
     let vmProp = this.stack.pop();
     Debug.instruction({ argc: argc, prop: vmProp, objID: objID });
     this.ip += 5;
-    this.callprop(new VmObject(Heap.getObj(objID)), vmProp, argc, false, this.stack.getSelf() as VmObject); 
+    this.callprop(new VmObject(Heap.getObj(objID)), this.stack.getSelf(), vmProp, argc, false); 
   }
 
   op_varargc() { // 0x76
