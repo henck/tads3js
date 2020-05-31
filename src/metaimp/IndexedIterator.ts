@@ -13,12 +13,12 @@ class IndexedIterator extends Iterator {
    */
   constructor(data: VmData[]) {
     super();
-    this.index = null;
+    this.index = -1;
     this.data = data;
   }
 
-  private hasValidIndex(): boolean {
-    return (this.index != null && this.index >= 0 && this.index < this.data.length);
+  private isValidIndex(index: number): boolean {
+    return (index >= 0 && index < this.data.length);
   }
 
   /*
@@ -27,27 +27,27 @@ class IndexedIterator extends Iterator {
    */
 
   protected resetIterator(): VmData {
-    this.index = null;
+    this.index = -1;
     return null; // Returned in R0
   }
 
   protected isNextAvailable(): VmData {
-    return this.hasValidIndex() ? new VmTrue() : new VmNil();
+    return (this.isValidIndex(this.index + 1) ? new VmTrue() : new VmNil());
   }
 
   protected getNext(): VmData {
-    if(this.index == null) this.index = 0;
-    if(!this.hasValidIndex()) throw('Index out of bounds');
-    return this.data[this.index++];
+    this.index++;
+    if(!this.isValidIndex(this.index)) throw('Index out of bounds');
+    return this.data[this.index];
   }
 
   protected getCurKey(): VmData {
-    if(!this.hasValidIndex()) throw('Index out of bounds');
+    if(!this.isValidIndex(this.index)) throw('Index out of bounds');
     return new VmInt(this.index);
   }
 
   protected getCurVal(): VmData {
-    if(!this.hasValidIndex()) throw('Index out of bounds');
+    if(!this.isValidIndex(this.index)) throw('Index out of bounds');
     return this.data[this.index];
   }
 
