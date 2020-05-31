@@ -484,7 +484,7 @@ export class Vm {
 
     // If a double-quoted string, print it.
     else if(propInfo.data instanceof VmDstring) {
-      console.log('OUTPUT', propInfo.data.value);
+      this.output(propInfo.data.value);
     }
 
     // If a code offset, call function
@@ -555,6 +555,11 @@ export class Vm {
     this.ip = oldIP;
     this.ep = oldEP;
     return this.r0;
+  }
+
+  output(str: string) {
+    console.log(str);
+    if(str == 'STOP') throw('STOPPED');
   }
 
   dump() {
@@ -1795,7 +1800,8 @@ export class Vm {
   op_say() { // 0xb0
     Debug.instruction();
     let arg = this.codePool.getUint4(this.ip);
-    console.log('OUTPUT', this.dataPool.getString(arg));
+    let str = this.dataPool.getString(arg);
+    this.output(str);
     this.ip += 4;
   }
 
@@ -1914,7 +1920,7 @@ export class Vm {
 
   op_sayval() { // 0xb9 
     let val = this.stack.pop();
-    console.log('OUTPUT', val.toStr());
+    this.output(val.toStr());
   }
 
   op_index() { // 0xba
@@ -1974,7 +1980,7 @@ export class Vm {
     // metaclass's name from its index.
     let args = this.stack.popMany(argc);
     let name = MetaclassRegistry.indexToName(metaclass_id);
-    Debug.instruction({'metaclassID': metaclass_id, 'argc': argc, 'class': name });
+    Debug.instruction({'metaclassID': metaclass_id, 'argc': argc, 'class': name, 'args': args });
     let instance = MetaclassFactory.create(metaclass_id, ...args);
     instance.setTransient(transient);
     this.r0 = new VmObject(instance.id);
