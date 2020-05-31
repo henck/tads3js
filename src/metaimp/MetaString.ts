@@ -30,34 +30,34 @@ class MetaString extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.length, 0);
-      case 1: return new VmNativeCode(this.substr, 1, 1);
-      case 2: return new VmNativeCode(this.toUpper, 0);
-      case 3: return new VmNativeCode(this.toLower, 0);
-      case 4: return new VmNativeCode(this.find, 1, 1);
-      case 5: return new VmNativeCode(this.toUnicode, 0, 1);
-      case 6: return new VmNativeCode(this.htmlify, 0, 1);
-      case 7: return new VmNativeCode(this.startsWith, 1);
-      case 8: return new VmNativeCode(this.endsWith, 1);
-      case 9: return new VmNativeCode(this.mapToByteArray, 0, 1);
-      case 10: return new VmNativeCode(this.findReplace, 2, 3);
-      case 11: return new VmNativeCode(this.splice, 2, 1);
-      case 12: return new VmNativeCode(this.split, 0, 2);
-      // case 13: return VmNativeCode(this.specialsToHTML, 0, 1);
-      // case 14: return VmNativeCode(this.specialsToText, 0, 1);
-      case 15: return new VmNativeCode(this.urlEncode, 0);
-      case 16: return new VmNativeCode(this.urlDecode, 0);
-      case 17: return new VmNativeCode(this.sha256, 0);
-      case 18: return new VmNativeCode(this.digestMD5, 0);
+      case 0:  return new VmNativeCode("String.length", this.length, 0);
+      case 1:  return new VmNativeCode("String.substr", this.substr, 1, 1);
+      case 2:  return new VmNativeCode("String.toUpper", this.toUpper, 0);
+      case 3:  return new VmNativeCode("String.toLower", this.toLower, 0);
+      case 4:  return new VmNativeCode("String.find", this.find, 1, 1);
+      case 5:  return new VmNativeCode("String.toUnicode", this.toUnicode, 0, 1);
+      case 6:  return new VmNativeCode("String.htmlify", this.htmlify, 0, 1);
+      case 7:  return new VmNativeCode("String.startsWith", this.startsWith, 1);
+      case 8:  return new VmNativeCode("String.endWith", this.endsWith, 1);
+      case 9:  return new VmNativeCode("String.mapToByteArray", this.mapToByteArray, 0, 1);
+      case 10: return new VmNativeCode("String.findReplace", this.findReplace, 2, 3);
+      case 11: return new VmNativeCode("String.splice", this.splice, 2, 1);
+      case 12: return new VmNativeCode("String.split", this.split, 0, 2);
+      // case 13: return VmNativeCode("String.specialsToHTML", this.specialsToHTML, 0, 1);
+      // case 14: return VmNativeCode("String.specialsToText", this.specialsToText, 0, 1);
+      case 15: return new VmNativeCode("String.urlEncode", this.urlEncode, 0);
+      case 16: return new VmNativeCode("String.urlDeoce", this.urlDecode, 0);
+      case 17: return new VmNativeCode("String.sha256", this.sha256, 0);
+      case 18: return new VmNativeCode("String.digestMD5", this.digestMD5, 0);
       // case 19: return new VmNativeCode(this.packBytes, 1, 0, true);
       // case 20: return new VmNativeCode(this.unpackBytes, 1);
-      case 21: return new VmNativeCode(this.toTitleCase, 0);
-      case 22: return new VmNativeCode(this.toFoldedCase, 0);
-      case 23: return new VmNativeCode(this.compareTo, 1);
-      case 24: return new VmNativeCode(this.compareIgnoreCase, 1);
+      case 21: return new VmNativeCode("String.toTitleCase", this.toTitleCase, 0);
+      case 22: return new VmNativeCode("String.toFoldedCase", this.toFoldedCase, 0);
+      case 23: return new VmNativeCode("String.compareTo", this.compareTo, 1);
+      case 24: return new VmNativeCode("String.compareIgnoreCase", this.compareIgnoreCase, 1);
       // case 25: return new VmNativeCode(this.findLast, 1, 1);
-      case 26: return new VmNativeCode(this.findAll, 1, 0);
-      case 27: return new VmNativeCode(this.match, 1, 0);
+      case 26: return new VmNativeCode("String.findAll", this.findAll, 1, 0);
+      case 27: return new VmNativeCode("String.match", this.match, 1, 0);
     }
     return null;
   }

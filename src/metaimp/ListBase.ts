@@ -3,7 +3,6 @@ import { Collection } from "./Collection"
 import { MetaString } from "./MetaString"
 import { Iterator } from "./Iterator";
 import { IndexedIterator } from "./IndexedIterator";
-import { List } from "./List";
 
 abstract class ListBase extends Collection {
   protected value: VmData[];

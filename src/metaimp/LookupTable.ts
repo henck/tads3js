@@ -73,19 +73,19 @@ class LookupTable extends Collection  {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.isKeyPresent, 1);
-      case 1: return new VmNativeCode(this.removeElement, 1);
-      case 2: return new VmNativeCode(this.applyAll, 1);
-      case 3: return new VmNativeCode(this.forEach, 1);
-      case 4: return new VmNativeCode(this.getBucketCount, 0);
-      case 5: return new VmNativeCode(this.getEntryCount, 0);
-      case 6: return new VmNativeCode(this.forEachAssoc, 1);
-      case 7: return new VmNativeCode(this.keysToList, 0);
-      case 8: return new VmNativeCode(this.valsToList, 0);
-      case 9: return new VmNativeCode(this.getDefaultValue, 0);
-      case 10: return new VmNativeCode(this.setDefaultValue, 1);
-      case 11: return new VmNativeCode(this.nthKey, 1);
-      case 12: return new VmNativeCode(this.nthVal, 1);
+      case 0: return  new VmNativeCode("LookupTable.isKeyPresent", this.isKeyPresent, 1);
+      case 1: return  new VmNativeCode("LookupTable.removeElement", this.removeElement, 1);
+      case 2: return  new VmNativeCode("LookupTable.applyAll", this.applyAll, 1);
+      case 3: return  new VmNativeCode("LookupTable.forEach", this.forEach, 1);
+      case 4: return  new VmNativeCode("LookupTable.getBucketCount", this.getBucketCount, 0);
+      case 5: return  new VmNativeCode("LookupTable.getEntryCount", this.getEntryCount, 0);
+      case 6: return  new VmNativeCode("LookupTable.forEachAssoc", this.forEachAssoc, 1);
+      case 7: return  new VmNativeCode("LookupTable.keysToList", this.keysToList, 0);
+      case 8: return  new VmNativeCode("LookupTable.valsToList", this.valsToList, 0);
+      case 9: return  new VmNativeCode("LookupTable.getDefaultValue", this.getDefaultValue, 0);
+      case 10: return new VmNativeCode("LookupTable.setDefaultValue", this.setDefaultValue, 1);
+      case 11: return new VmNativeCode("LookupTable.nthKey", this.nthKey, 1);
+      case 12: return new VmNativeCode("LookupTable.nthVal", this.nthVal, 1);
     }
     return super.getMethodByIndex(idx);
   }    

@@ -64,13 +64,13 @@ class ByteArray extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return  new VmNativeCode(this.length, 0);
-      case 1: return  new VmNativeCode(this.subarray, 1, 1);
-      case 2: return  new VmNativeCode(this.copyFrom, 4);
-      case 3: return  new VmNativeCode(this.fillValue, 1, 2);
-      case 4: return  new VmNativeCode(this.mapToString, 0, 3);
-      case 9: return  new VmNativeCode(this.sha256, 0, 2);
-      case 10: return new VmNativeCode(this.digestMD5, 0, 2);
+      case 0: return  new VmNativeCode("ByteArray.length", this.length, 0);
+      case 1: return  new VmNativeCode("ByteArray.subarray", this.subarray, 1, 1);
+      case 2: return  new VmNativeCode("ByteArray.copyFrom", this.copyFrom, 4);
+      case 3: return  new VmNativeCode("ByteArray.fillValue", this.fillValue, 1, 2);
+      case 4: return  new VmNativeCode("ByteArray.mapToString", this.mapToString, 0, 3);
+      case 9: return  new VmNativeCode("ByteArray.sha256", this.sha256, 0, 2);
+      case 10: return new VmNativeCode("ByteArray.digestMD5", this.digestMD5, 0, 2);
     }
     return null;
   }  

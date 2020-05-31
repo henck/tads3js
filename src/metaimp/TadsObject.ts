@@ -86,14 +86,14 @@ class TadsObject extends RootObject
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.createInstance, 0, 0, true);
-      case 1: return new VmNativeCode(this.createClone, 0);
-      case 2: return new VmNativeCode(this.createTransientInstance, 0, 0, true);
-      case 3: return new VmNativeCode(this.createInstanceOf, 0, 0, true);
-      case 4: return new VmNativeCode(this.createTransientInstanceOf, 0, 0, true);
-      case 5: return new VmNativeCode(this.setSuperclassList, 1);
-      case 6: return new VmNativeCode(this.getMethod, 1);
-      case 7: return new VmNativeCode(this.setMethod, 2);
+      case 0: return new VmNativeCode("TadsObject.createInstance", this.createInstance, 0, 0, true);
+      case 1: return new VmNativeCode("TadsObject.createClone", this.createClone, 0);
+      case 2: return new VmNativeCode("TadsObject.createTransientInstance", this.createTransientInstance, 0, 0, true);
+      case 3: return new VmNativeCode("TadsObject.createInstanceOf", this.createInstanceOf, 0, 0, true);
+      case 4: return new VmNativeCode("TadsObject.createTransientInstanceOf", this.createTransientInstanceOf, 0, 0, true);
+      case 5: return new VmNativeCode("TadsObject.setSuperclassList", this.setSuperclassList, 1);
+      case 6: return new VmNativeCode("TadsObject.getMethod", this.getMethod, 1);
+      case 7: return new VmNativeCode("TadsObject.setMethod", this.setMethod, 2);
     }
     return null;
   }    

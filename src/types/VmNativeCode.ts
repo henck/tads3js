@@ -7,12 +7,14 @@ import { VmNil } from "./VmNil";
 type TPropFunc = ((...args: any[]) => VmData);
 
 export class VmNativeCode extends VmData {
+  public funcname: string;
   public params: number;
   public optParams: number;
   public varyingParams: boolean;
 
-  constructor(value: TPropFunc, params?: number, optParams?: number, varyingParams?: boolean) {
+  constructor(funcname: string, value: TPropFunc, params?: number, optParams?: number, varyingParams?: boolean) {
     super(value);
+    this.funcname = funcname;
     this.params = params ?? 0;
     this.optParams = optParams ?? 0;
     this.varyingParams = varyingParams ?? false;

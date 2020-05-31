@@ -27,14 +27,14 @@ class StringBuffer extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.length, 0);
-      case 1: return new VmNativeCode(this.charAt, 1);
-      case 2: return new VmNativeCode(this.append, 1);
-      case 3: return new VmNativeCode(this.insert, 2);
-      case 4: return new VmNativeCode(this.copyChars, 2);
-      case 5: return new VmNativeCode(this.deleteChars, 1, 1);
-      case 6: return new VmNativeCode(this.splice, 3);
-      case 7: return new VmNativeCode(this.substr, 1, 0);
+      case 0: return new VmNativeCode("StringBuffer.length", this.length, 0);
+      case 1: return new VmNativeCode("StringBuffer.charAt", this.charAt, 1);
+      case 2: return new VmNativeCode("StringBuffer.append", this.append, 1);
+      case 3: return new VmNativeCode("StringBuffer.insert", this.insert, 2);
+      case 4: return new VmNativeCode("StringBuffer.copyChars", this.copyChars, 2);
+      case 5: return new VmNativeCode("StringBuffer.deleteChars", this.deleteChars, 1, 1);
+      case 6: return new VmNativeCode("StringBuffer.splice", this.splice, 3);
+      case 7: return new VmNativeCode("StringBuffer.substr", this.substr, 1, 0);
     }
     return null;
   }

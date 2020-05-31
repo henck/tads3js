@@ -29,7 +29,7 @@ class File extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return  new VmNativeCode(this.openTextFile, 2, 1);
+      case 0: return  new VmNativeCode("File.openTextFile", this.openTextFile, 2, 1);
     }
     return null;
   }  

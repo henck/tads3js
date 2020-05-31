@@ -20,11 +20,11 @@ abstract class Iterator extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.meta_getNext);
-      case 1: return new VmNativeCode(this.meta_isNextAvailable);
-      case 2: return new VmNativeCode(this.meta_resetIterator);
-      case 3: return new VmNativeCode(this.meta_getCurKey);
-      case 4: return new VmNativeCode(this.meta_getCurVal);
+      case 0: return new VmNativeCode("Iterator.getNext", this.meta_getNext);
+      case 1: return new VmNativeCode("Iterator.isNextAvailable", this.meta_isNextAvailable);
+      case 2: return new VmNativeCode("Iterator.resetIterator", this.meta_resetIterator);
+      case 3: return new VmNativeCode("Iterator.getCurKey", this.meta_getCurKey);
+      case 4: return new VmNativeCode("Iterator.getCurVal", this.meta_getCurVal);
     }
     return null;
   }

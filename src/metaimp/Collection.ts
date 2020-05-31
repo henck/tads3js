@@ -7,8 +7,8 @@ import { Iterator } from "./Iterator";
 abstract class Collection extends RootObject {
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.createIterator);
-      case 1: return new VmNativeCode(this.createLiveIterator);
+      case 0: return new VmNativeCode("Collection.createIterator", this.createIterator);
+      case 1: return new VmNativeCode("Collection.createLiveIterator", this.createLiveIterator);
     }
     return null;
   }  

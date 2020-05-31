@@ -76,7 +76,7 @@ class IntrinsicClass extends RootObject {
 
   getMethodByIndex(idx: number): VmNativeCode {
     switch(idx) {
-      case 0: return new VmNativeCode(this.metaIsIntrinsicClass, 1);
+      case 0: return new VmNativeCode("IntrinsicClass.isIntrinsicClass", this.metaIsIntrinsicClass, 1);
     }
     return null;
   }  
