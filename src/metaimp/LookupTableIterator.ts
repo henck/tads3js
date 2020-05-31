@@ -14,13 +14,13 @@ class LookupTableIterator extends Iterator {
    */
   constructor(data: VmMap) {
     super();
-    this.index = null;
+    this.index = -1;
     this.data = data;
   }
 
-  private hasValidIndex(): boolean {
-    return (this.index != null && this.index >= 0 && this.index < this.data.size());
-  }
+  private isValidIndex(index: number): boolean {
+    return (index >= 0 && index < this.data.size());
+  }  
 
   /*
    * Virtual methods - all private as they should not be called
@@ -28,30 +28,29 @@ class LookupTableIterator extends Iterator {
    */
 
   protected resetIterator(): VmData {
-    this.index = null;
-    return null; // Returned in R0
+    this.index = -1;
+    return new VmNil(); // Returned in R0
   }
 
   protected isNextAvailable(): VmData {
-    return this.hasValidIndex() ? new VmTrue() : new VmNil();
-  }
+    return (this.isValidIndex(this.index + 1) ? new VmTrue() : new VmNil());
+  }  
 
   protected getNext(): VmData {
-    if(this.index == null) this.index = 0;
-    if(!this.hasValidIndex()) throw('Index out of bounds');
-    return this.data.values()[this.index++];
-  }
+    this.index++;
+    if(!this.isValidIndex(this.index)) throw('Index out of bounds');
+    return this.data.values()[this.index];
+  }  
 
   protected getCurKey(): VmData {
-    if(!this.hasValidIndex()) throw('Index out of bounds');
+    if(!this.isValidIndex(this.index)) throw('Index out of bounds');
     return new VmInt(this.index);
-  }
+  }  
 
   protected getCurVal(): VmData {
-    if(!this.hasValidIndex()) throw('Index out of bounds');
+    if(!this.isValidIndex(this.index)) throw('Index out of bounds');
     return this.data.values()[this.index];
-  }
-
+  }  
 }
 
 MetaclassRegistry.register('lookuptable-iterator/030000', LookupTableIterator);

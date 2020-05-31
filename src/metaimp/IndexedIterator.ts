@@ -28,7 +28,7 @@ class IndexedIterator extends Iterator {
 
   protected resetIterator(): VmData {
     this.index = -1;
-    return null; // Returned in R0
+    return new VmNil(); // Returned in R0
   }
 
   protected isNextAvailable(): VmData {
@@ -50,7 +50,6 @@ class IndexedIterator extends Iterator {
     if(!this.isValidIndex(this.index)) throw('Index out of bounds');
     return this.data[this.index];
   }
-
 }
 
 MetaclassRegistry.register('indexed-iterator/030000', IndexedIterator);
