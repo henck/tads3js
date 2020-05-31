@@ -451,6 +451,7 @@ export class Vm {
     if(propInfo.data instanceof VmNativeCode) {
       let args = this.stack.popMany(argc);
       try {
+        console.log(propInfo.data.funcname);
         this.r0 = propInfo.targetObject.getInstance().callNativeMethod(propInfo.data, ...args);
       } catch(e) {
         // Native code may raise an exception.
