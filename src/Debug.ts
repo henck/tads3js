@@ -3,7 +3,7 @@ import { Vm } from "./Vm";
 const colors = require('colors');
 
 export class Debug {
-  static SHOW: boolean = false;
+  static SHOW: boolean = true;
   static opname: string;
   static ip: number;
   static opcode: number;
@@ -17,7 +17,7 @@ export class Debug {
 
   static instruction(args?: {}) {
     if(!Debug.SHOW) return;
-    let ipstr = colors.gray(Debug.ip.toString().padStart(4, '0'));
+    let ipstr = colors.gray(Debug.ip.toString().padStart(6, '0'));
     let opcodestr = colors.blue.bold('0x' + Debug.opcode.toString(16).padStart(2, '0'));
     let opname = colors.magenta.bold(Debug.opname.padEnd(12));
     let final = [];
