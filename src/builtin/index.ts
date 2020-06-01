@@ -3,6 +3,7 @@ export { builtin_t3SetSay } from './t3vm/t3SetSay'
 export { builtin_t3GetVMPreinitMode } from './t3vm/t3GetVMPreinitMode'
 export { builtin_t3GetVMVsn } from './t3vm/t3GetVMVsn'
 export { builtin_t3GetNamedArg } from './t3vm/t3GetNamedArg'
+export { builtin_t3GetNamedArgList } from './t3vm/t3GetNamedArgList'
 
 export { builtin_abs } from './gen/abs'
 export { builtin_concat } from './gen/concat'

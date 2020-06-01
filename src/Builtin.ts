@@ -16,7 +16,7 @@ export class Builtin {
       /* 08 */ null, // t3AllocProp
       /* 09 */ null, // t3GetStackTrace
       /* 10 */ B.builtin_t3GetNamedArg,
-      /* 11 */ null  // t3GetNamedArgList
+      /* 11 */ B.builtin_t3GetNamedArgList
     ],
     [
       /* 00 */ B.builtin_dataType,
