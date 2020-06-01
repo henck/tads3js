@@ -398,6 +398,10 @@ export class Vm {
    * This builds a list of name/value pairs, with all named
    * variables found on the stack in the order they were 
    * found on the stack (most recent first).
+   * 
+   * Each name will appear only once; newer stackframes overwrite
+   * existing named arguments with the same name.
+   * 
    * @returns Name-value list
    */
   public getNamedArgs(): { name: string, value: VmData }[] {
@@ -415,12 +419,19 @@ export class Vm {
 
       // Read names from stack frame, adding them to list.
       let names = this.readNamedArgTable(address);
+
+      // Get values for variables from stack frame:
       let argc = this.stack.peekAbsolute(fp - 2).value;
       let localvars = names.map((name: string, idx: number) => { return {
         name: name,
         value: this.stack.peekAbsolute(fp - 10 - argc - names.length + 1 + idx)
       }});
 
+      // Remove any variables that are already in the variable list
+      // from a newer stack frame:
+      localvars = localvars.filter((lv) => !variables.map((v) => v.name).includes(lv.name));
+
+      // Add the new variables to the variables list:
       variables = variables.concat(localvars);
 
       // Move to previous stack frame.
