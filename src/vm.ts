@@ -40,6 +40,7 @@ export class Vm {
   public stack: Stack;
   public stop = false;
   private varargc: number = undefined;
+  public outputFunc: VmFuncPtr | VmObject = new VmNil();
 
   // We keep track of whether we're running inside a "finally" block. When "finally"
   // throws an exception, we'll have to unwind the stack to the previous method frame.
@@ -575,7 +576,11 @@ export class Vm {
 
     // If a double-quoted string, print it.
     else if(propInfo.data instanceof VmDstring) {
-      this.output('FUNC', propInfo.data.value);
+      if(!(this.outputFunc instanceof VmNil)) {
+        this.outputFunc.invoke(new VmSstring(propInfo.data.value));
+      } else {
+        this.output('FUNC', propInfo.data.value);
+      }
     }
 
     // If a code offset, call function
@@ -649,7 +654,7 @@ export class Vm {
   }
 
   output(source: string, str: string) {
-    console.log(source, str);
+    console.log(source.padEnd(12), str);
     if(str == 'STOP') throw('STOPPED');
   }
 
@@ -2041,7 +2046,11 @@ export class Vm {
 
   op_sayval() { // 0xb9 
     let val = this.stack.pop();
-    this.output('SAYVAL', val.toStr());
+    if(!(this.outputFunc instanceof VmNil)) {
+      this.outputFunc.invoke(new VmSstring(val.toStr()));
+    } else {
+      this.output('SAYVAL', val.toStr());
+    }
   }
 
   op_index() { // 0xba
