@@ -15,7 +15,7 @@ export class Builtin {
       /* 07 */ null, // t3GetGlobalSymbols
       /* 08 */ null, // t3AllocProp
       /* 09 */ null, // t3GetStackTrace
-      /* 10 */ null, // t3GetNamedArg
+      /* 10 */ B.builtin_t3GetNamedArg,
       /* 11 */ null  // t3GetNamedArgList
     ],
     [
