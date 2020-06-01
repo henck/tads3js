@@ -6,6 +6,7 @@ import { DataFactory, VmData, VmTrue, VmNil, VmObject, VmNativeCode, VmProp, VmL
 import { Vm } from '../Vm';
 import { Symbols } from '../Symbols';
 import { IntrinsicClass } from './IntrinsicClass';
+import { Debug } from '../Debug';
 
 class TadsObject extends RootObject
 {
@@ -18,7 +19,7 @@ class TadsObject extends RootObject
     if(args.length >= 1) {
       let superClass = args.shift();
       // Set the superclass.
-      console.log("NEW superclass=", superClass.value);
+      Debug.info("NEW superclass=", superClass.value);
       this.superClasses = [superClass.value];
       // Call constructor, if any:
       this.callConstructor(...args);
