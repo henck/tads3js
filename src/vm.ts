@@ -8,7 +8,7 @@ import { Builtin } from './Builtin'
 import { MetaclassRegistry } from './metaclass/MetaclassRegistry'
 import { MetaclassFactory } from './metaclass/MetaclassFactory'
 import { Heap } from './Heap'
-import { MetaString, List, Iterator, IntrinsicClass } from './metaimp'
+import { MetaString, List, Iterator, IntrinsicClass, AnonFunc } from './metaimp'
 import { IFuncInfo } from './IFuncInfo'
 import { Symbols } from './Symbols'
 import { UTF8 } from './utf8'
@@ -1178,16 +1178,29 @@ export class Vm {
     Debug.instruction({ argc: argc });
     this.ip++;
     let val = this.stack.pop();
+    // Ordinary function pointer:
     if(val instanceof VmFuncPtr) {
       this.call(val.value, argc, null, null, null, null, null);
-    } else if(val instanceof VmBifPtr) { // This isn't in the docs, but I think it should be supported.
+    } 
+    // Builtin function pointer
+    else if(val instanceof VmBifPtr) { // This isn't in the docs, but I think it should be supported.
       this.r0 = Builtin.call(val.getSetIndex(), val.getFunctionIndex(), argc);
-    } else if(val instanceof VmProp) {
+    } 
+    // Prop ID
+    else if(val instanceof VmProp) {
       throw('TODO: PTRCALL NOT IMPLEMENTED FOR PROPID');
-    } else if(val instanceof VmObject) {
-      console.log('TODO: PTRCALL NOT IMPLEMENTED FOR OBJECT');
-      console.log('ignoring');
-    } else {
+    } 
+    // Anonymous function object
+    else if(val instanceof VmObject && val.getInstance() instanceof AnonFunc) {
+      let args = this.stack.popMany(argc);
+      this.r0 = val.invoke(...args);
+    } 
+    // Object
+    else if(val instanceof VmObject) {
+      throw('PTRCALL NOT IMPLEMENTED FOR OBJECT');
+    } 
+    // Otherwise unsupported:
+    else {
       throw('PTRCALL: FUNCPTR_VAL_REQD');
     }
   }
