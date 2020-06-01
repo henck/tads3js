@@ -346,15 +346,20 @@ export class Vm {
     };
   }
 
-  getNamedArgs(): string[] {
+  /**
+   * Read a named arguments table at given address.
+   * This can be the address of a NAMEDARGPTR or 
+   * NAMEDARGTAB instruction. If it's another instruction,
+   * an empty list is returned.
+   * @param address Address to read from
+   * @returns Name list
+   */
+  private readNamedArgTable(address: number): string[] {
     let names = [];
-
-    // Get current return address from stack.
-    let address: number = this.stack.getReturnAddress().value;
 
     // Read instruction at address:
     let instruction = this.codePool.getByte(address);
-    
+
     // If it's NAMEDARGPTR, jump to associated NAMEDARGTAB.
     if(instruction == 0x56) {
       address += 2; // Skip opcode byte and named_arg_count
@@ -386,6 +391,42 @@ export class Vm {
     }
 
     return names;
+  }
+
+  /**
+   * Read named argument names and value from the stack.
+   * This builds a list of name/value pairs, with all named
+   * variables found on the stack in the order they were 
+   * found on the stack (most recent first).
+   * @returns Name-value list
+   */
+  public getNamedArgs(): { name: string, value: VmData }[] {
+    let variables: { name: string, value: VmData }[] = [];
+
+    // Start at top stack frame.
+    let fp = this.stack.fp;
+
+    do {
+      // Get return address from stack frame.
+      let address: number = this.stack.peekAbsolute(fp - 4).value;
+
+      // If the frame has no previous frame, stop
+      if(address == -1) return variables;
+
+      // Read names from stack frame, adding them to list.
+      let names = this.readNamedArgTable(address);
+      let argc = this.stack.peekAbsolute(fp - 2).value;
+      let localvars = names.map((name: string, idx: number) => { return {
+        name: name,
+        value: this.stack.peekAbsolute(fp - 10 - argc - names.length + 1 + idx)
+      }});
+
+      variables = variables.concat(localvars);
+
+      // Move to previous stack frame.
+      fp = this.stack.peekAbsolute(fp - 1).value;
+    }
+    while(1 == 1);
   }
 
   call(offset: number, argc: number, prop: VmProp, targetObj: VmObject, definingObj: VmObject, selfObject: VmObject, invokee: VmData) {

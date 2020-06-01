@@ -3,19 +3,18 @@ import { Vm } from "../../Vm";
 
 
 export function builtin_t3GetNamedArg(vmName: VmData, vmDefVal?: VmData): VmData {
+  // Get name of named argument to find:
   let name = vmName.unpack();
-  let names = Vm.getInstance().getNamedArgs();
-  let idx = names.indexOf(name);
+  // Get named arguments by walking stack:
+  let variables = Vm.getInstance().getNamedArgs();
+  // Find the index of named argument with specified name:
+  let idx = variables.findIndex((v) => v.name == name);
+  // If not found, use default value if any:
   if(idx == -1) {
     if(!vmDefVal) throw('Undefined named argument.');
     return vmDefVal;
   }
-  let stack = Vm.getInstance().stack;
-  //console.log("idx", idx);
-  //console.log("argcount", stack.getArgCount());
-  let value = stack.getArg(stack.getArgCount() + names.length - idx - 1);
-  
-  //console.log("Arg found", name, value);
-  return value;
+  // Return the named argument's value as found on the stack.
+  return variables[idx].value;
 }
 
