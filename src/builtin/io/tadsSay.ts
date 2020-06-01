@@ -1,4 +1,4 @@
-import { VmData } from "../../types";
+import { VmData, VmSstring } from "../../types";
 import { Debug } from "../../Debug";
 import { Vm } from "../../Vm";
 
@@ -8,7 +8,9 @@ import { Vm } from "../../Vm";
  * @todo: Bignumber support
  */
 export function builtin_tadsSay(...args: VmData[]): VmData {
-  args.forEach((a) => Vm.getInstance().output('TADSSAY', a.toStr()));
+  args.forEach((a) => {
+    Vm.getInstance().stdout('TADSSAY', a.toStr())
+  });
   return null;
 }
 

@@ -576,11 +576,7 @@ export class Vm {
 
     // If a double-quoted string, print it.
     else if(propInfo.data instanceof VmDstring) {
-      if(!(this.outputFunc instanceof VmNil)) {
-        this.outputFunc.invoke(new VmSstring(propInfo.data.value));
-      } else {
-        this.output('FUNC', propInfo.data.value);
-      }
+      this.output('DSTRING', new VmSstring(propInfo.data.value));
     }
 
     // If a code offset, call function
@@ -653,7 +649,16 @@ export class Vm {
     return this.r0;
   }
 
-  output(source: string, str: string) {
+  public output(source: string, str: VmSstring) {
+    if(!(this.outputFunc instanceof VmNil)) {
+      //this.stdout(`(${source})`, str.value);
+      this.outputFunc.invoke(str);
+    } else {
+      this.stdout(`${source}`, str.value);
+    }
+  }
+
+  public stdout(source: string, str: string) {
     console.log(source.padEnd(12), str);
     if(str == 'STOP') throw('STOPPED');
   }
@@ -1927,7 +1932,7 @@ export class Vm {
     Debug.instruction();
     let arg = this.codePool.getUint4(this.ip);
     let str = this.dataPool.getString(arg);
-    this.output('SAY', str);
+    this.output('SAY', new VmSstring(str));
     this.ip += 4;
   }
 
@@ -2046,11 +2051,7 @@ export class Vm {
 
   op_sayval() { // 0xb9 
     let val = this.stack.pop();
-    if(!(this.outputFunc instanceof VmNil)) {
-      this.outputFunc.invoke(new VmSstring(val.toStr()));
-    } else {
-      this.output('SAYVAL', val.toStr());
-    }
+    this.output('SAYVAL', new VmSstring(val.toStr()));
   }
 
   op_index() { // 0xba
