@@ -11,6 +11,7 @@ import { Heap } from './Heap'
 import { MetaString, List, Iterator, IntrinsicClass } from './metaimp'
 import { IFuncInfo } from './IFuncInfo'
 import { Symbols } from './Symbols'
+import { UTF8 } from './utf8'
 
 const fs = require('fs');
 
@@ -93,8 +94,8 @@ export class Vm {
              // 0x53 empty   
     /* OK */ [0x54, { name: 'RET',             func: this.op_ret }],
              // 0x55 empty   
-    /* DB */ [0x56, { name: 'NAMEDARGPTR',     func: this.op_no_debug_support }],
-    /* DB */ [0x57, { name: 'NAMEDARGTAB',     func: this.op_no_debug_support }],
+    /* OK */ [0x56, { name: 'NAMEDARGPTR',     func: this.op_namedargptr }],
+    /* OK */ [0x57, { name: 'NAMEDARGTAB',     func: this.op_namedargtab }],
     /*    */ [0x58, { name: 'CALL',            func: this.op_call }],
     /*    */ [0x59, { name: 'PTRCALL',         func: this.op_ptrcall }],
              // 0x5a..0x5f empty
@@ -343,6 +344,48 @@ export class Vm {
       // absolute offset in codePool or 0 for no exception table:
       exceptionTableoffset: exceptionTableStart == 0 ? 0 : exceptionTableStart + offset 
     };
+  }
+
+  getNamedArgs(): string[] {
+    let names = [];
+
+    // Get current return address from stack.
+    let address: number = this.stack.getReturnAddress().value;
+
+    // Read instruction at address:
+    let instruction = this.codePool.getByte(address);
+    
+    // If it's NAMEDARGPTR, jump to associated NAMEDARGTAB.
+    if(instruction == 0x56) {
+      address += 2; // Skip opcode byte and named_arg_count
+      // Read table_offset and skip to NAMEDARGTAB instruction.
+      let table_offset = this.codePool.getInt2(address);
+      address = address + table_offset;
+    }
+
+    // See if we now have a NAMEDARGTAB.
+    instruction = this.codePool.getByte(address);
+    if(instruction == 0x57) {
+      // Skip instruction and table_bytes:
+      address += 3;
+      // Read arg_count:
+      let arg_count = this.codePool.getUint2(address);
+      address += 2;
+      
+      // Read names from table:
+      for(let i = 0; i < arg_count; i++) {
+        let offset = this.codePool.getUint2(address + i * 2);
+        let end = this.codePool.getUint2(address + i * 2 + 2);
+        let len = end - offset; 
+        let bytes = [];
+        for(let j = 0; j < len; j++) {
+          bytes.push(this.codePool.getByte(address + offset + j));
+        }
+        names.push(UTF8.decode(bytes));
+      }
+    }
+
+    return names;
   }
 
   call(offset: number, argc: number, prop: VmProp, targetObj: VmObject, definingObj: VmObject, selfObject: VmObject, invokee: VmData) {
@@ -1049,6 +1092,23 @@ export class Vm {
   op_ret() { // 0x54
     Debug.instruction();
     this.ret();
+  }
+
+  op_namedargptr() { // 0x56
+    let argc = this.codePool.getByte(this.ip);
+    Debug.instruction( { argc: argc } );
+    this.stack.popMany(argc);
+    // skip table_offset (of 2 bytes)
+    this.ip += 3;
+  }
+
+  op_namedargtab() { // 0x57 
+    // Bytes to skip (not including table_bytes element itself)
+    let table_bytes = this.codePool.getUint2(this.ip);
+    let argc = this.codePool.getUint2(this.ip + 2);
+    Debug.instruction( { argc: argc } );
+    this.stack.popMany(argc);
+    this.ip += table_bytes + 2;
   }
 
   op_call() { // 0x58

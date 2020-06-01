@@ -14,7 +14,8 @@ class GrammarProd extends RootObject {
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
-    throw('GrammarProd: Cannot load from image');
+    return new GrammarProd();
+    //throw('GrammarProd: Cannot load from image');
   }
 
   getMethodByIndex(idx: number): VmNativeCode {
@@ -42,6 +43,10 @@ class GrammarProd extends RootObject {
    */
 }
 
+// If #include <gramprod.h> is not given, compiler will fall back
+// to 'grammar-production/030000'. We'll assume that both versions
+// are the same.
+MetaclassRegistry.register('grammar-production/030000', GrammarProd);
 MetaclassRegistry.register('grammar-production/030002', GrammarProd);
 
 export { GrammarProd }
