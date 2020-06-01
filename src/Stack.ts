@@ -1,5 +1,5 @@
 const colors = require('colors');
-import { VmData, VmProp, VmNil, VmObject } from './types'
+import { VmData, VmProp, VmNil, VmObject, VmCodeOffset } from './types'
 
 class Stack {
   static readonly STACK_SIZE = 1000;
@@ -52,6 +52,10 @@ class Stack {
    * @throws Stack overflow if stack if full.
    */
   public push(value: VmData): void {
+    if(!(value instanceof VmData)) {
+      console.log(value);
+      throw('Non-VmData pushed on stack.');
+    }
     if(this.sp >= Stack.STACK_SIZE) throw('STACK OVERFLOW');
     this.elements[this.sp++] = value;
   }
@@ -103,6 +107,10 @@ class Stack {
    * @param data Wrapped value for local variable
    */
   setLocal(localNum: number, data: VmData): void {
+    if(!(data instanceof VmData)) {
+      console.log(data);
+      throw('Setting non-VmData local.');
+    }
     this.elements[this.fp + localNum] = data;
   }
 
@@ -123,6 +131,10 @@ class Stack {
    * @param data Wrapped argument value
    */
   setArg(argNum: number, data: VmData): void {
+    if(!(data instanceof VmData)) {
+      console.log(data);
+      throw('Setting non-VmData arg.');
+    }
     this.elements[this.fp - 10 - argNum] = data;
   }
 
@@ -215,6 +227,12 @@ class Stack {
     return this.elements[this.fp - 5];
   }
 
+  /**
+   * Return IP address of caller.
+   */
+  getReturnAddress(): VmCodeOffset {
+    return this.elements[this.fp - 4]; 
+  }
 
   public dump() {
     console.info('STACK:');
