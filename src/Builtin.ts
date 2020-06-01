@@ -8,8 +8,8 @@ export class Builtin {
       /* 00 */ B.builtin_t3RunGC,
       /* 01 */ B.builtin_t3SetSay,
       /* 02 */ B.builtin_t3GetVMVsn,
-      /* 03 */ null, // t3GetVMID
-      /* 04 */ null, // t3GetVMBanner
+      /* 03 */ B.builtin_t3GetVMID,
+      /* 04 */ B.builtin_t3GetVMBanner,
       /* 05 */ B.builtin_t3GetVMPreinitMode,
       /* 06 */ null, // t3DebugTrace
       /* 07 */ null, // t3GetGlobalSymbols
