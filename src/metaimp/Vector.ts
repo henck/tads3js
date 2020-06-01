@@ -97,17 +97,24 @@ class Vector extends ListBase {
    */  
   
   public add(data: VmData): VmData {
-    let values = [data];
-    if(data instanceof VmList) values = data.value;
-    if(data instanceof VmObject && data.getInstance() instanceof ListBase) values = data.getInstance().getValue();
-    return new VmObject(new Vector(this.value.concat(values)));
+    // If argument is a list-like, get its array of elements. 
+    // Otherwise consider argument an array of a single element.
+    let arr = data.unpack();
+    if(!Array.isArray(arr)) arr = [data];
+    
+    // If data is a VmList, then add it to 
+    return new VmObject(new Vector(this.value.concat(arr)));
   }
 
   public subtract(data: VmData): VmData {
-    let values = [data];
-    if(data instanceof VmList) values = data.value;
-    if(data instanceof VmObject && data.getInstance() instanceof ListBase) values = data.getInstance().getValue();    
-    return new VmObject(new Vector(this.value.filter((v) => !values.find((w) => w.eq(v)))));
+    // If argument is a list-like, get its array of elements. 
+    // Otherwise consider argument an array of a single element.
+    let arr = data.unpack();
+    if(!Array.isArray(arr)) arr = [data];
+
+    // Remove from the "this" list all elements that occur in the subtracted list:
+    let lst = this.value.filter((x: VmData) => !arr.find((y: VmData) => x.eq(y)));
+    return new VmObject(new Vector(lst));
   }
   
   public setindex(vmIndex: VmData, data: VmData): VmData {

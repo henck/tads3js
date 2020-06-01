@@ -31,9 +31,6 @@ export class VmList extends VmData {
   }
 
   sub(data: VmData): VmData {
-    console.log("SUB FROM VMLIST");
-    console.log(data);
-
     // If argument is a list-like, get its array of elements. 
     // Otherwise consider argument an array of a single element.
     let arr = data.unpack();

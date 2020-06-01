@@ -72,6 +72,31 @@ class List extends ListBase {
   }  
 
   /*
+   * Virtual methods
+   */  
+
+  public add(data: VmData): VmData {
+    // If argument is a list-like, get its array of elements. 
+    // Otherwise consider argument an array of a single element.
+    let arr = data.unpack();
+    if(!Array.isArray(arr)) arr = [data];
+    
+    // If data is a VmList, then add it to 
+    return new VmObject(new List(this.value.concat(arr)));
+  }
+
+  public subtract(data: VmData): VmData {
+    // If argument is a list-like, get its array of elements. 
+    // Otherwise consider argument an array of a single element.
+    let arr = data.unpack();
+    if(!Array.isArray(arr)) arr = [data];
+
+    // Remove from the "this" list all elements that occur in the subtracted list:
+    let lst = this.value.filter((x: VmData) => !arr.find((y: VmData) => x.eq(y)));
+    return new VmObject(new List(lst));
+  }  
+
+  /*
    * Meta methods - all private as they should not be called
    * directly by other code, only when a property is evaluated.
    */
