@@ -381,7 +381,7 @@ class MetaString extends RootObject {
 
   protected findReplace(vmOldStr: VmData, vmNewStr: VmData, vmFlags?: VmInt, vmIndex?: VmInt, vmLimit?: VmInt): VmData {
     // TODO: Actually do something; currently just copies old str.
-    return new VmObject(new MetaString(vmOldStr.unpack()));
+    return new VmObject(new MetaString(this.value));
   }
 
   getValue() {
