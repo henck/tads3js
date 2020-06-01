@@ -21,21 +21,27 @@ export class VmList extends VmData {
   // Operators
 
   add(data: VmData): VmData {
-    if(data instanceof VmList) {
-      return new VmObject(new List(this.value.concat(data.value)));
-    } else {
-      return new VmObject(new List(this.value.concat([data])));
-    }
+    // If argument is a list-like, get its array of elements. 
+    // Otherwise consider argument an array of a single element.
+    let arr = data.unpack();
+    if(!Array.isArray(arr)) arr = [data];
+    
+    // If data is a VmList, then add it to 
+    return new VmList(this.value.concat(arr));
   }
 
   sub(data: VmData): VmData {
-    let res;
-    if(data instanceof VmList) {  // [x,y,z] - [a,b,c]
-      res = this.value.filter((x: VmData) => !data.value.find((y: VmData) => y.constructor == x.constructor && y.value == x.value));
-    } else { // [x,y,z] - 3
-      res = this.value.filter((x: VmData) => !(x.constructor == data.constructor && x.value == data.value));
-    }
-    return res;
+    console.log("SUB FROM VMLIST");
+    console.log(data);
+
+    // If argument is a list-like, get its array of elements. 
+    // Otherwise consider argument an array of a single element.
+    let arr = data.unpack();
+    if(!Array.isArray(arr)) arr = [data];
+
+    // Remove from the "this" list all elements that occur in the subtracted list:
+    let lst = this.value.filter((x: VmData) => !arr.find((y: VmData) => x.eq(y)));
+    return new VmList(lst);
   }
 
   not() {
