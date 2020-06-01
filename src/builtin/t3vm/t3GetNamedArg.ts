@@ -1,7 +1,13 @@
-import { VmData, VmNil } from "../../types";
+import { VmData } from "../../types";
 import { Vm } from "../../Vm";
 
-
+/**
+ * Retrieves the value of the named argument with the given name. 
+ * @param vmName Argument name
+ * @param vmDefVal Default value
+ * @returns Value
+ * @throws Exception if name does not exist and no default value given
+ */
 export function builtin_t3GetNamedArg(vmName: VmData, vmDefVal?: VmData): VmData {
   // Get name of named argument to find:
   let name = vmName.unpack();
