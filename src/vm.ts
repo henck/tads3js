@@ -575,7 +575,7 @@ export class Vm {
 
     // If a double-quoted string, print it.
     else if(propInfo.data instanceof VmDstring) {
-      this.output(propInfo.data.value);
+      this.output('FUNC', propInfo.data.value);
     }
 
     // If a code offset, call function
@@ -648,8 +648,8 @@ export class Vm {
     return this.r0;
   }
 
-  output(str: string) {
-    console.log(str);
+  output(source: string, str: string) {
+    console.log(source, str);
     if(str == 'STOP') throw('STOPPED');
   }
 
@@ -1922,7 +1922,7 @@ export class Vm {
     Debug.instruction();
     let arg = this.codePool.getUint4(this.ip);
     let str = this.dataPool.getString(arg);
-    this.output(str);
+    this.output('SAY', str);
     this.ip += 4;
   }
 
@@ -2041,7 +2041,7 @@ export class Vm {
 
   op_sayval() { // 0xb9 
     let val = this.stack.pop();
-    this.output(val.toStr());
+    this.output('SAYVAL', val.toStr());
   }
 
   op_index() { // 0xba
