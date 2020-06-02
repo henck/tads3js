@@ -47,7 +47,7 @@ export class Builtin {
       /* 25 */ B.builtin_abs,
       /* 26 */ B.builtin_sgn,
       /* 27 */ B.builtin_concat,
-      /* 28 */ null // rexSearchLast
+      /* 28 */ B.builtin_rexSearchLast
     ],
     [
       /* 00 */ B.builtin_tadsSay,

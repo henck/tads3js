@@ -24,6 +24,7 @@ export { builtin_firstObj, builtin_nextObj } from './gen/firstObj'
 export { builtin_getFuncParams } from './gen/getFuncParams'
 export { builtin_rexGroup } from './gen/rexGroup'
 export { builtin_rexSearch } from './gen/rexSearch'
+export { builtin_rexSearchLast } from './gen/rexSearchLast'
 export { builtin_rexMatch } from './gen/rexMatch'
 export { builtin_rexReplace } from './gen/rexReplace'
 
