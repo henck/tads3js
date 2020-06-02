@@ -11,6 +11,8 @@ import { List } from "./List";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { VmType } from '../types/VmType';
+import { Vm } from '../Vm';
+import { IRexGroup } from '../regexp/RexGroup';
 
 class MetaString extends RootObject {
   private value: string;
@@ -127,6 +129,7 @@ class MetaString extends RootObject {
 
   private find(vmTarget: VmData, vmIndex?: VmInt): VmInt | VmNil {
     let index = this.unwrapIndex(vmIndex);
+    if(index == undefined) index = 0;
 
     // Target is either a constant string, a metastring, or a RexPattern:
     let target = vmTarget.unpack();
@@ -135,10 +138,15 @@ class MetaString extends RootObject {
     if(target instanceof RexPattern) {
       let regexp = target.getRegExp();
       // Remove start of string up to index before looking for match.
-      let m = this.value.substr(index).match(regexp);
+      let m:any = regexp.exec(this.value.substr(index));
+      //console.log(m);
       if(m == null) return new VmNil();
-      // Add index again to position.
-      return new VmInt(m.index + index + 1); // +1 T3 strings start at 1
+      // Add index again to matches:
+      for(let i = 0; i < m.index.length; i++) {
+        m.index[i] += index + 1;
+      }
+      Vm.getInstance().match = m;
+      return new VmInt(m.index[0]);
     }
     // A string is specified. Use it:
     else if(typeof(target) == 'string') {
@@ -153,7 +161,7 @@ class MetaString extends RootObject {
 
     // Perform search using a RexPattern:
     if(target instanceof RexPattern) {
-      let globRegExp = new RegExp(target.getRegExp(), 'g');
+      let globRegExp = null;//new RegExp(target.getRegExp(), 'g');
       let m = this.value.match(globRegExp);
       return new VmObject(new List(m.map((x) => new VmObject(new MetaString(x)))));
     } 
@@ -208,7 +216,7 @@ class MetaString extends RootObject {
     if(obj instanceof RexPattern) {
       let regexp = obj.getRegExp();
       // Remove start of string up to index before looking for match.
-      let m = this.value.substr(index).match(regexp);
+      let m: any; // this.value.substr(index).match(regexp);
       // If no match, or match not at start, return nil.
       if(m == null || m.index != 0) return new VmNil();
       // Return length of match.
@@ -279,9 +287,9 @@ class MetaString extends RootObject {
 
     // If delimiter is a RexPattern:
     else if(delim instanceof RexPattern) {
-      let m;
+      let m : any;
       // Find up to limit-1 matches (unless limit is 0)
-      while((limit > 1 || limit == 0) && (m = str.match(delim.getRegExp()))) {
+      while((limit > 1 || limit == 0) && (m = delim.getRegExp().exec(str))) {
         // Add match to list
         parts.push(str.substr(0, m.index));
         // Remove match from string

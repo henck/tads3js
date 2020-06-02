@@ -3,13 +3,14 @@
 #include "strbuf.h"
     
 _main(args)
-{          //  1234567890123456789012345
-    local x = 'hello, world, hello world';
-    return (
-         x.find('world') == 8
-      && x.find('world', 12) == 21
-      && x.find(R'w.r') == 8
-    );
+{
+    return 'abcdef'.find('cd') == 3
+        && 'abcdef'.find('g') == nil
+        && 'abcdef'.find('c',3) == 3
+        && 'abcdef'.find('c',4) == nil
+        && 'abcabcabc'.find('c', 4) == 6
+        && 'abcabcabc'.find('c', 7) == 9
+        && 'abcdef123456'.find(R'%d+') == 7;
 }
 
 
