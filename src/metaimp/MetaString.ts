@@ -139,14 +139,9 @@ class MetaString extends RootObject {
       let regexp = target.getRegExp();
       // Remove start of string up to index before looking for match.
       let m:any = regexp.exec(this.value.substr(index));
-      //console.log(m);
       if(m == null) return new VmNil();
-      // Add index again to matches:
-      for(let i = 0; i < m.index.length; i++) {
-        m.index[i] += index + 1;
-      }
       Vm.getInstance().match = m;
-      return new VmInt(m.index[0]);
+      return new VmInt(m.index[0] + 1); // +1 T3 strings start at 1
     }
     // A string is specified. Use it:
     else if(typeof(target) == 'string') {
@@ -289,11 +284,11 @@ class MetaString extends RootObject {
     else if(delim instanceof RexPattern) {
       let m : any;
       // Find up to limit-1 matches (unless limit is 0)
-      while((limit > 1 || limit == 0) && (m = delim.getRegExp().exec(str))) {
+      while((limit > 1 || limit == 0) && (m = delim.getRegExp().exec(str, 0))) {
         // Add match to list
-        parts.push(str.substr(0, m.index));
+        parts.push(str.substr(0, m.index[0]));
         // Remove match from string
-        str = str.substr(m.index+m[0].length);
+        str = str.substr(m.index[0]+m[0].length);
         if(limit != 0) limit--;
       }
     }
