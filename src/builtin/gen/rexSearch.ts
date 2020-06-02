@@ -21,7 +21,7 @@ export function builtin_rexSearch(vmPat: VmData, vmStr: VmData, vmIndex?: VmInt)
   if(m == null) return new VmNil();
 
   return new VmList([
-    new VmInt(m.index[0]),
+    new VmInt(m.index[0] + 1),
     new VmInt(m[0].length),
     new VmSstring(m[0])
   ]);
