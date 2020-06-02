@@ -5,69 +5,83 @@ import { VmObject, VmNativeCode, VmSstring, VmData } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { MetaString } from "./MetaString";
+import { RexClasses } from '../util/RexClasses';
 
 class RexPattern extends RootObject {
-  static NamedCharacters: Map<string, string> = new Map<string, string>([
-    ['lparen',  '\\('],
-    ['rparen',  '\\)'],
-    ['lsquare', '\\['],
-    ['rsquare', '\\]'],
-    ['lbrace',  '\\{'],
-    ['rbrace',  '\\}'],
-    ['langle',  '\\<'],
-    ['rangle',  '\\>'],
-    ['vbar',    '\\|'],
-    ['caret',   '\\^'],
-    ['period',  '\\.'],
-    ['dot',     '\\.'],
-    ['squote',  '\\\''],
-    ['dquote',  '\\"'],
-    ['star',    '\\*'],
-    ['plus',    '\\+'],
-    ['percent', '\\%'],
-    ['question', '\\?'],
-    ['dollar',  '\\$'],
-    ['backslash', '\\\\'],
-    ['return',  '\\n'],
-    ['linefeed', '\\r'],
-    ['tab',     '\\t'],
-    ['nul',     '\\0'],
-    ['null',    '\\0']
-  ]);
-
-  static CharacterClasses: Map<string, string> = new Map<string, string>([
-    ['alpha', 'A-Za-z'],
-    ['upper', 'A-Z'],
-    ['lower', 'a-z'],
-    ['digit', '0-9'],
-    ['alphanum', 'A-Za-z0-9'],
-    ['space', ' \t'],
-    ['vspace', '\r\n\b'],
-    ['punct', '\,\.\?\:\!'],
-    ['newline', '\n\r\b']
-  ]);
-
-  private magic: number;
   private value: string;
+  private parsedValue: string;
   private regexp: RegExp;
 
   constructor(value: VmData) {
     super();
     this.value = value.unpack();
 
-    // In T3, % is used as a backslash.
-    this.value = this.value.replace('%', '\\');
+    let caseSensitive = true;
+    this.parsedValue = this.value;
 
-    // Replace character names and character classes:
-    let parsedValue = this.value.replace(/\<[^\>]*\>/g, (substr:string) => {
+    // Any backslashes need to be duplicated:
+    //parsedValue = parsedValue.replace('/\\/', '\\\\');
+
+    // See if there's a <NoCase> in the string.
+    this.parsedValue = this.parsedValue.replace(/<nocase>/ig, (x) => {
+      caseSensitive = false;
+      return '';
+    });
+
+    // See if there's a <Min> in the string.
+    let hasMin = false;
+    this.parsedValue = this.parsedValue.replace(/<min>/ig, (x) => {
+      hasMin = true;
+      return '';
+    });
+    // If <Min> was specified, then we need to make * non-greedy.
+    if(hasMin) this.parsedValue = this.parsedValue.replace('*', '*?');
+
+    // Remove other flags:
+    // These flags are never used in Adv3.
+    ['<fb>', '<firstbegin>', '<fe>', '<firstend>', '<max>'].forEach((flag) => {
+      this.parsedValue = this.parsedValue.replace(new RegExp(flag, 'ig'), '');
+    });
+
+    // Replace % sequences with character classes:
+    this.parsedValue = this.parsedValue.replace(/%d/g, '<digit>');
+    this.parsedValue = this.parsedValue.replace(/%D/g, '<^digit>');
+    this.parsedValue = this.parsedValue.replace(/%s/g, '<space>');
+    this.parsedValue = this.parsedValue.replace(/%S/g, '<^space>');
+    this.parsedValue = this.parsedValue.replace(/%v/g, '<vspace>');
+    this.parsedValue = this.parsedValue.replace(/%V/g, '<^vspace>');
+    this.parsedValue = this.parsedValue.replace(/%w/g, '<alphanum>');
+    this.parsedValue = this.parsedValue.replace(/%W/g, '<^alphanum>');
+
+    // Start-of-word and end-of-word are converted to ordinary word boundaries.
+    this.parsedValue = this.parsedValue.replace(/%</g, '\\b');
+    this.parsedValue = this.parsedValue.replace(/%>/g, '\\b');
+
+    // In T3, % is used as a backslash.
+    this.parsedValue = this.parsedValue.replace(/%([^%<>])/g, '\\$1');
+
+    // In T3, character names and classes are written using angle brackets < and >.
+    // We must replace this with rectangular brackets.
+    // <x>                => [x]
+    // <lparen>           => [\(]
+    // <period|plus|star> => [\.\+\*]
+    // <^question>        => [^\?]
+    this.parsedValue = this.parsedValue.replace(/\<[^\<\>]*\>/g, (substr:string) => {
       let content = substr.substr(1, substr.length - 2); // string minus angle brackets
+      // Does exp start with a negation?
+      // A ^ not in the first position is taken by JS as a literal ^, just like T3,
+      // so no special treatment needed.
       let negate = content.startsWith('^'); if(negate) content = content.substr(1);
+
+      // Escape hyphens:
+      content = content.replace(/-/g, '\\');
+
       let parts = content.split('|');
       parts = parts.map((part) => {
-        RexPattern.CharacterClasses.forEach((value, key) => {
+        RexClasses.CharacterClasses.forEach((value, key) => {
           if(part.toLowerCase() == key) part = value;
         });
-        RexPattern.NamedCharacters.forEach((value, key) => {
+        RexClasses.NamedCharacters.forEach((value, key) => {
           if(part.toLowerCase() == key) part = value;
         });
         return part;
@@ -75,15 +89,30 @@ class RexPattern extends RootObject {
       return `[${negate ? '^' : ''}${parts.join('')}]`;
     });
 
-    // TODO: parse regexps correctly
-    // this.regexp = new RegExp(parsedValue);
+    //console.log(parsedValue);
+    //let rx = new RegExp(parsedValue, 'g' + (!caseSensitive) ? 'i' : '');
+    //console.log(rx.exec('aa\vcc'));
+
+    this.regexp = new RegExp(this.parsedValue, 'g' + (!caseSensitive) ? 'i' : '');
   }
 
-  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject {
-    let magic = image.getUInt8(offset);
-    let strOffset = image.getUInt32(offset + 1);
-    let value = new VmSstring(dataPool.getString(strOffset));    
-    return new RexPattern(value);
+  static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject { 
+    // Skip dataholder type. We can ignore this, because we know the data is a string.
+    offset++;
+    // Load string offset in datapool:
+    let strOffset = image.getUInt32(offset);
+    // Load string from datapool.
+    let value = dataPool.getString(strOffset);    
+
+    // Adv3 bugfix. There is a regexp with an unterminated group.
+    if(value == '([`\'"\u2018\u201C](.*)') {
+      value = '[`\'"\u2018\u201C](.*)';
+    }
+ 
+    // Show RegExp as it was loaded from the image:
+    // console.log("RX LOADED: ", value);
+
+    return new RexPattern(new VmSstring(value));
   }
 
   getMethodByIndex(idx: number): VmNativeCode {
@@ -98,7 +127,7 @@ class RexPattern extends RootObject {
    */
 
   toStr(radix?: number, isSigned?: boolean): string {
-    return this.value;
+    return `${this.value} = ${this.parsedValue}`;
   }   
 
   /*
