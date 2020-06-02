@@ -1,4 +1,5 @@
 import { IRexGroup } from "./RexGroup";
+import { Vm } from "../Vm";
 
 export class RegExpPlus {
   private regex: RegExp;
@@ -60,9 +61,9 @@ export class RegExpPlus {
    * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test
    * @see http://www.ecma-international.org/ecma-262/6.0/#sec-regexp.prototype.test
    */
-  test(str: string): boolean {
+  /* test(str: string): boolean {
     return this.regex.test(str);
-  }
+  } */
 
   /**
    * Simply invokes the inherited method {@linkcode RegExp[Symbol.search]}.
@@ -71,9 +72,9 @@ export class RegExpPlus {
    * @see http://www.ecma-international.org/ecma-262/6.0/#sec-regexp.prototype-@@search
    * @alias Regex.search
    */
-  [Symbol.search](str: string) {
+  /* [Symbol.search](str: string) {
     return this.regex[Symbol.search](str);
-  }
+  } */
 
   /**
   * Simply invokes the inherited method {@linkcode RegExp[Symbol.split]}.
@@ -83,9 +84,10 @@ export class RegExpPlus {
   * @see http://www.ecma-international.org/ecma-262/6.0/#sec-regexp.prototype-@@split
   * @alias Regex.split
   */
+  /* 
   [Symbol.split](str: string, limit: number) {
     return this.regex[Symbol.split](str);
-  }
+  } */
   
   /**
    * Full indexed exec method: Based on {@linkcode RegExp#exec} but instead of simply getting "index" in the return which
@@ -118,13 +120,15 @@ export class RegExpPlus {
    * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec
    * @see http://www.ecma-international.org/ecma-262/6.0/#sec-regexp.prototype.exec
    */
-  exec(str: string): Object {
+  exec(str: string, offset?: number): Object {
     var result:any = [];
     result.index = [];
     var resultRegex = this.regex.exec(str);
+    if(offset) this.regex.lastIndex = offset;
     this.lastIndex = this.regex.lastIndex;
 
     if (!resultRegex) {
+        Vm.getInstance().match = null;
         return resultRegex;
     }
     result[0] = resultRegex[0];
@@ -155,6 +159,8 @@ export class RegExpPlus {
     if (this.regexGroupStructure && this.regexGroupStructure[0][3]) {
         execInternal(resultRegex.index, this.regexGroupStructure[0][3]);
     }
+
+    Vm.getInstance().match = result;
     return result;
   };
 
@@ -173,6 +179,7 @@ export class RegExpPlus {
    * @see http://www.ecma-international.org/ecma-262/6.0/#sec-regexp.prototype-@@match
    * @alias Regex.match
    */
+  /* 
   [Symbol.match](str: string): Object {
     this.lastIndex = 0;
     this.regex.lastIndex = 0;
@@ -198,7 +205,7 @@ export class RegExpPlus {
     this.lastIndex = 0;
     this.regex.lastIndex = 0;
     return resultExecArray;
-  }
+  } */
 
   /**
    * Takes the regular expression "regex" as input and puts all the non-grouped regex characters before a group
