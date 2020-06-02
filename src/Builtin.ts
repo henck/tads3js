@@ -4,7 +4,7 @@ import { Vm } from "./Vm";
 
 export class Builtin {
   private static funcs: ((...args: any[]) => any)[][] = [
-    [ 
+    [ // t3vm
       /* 00 */ B.builtin_t3RunGC,
       /* 01 */ B.builtin_t3SetSay,
       /* 02 */ B.builtin_t3GetVMVsn,
@@ -18,7 +18,7 @@ export class Builtin {
       /* 10 */ B.builtin_t3GetNamedArg,
       /* 11 */ B.builtin_t3GetNamedArgList
     ],
-    [
+    [ // tadsgen
       /* 00 */ B.builtin_dataType,
       /* 01 */ B.builtin_getArg,
       /* 02 */ B.builtin_firstObj,
@@ -30,7 +30,7 @@ export class Builtin {
       /* 08 */ B.builtin_getTime,
       /* 09 */ B.builtin_rexMatch,
       /* 10 */ B.builtin_rexSearch,
-      /* 11 */ null, // rexGroup
+      /* 11 */ B.builtin_rexGroup,
       /* 12 */ B.builtin_rexReplace,
       /* 13 */ null, // savepoint
       /* 14 */ null, // undo
