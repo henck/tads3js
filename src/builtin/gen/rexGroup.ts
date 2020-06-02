@@ -15,7 +15,7 @@ export function builtin_rexGroup(vmGroupNum: VmInt): VmData {
   if(match == null || groupNum >= match.index.length) return new VmNil();
 
   return new VmList([
-    new VmInt(match.index[groupNum]),
+    new VmInt(match.index[groupNum] + 1), // Make this 1-based for TADS
     new VmInt(match[groupNum].length),
     new VmSstring(match[groupNum])
   ]);
