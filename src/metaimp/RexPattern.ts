@@ -5,12 +5,14 @@ import { VmObject, VmNativeCode, VmSstring, VmData } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { MetaString } from "./MetaString";
-import { RexClasses } from '../util/RexClasses';
+import { RexClasses } from '../regexp/RexClasses';
+
+import { RegExpPlus } from '../regexp/RegExpPlus';
 
 class RexPattern extends RootObject {
   private value: string;
   private parsedValue: string;
-  private regexp: RegExp;
+  private regexp: RegExpPlus;
 
   constructor(value: VmData) {
     super();
@@ -93,7 +95,7 @@ class RexPattern extends RootObject {
     //let rx = new RegExp(parsedValue, 'g' + (!caseSensitive) ? 'i' : '');
     //console.log(rx.exec('aa\vcc'));
 
-    this.regexp = new RegExp(this.parsedValue, 'g' + (!caseSensitive) ? 'i' : '');
+    this.regexp = new RegExpPlus(this.parsedValue, 'g' + (!caseSensitive) ? 'i' : '');
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject { 
