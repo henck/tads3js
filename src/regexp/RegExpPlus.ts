@@ -121,10 +121,14 @@ export class RegExpPlus {
    * @see http://www.ecma-international.org/ecma-262/6.0/#sec-regexp.prototype.exec
    */
   exec(str: string, offset?: number): Object {
+    // If offset given, then discard (offset) chars of string.
+    if(offset) {
+      str = str.substr(offset);
+    }
+    
     var result:any = [];
     result.index = [];
     var resultRegex = this.regex.exec(str);
-    if(offset) this.regex.lastIndex = offset;
     this.lastIndex = this.regex.lastIndex;
 
     if (!resultRegex) {
@@ -158,6 +162,13 @@ export class RegExpPlus {
     };
     if (this.regexGroupStructure && this.regexGroupStructure[0][3]) {
         execInternal(resultRegex.index, this.regexGroupStructure[0][3]);
+    }
+
+    // If an offset was given, add it to the indices.
+    if(offset) {
+      for(let i = 0; i < result.index.length; i++) {
+        result.index[i] += offset;
+      }
     }
 
     Vm.getInstance().match = result;
