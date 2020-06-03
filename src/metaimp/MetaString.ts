@@ -4,16 +4,17 @@ const SHA256 = require("crypto-js/sha256");
 import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr, VmNativeCode, VmSstring } from "../types";
-import { ByteArray } from "./ByteArray";
-import { RexPattern } from "./RexPattern";
-import { List } from "./List";
-import { SourceImage } from "../SourceImage";
-import { Pool } from "../Pool";
-import { VmType } from '../types/VmType';
-import { builtin_rexSearch } from '../builtin/gen/rexSearch';
-import { Match } from '../regexp/RegExpPlus';
-import { AnonFunc } from './AnonFunc';
+import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr, VmNativeCode, VmSstring } from "../types"
+import { ByteArray } from "./ByteArray"
+import { RexPattern } from "./RexPattern"
+import { List } from "./List"
+import { SourceImage } from "../SourceImage"
+import { Pool } from "../Pool"
+import { VmType } from '../types/VmType'
+import { builtin_rexSearch } from '../builtin/gen/rexSearch'
+import { builtin_rexMatch } from '../builtin/gen/rexMatch'
+import { Match } from '../regexp/RegExpPlus'
+import { AnonFunc } from './AnonFunc'
 
 class MetaString extends RootObject {
   private value: string;
@@ -216,29 +217,25 @@ class MetaString extends RootObject {
   }
 
   private match(vmTarget: VmData, vmIndex?: VmInt): VmInt | VmNil {
-    let index = this.unwrapIndex(vmIndex);
+    let index = vmIndex ? this.unwrapIndex(vmIndex) : 0;
 
-    let obj = null; if(vmTarget instanceof VmObject) obj = vmTarget.getInstance();
+    let target = vmTarget.unpack();
 
     // If a RexPattern is specified, use it:
-    if(obj instanceof RexPattern) {
-      let regexp = obj.getRegExp();
-      // Remove start of string up to index before looking for match.
-      let m: any; // this.value.substr(index).match(regexp);
-      // If no match, or match not at start, return nil.
-      if(m == null || m.index != 0) return new VmNil();
-      // Return length of match.
-      return new VmInt(m[0].length);
+    if(target instanceof RexPattern) {
+      return builtin_rexMatch(vmTarget, new VmObject(this.id), vmIndex);
     }
     // A string is specified. Use it:
-    else {
-      let str = (obj instanceof MetaString) ? obj.getValue() : vmTarget.value;
+    else if(typeof(target) == 'string') {
       // Get position of match.
-      let pos = this.value.indexOf(str, index);
+      let pos = this.value.indexOf(target, index);
       // If no match, or match not at start, return nil.
       if(pos - index != 0) return new VmNil();
       // Return length of match (always same as search string):
-      return new VmInt(str.length);
+      return new VmInt(target.length);
+    }
+    else { 
+      throw('String.match: unsupported argument');
     }
   }  
   
