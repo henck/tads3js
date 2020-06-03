@@ -1,5 +1,7 @@
-import { IRexGroup } from "./RexGroup";
 import { Vm } from "../Vm";
+
+// From:
+// http://www--s0-v1.becke.ch/tool/becke-ch--regex--s0-v1/becke-ch--regex--s0-0-v1--homepage--pl--client/
 
 export class RegExpPlus {
   private regex: RegExp;
