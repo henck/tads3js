@@ -53,35 +53,41 @@ export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: 
   if(vmLimit && vmLimit instanceof VmNil) limit = 999;
   if(vmLimit && vmLimit instanceof VmInt) limit = vmLimit.unpack();
 
-  // Search at every position in the string (starting at index), 
-  // left to right:
-  let pos = index;
-  let count = 0;
-  while(pos < str.length && count < limit) {
-    // Run every pattern against the string at the current position.
-    let match: any = null;
-    let patIndex: number = 0;
-    for(let i = 0; i < patterns.length; i++) {
-      let m: any = patterns[i].getRegExp().exec(str, pos);
-      if(m == null) continue;
-      // Save match if it has a lower position than the current match.
-      if(match == null || m.index[0] < match.index[0]) {
-        patIndex = i;
-        match = m;
+  if(!isSerial) {
+    // Search at every position in the string (starting at index), 
+    // left to right:
+    let pos = index;
+    let count = 0;
+    while(pos < str.length && count < limit) {
+      // Run every pattern against the string at the current position.
+      let match: any = null;
+      let patIndex: number = 0;
+      for(let i = 0; i < patterns.length; i++) {
+        let m: any = patterns[i].getRegExp().exec(str, pos);
+        if(m == null) continue;
+        // Save match if it has a lower position than the current match.
+        if(match == null || m.index[0] < match.index[0]) {
+          patIndex = i;
+          match = m;
+        }
       }
-    }
-    // No match? Then quit.
-    if(match == null) break;
+      // No match? Then quit.
+      if(match == null) break;
 
-    let replace_str = getReplacement(str, patIndex, match, vmReplacement);
-    let left = str.substr(0, match.index[0]);
-    let right = str.substr(match.index[0] + match[0].length);
-    str = left + replace_str + right;
-    pos = match.index[0] + replace_str.length;
-    count++;
+      let replace_str = getReplacement(str, patIndex, match, vmReplacement);
+      let left = str.substr(0, match.index[0]);
+      let right = str.substr(match.index[0] + match[0].length);
+      str = left + replace_str + right;
+      pos = match.index[0] + replace_str.length;
+      count++;
+    }
+  }
+
+  // Serial mode
+  else {
+    throw('rexReplace serial mode not supported.');
   }
   
-  // TODO: Does nothing
   return new VmObject(new MetaString(str));
 }
 
