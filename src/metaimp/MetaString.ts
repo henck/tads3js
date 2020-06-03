@@ -4,15 +4,17 @@ const SHA256 = require("crypto-js/sha256");
 import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr, VmNativeCode } from "../types";
+import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr, VmNativeCode, VmSstring } from "../types";
 import { ByteArray } from "./ByteArray";
 import { RexPattern } from "./RexPattern";
 import { List } from "./List";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { VmType } from '../types/VmType';
+import { builtin_rexSearch } from '../builtin/gen/rexSearch';
+import { Match } from '../regexp/RegExpPlus';
 import { Vm } from '../Vm';
-import { IRexGroup } from '../regexp/RexGroup';
+import { AnonFunc } from './AnonFunc';
 
 class MetaString extends RootObject {
   private value: string;
@@ -128,49 +130,61 @@ class MetaString extends RootObject {
   }
 
   private find(vmTarget: VmData, vmIndex?: VmInt): VmInt | VmNil {
-    let index = this.unwrapIndex(vmIndex);
-    if(index == undefined) index = 0;
-
-    // Target is either a constant string, a metastring, or a RexPattern:
-    let target = vmTarget.unpack();
-
-    // If a RexPattern is specified, use it:
-    if(target instanceof RexPattern) {
-      let regexp = target.getRegExp();
-      // Remove start of string up to index before looking for match.
-      let m:any = regexp.exec(this.value.substr(index));
-      if(m == null) return new VmNil();
-      Vm.getInstance().match = m;
-      return new VmInt(m.index[0] + 1); // +1 T3 strings start at 1
-    }
-    // A string is specified. Use it:
-    else if(typeof(target) == 'string') {
-      let pos = this.value.indexOf(target, index);
-      if(pos == -1) return new VmNil();
-      return new VmInt(pos + 1); // +1 T3 strings start at 1
-    }
+    let res = builtin_rexSearch(vmTarget, new VmObject(this.id), vmIndex);
+    if(res instanceof VmNil) return res;
+    return res.unpack()[0];
   }
 
-  private findAll(vmTarget: VmData, func?: VmFuncPtr): VmObject {
+  private findAll(vmTarget: VmData, vmFunc?: VmData): VmObject {
     let target = vmTarget.unpack();
+    let matches: Match[] = [];
 
     // Perform search using a RexPattern:
     if(target instanceof RexPattern) {
-      let globRegExp = null;//new RegExp(target.getRegExp(), 'g');
-      let m = this.value.match(globRegExp);
-      return new VmObject(new List(m.map((x) => new VmObject(new MetaString(x)))));
+      let pos = 0;
+      let m: Match = target.getRegExp().exec(this.value, pos);
+      while(m != null) {
+        matches.push(m);
+        pos = m.index + m.length;
+        m = target.getRegExp().exec(this.value, pos);
+      }
     } 
-    // Perform search uses a string:
+    // Perform search using a string:
     else if(typeof(target) == 'string') {
       let count = 0, pos = 0, idx = 0;
       while((idx = this.value.indexOf(target, pos)) != -1) {
+        let m = new Match();
+        m.value = target;
+        m.length = target.length;
+        m.index = idx;
+        matches.push(m);
         count++; pos = idx + target.length;
       }
-      let matches: VmObject[] = [];
-      for(let i = 0; i < count; i++) matches.push(new VmObject(new MetaString(target)));
-      return new VmObject(new List(matches));
     }
-    // TODO must accept func
+    else {
+      throw('findAll: unsupported argument');
+    }
+
+    // Create a result list:
+    let results: VmData[] = matches.map((m) => {
+      // Build function argument list
+      let args = [
+        new VmSstring(m.value),
+        new VmInt(m.index + 1)
+      ];
+      for(let i = 1; i < m.groups.length; i++) args.push(new VmSstring(m.groups[i].value));
+    
+      if(vmFunc instanceof VmFuncPtr || (vmFunc instanceof VmObject && vmFunc.getInstance() instanceof AnonFunc)) {
+        let funcinfo = vmFunc.funcinfo();
+        args = args.slice(0, funcinfo.params); // remove arguments that function doesn't expect
+        while(funcinfo.params > args.length) args.push(new VmNil()); // Add nil for missing arguments.
+        return vmFunc.invoke(...args);
+      }
+
+      else return new VmSstring(m.value);
+    });
+
+    return new VmObject(new List(results));
   }
 
   private htmlify(flags?: VmInt): VmData {
@@ -282,13 +296,13 @@ class MetaString extends RootObject {
 
     // If delimiter is a RexPattern:
     else if(delim instanceof RexPattern) {
-      let m : any;
+      let m: Match;
       // Find up to limit-1 matches (unless limit is 0)
       while((limit > 1 || limit == 0) && (m = delim.getRegExp().exec(str, 0))) {
         // Add match to list
-        parts.push(str.substr(0, m.index[0]));
+        parts.push(str.substr(0, m.index));
         // Remove match from string
-        str = str.substr(m.index[0]+m[0].length);
+        str = str.substr(m.index+m.length);
         if(limit != 0) limit--;
       }
     }
