@@ -13,7 +13,6 @@ import { Pool } from "../Pool";
 import { VmType } from '../types/VmType';
 import { builtin_rexSearch } from '../builtin/gen/rexSearch';
 import { Match } from '../regexp/RegExpPlus';
-import { Vm } from '../Vm';
 import { AnonFunc } from './AnonFunc';
 
 class MetaString extends RootObject {

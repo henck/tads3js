@@ -93,23 +93,16 @@ export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: 
 function getReplacement(str: string, patIndex: number, match: Match, vmReplacement: VmData): string {
   let replacements = vmReplacement.unpack();
 
-  // Case: replacement is a function pointer:
-  if(vmReplacement instanceof VmFuncPtr) {
-    // For a Funcptr, we must check the number of arguments that the function
+  // Case: replacement is a function pointer (ordinary or anonymous)
+  if(vmReplacement instanceof VmFuncPtr || (vmReplacement instanceof VmObject && vmReplacement.getInstance() instanceof AnonFunc)) {
+    // For a function pointer, we must check the number of arguments that the function
     // actually expects and send no more than that:
-    let params = Vm.getInstance().getFuncInfo(vmReplacement.value).params;
+    let params = vmReplacement.funcinfo().params;
     let args = [];
     if(params >= 1) args.push(new VmSstring(match.value));
     if(params >= 2) args.push(new VmInt(match.index));
     if(params >= 3) args.push(new VmSstring(str));
     return vmReplacement.invoke(...args).unpack();
-  }
-  
-  // Case: replacement is an anonymous fuunction
-  if(vmReplacement instanceof VmObject && vmReplacement.getInstance() instanceof AnonFunc) {
-    // For an AnonFunc, we do not need to check the number
-    // of arguments.
-    return vmReplacement.invoke(new VmSstring(match.value), new VmInt(match.index), new VmSstring(str)).unpack();
   }
 
   // Case: replacements is an array.
