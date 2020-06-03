@@ -70,6 +70,8 @@ export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: 
       // No match? Then quit.
       if(match == null) break;
 
+      // Set rexGroup register for the match we are processing.
+      Vm.getInstance().match = match;
       let replace_str = getReplacement(str, patIndex, match, vmReplacement);
       let left = str.substr(0, match.index[0]);
       let right = str.substr(match.index[0] + match[0].length);
