@@ -3,7 +3,7 @@ import { RexPattern } from "../../metaimp";
 
 /**
  * Searches for the regular expression pat in the search string str, starting at the character position index.
-  * @param vmPat Pattern to search for (string or RexPattern)
+ * @param vmPat Pattern to search for (string or RexPattern)
  * @param vmStr String to search in
  * @param vmIndex Index to start at
  * @returns list with match info, or nil for no match
