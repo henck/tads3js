@@ -3,6 +3,38 @@ import { Vm } from "../Vm";
 // From:
 // http://www--s0-v1.becke.ch/tool/becke-ch--regex--s0-v1/becke-ch--regex--s0-0-v1--homepage--pl--client/
 
+interface IMatchGroup {
+  value: string;
+  index: number;
+  length: number;
+}
+
+export class Match {
+  public value: string;
+  public index: number;
+  public length: number;
+  public groups: IMatchGroup[];
+
+  constructor(match?: any) {
+    this.value = '';
+    this.index = 0;
+    this.length = 0;
+    this.groups = [];
+    if(match) {
+      this.value = match[0];
+      this.index = match.index[0];
+      this.length = match[0].length;
+      for(let i = 0; i < match.index.length; i++) {
+        this.groups.push({
+          value: match[i],
+          index: match.index[i],
+          length: match[i].length
+        });
+      }
+    }
+  }
+}
+
 export class RegExpPlus {
   private regex: RegExp;
   private flags: string;
@@ -122,7 +154,7 @@ export class RegExpPlus {
    * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec
    * @see http://www.ecma-international.org/ecma-262/6.0/#sec-regexp.prototype.exec
    */
-  exec(str: string, offset?: number): Object {
+  exec(str: string, offset?: number): Match {
     // If offset given, then discard (offset) chars of string.
     if(offset) {
       str = str.substr(offset);
@@ -135,7 +167,7 @@ export class RegExpPlus {
 
     if (!resultRegex) {
         Vm.getInstance().match = null;
-        return resultRegex;
+        return null;
     }
     result[0] = resultRegex[0];
     result.index[0] = resultRegex.index;
@@ -173,8 +205,9 @@ export class RegExpPlus {
       }
     }
 
-    Vm.getInstance().match = result;
-    return result;
+    let match = new Match(result);
+    Vm.getInstance().match = match;
+    return match;
   };
 
 
