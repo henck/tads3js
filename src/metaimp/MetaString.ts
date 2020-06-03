@@ -216,6 +216,12 @@ class MetaString extends RootObject {
     return new VmObject(b);
   }
 
+  /**
+   * Checks for a match to the given target value, at the given starting position in the subject string (self). 
+   * @param vmTarget Target to search for (string or RexPattern)
+   * @param vmIndex Index to search at
+   * @returns Length of match found, or nil for no match.
+   */
   private match(vmTarget: VmData, vmIndex?: VmInt): VmInt | VmNil {
     let index = vmIndex ? this.unwrapIndex(vmIndex) : 0;
 
