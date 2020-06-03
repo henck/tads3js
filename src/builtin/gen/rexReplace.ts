@@ -43,7 +43,10 @@ export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: 
   const isAll = (flags & ReplaceAll);
   const isIgnoreCase = (flags & ReplaceIgnoreCase);
   const isFollowCase = (flags & ReplaceFollowCase);
-  const isSerial = (flags & ReplaceSerial);  
+  const isSerial = (flags & ReplaceSerial); 
+  
+  if(isFollowCase) throw('rexReplace: No ReplaceFollowCase support');
+  if(isIgnoreCase) throw('rexReplace: No ReplaceIgnoreCase support');
 
   // By default, there is no limit.
   let limit: number = 999;
