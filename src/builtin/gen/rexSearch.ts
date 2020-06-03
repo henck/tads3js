@@ -1,5 +1,6 @@
 import { VmData, VmInt, VmNil, VmSstring, VmList } from "../../types";
 import { RexPattern } from "../../metaimp";
+import { Match } from "../../regexp/RegExpPlus";
 
 /**
  * Searches for the regular expression pat in the search string str, starting at the character position index.
@@ -22,15 +23,15 @@ export function builtin_rexSearch(vmPat: VmData, vmStr: VmData, vmIndex?: VmInt)
   index = index <= 0 ? str.length + index : index - 1;
 
   // Perform match:
-  let m: any = (pat as RexPattern).getRegExp().exec(str, index);
+  let m: Match = (pat as RexPattern).getRegExp().exec(str, index);
 
-  // If no match, or match does not start at specified index, return nil.
+  // If no match, return nil.
   if(m == null) return new VmNil();
 
   return new VmList([
-    new VmInt(m.index[0] + 1),
-    new VmInt(m[0].length),
-    new VmSstring(m[0])
+    new VmInt(m.index + 1),
+    new VmInt(m.length),
+    new VmSstring(m.value)
   ]);
 }
 

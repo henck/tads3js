@@ -12,7 +12,7 @@ import { MetaString, List, Iterator, IntrinsicClass, AnonFunc } from './metaimp'
 import { IFuncInfo } from './IFuncInfo'
 import { Symbols } from './Symbols'
 import { UTF8 } from './utf8'
-import { IRexGroup } from './regexp/RexGroup'
+import { Match } from './regexp/RegExpPlus'
 
 const fs = require('fs');
 
@@ -42,7 +42,7 @@ export class Vm {
   public stop = false;
   private varargc: number = undefined;
   public outputFunc: VmFuncPtr | VmObject = new VmNil();
-  public match: Object = null;
+  public match: Match = null;
 
   // We keep track of whether we're running inside a "finally" block. When "finally"
   // throws an exception, we'll have to unwind the stack to the previous method frame.

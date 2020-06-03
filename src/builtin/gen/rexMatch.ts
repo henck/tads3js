@@ -1,6 +1,6 @@
 import { VmData, VmInt, VmNil, VmSstring } from "../../types";
 import { RexPattern } from "../../metaimp";
-import { RegExpPlus } from "../../regexp/RegExpPlus";
+import { Match } from "../../regexp/RegExpPlus";
 import { Vm } from "../../Vm";
 
 export function builtin_rexMatch(vmPat: VmData, vmStr: VmData, vmIndex?: VmInt): VmData {
@@ -17,11 +17,11 @@ export function builtin_rexMatch(vmPat: VmData, vmStr: VmData, vmIndex?: VmInt):
   index = index <= 0 ? str.length + index : index - 1;
 
   // Perform match:
-  let m: any = (pat as RexPattern).getRegExp().exec(str, index);
+  let m: Match = (pat as RexPattern).getRegExp().exec(str, index);
 
   // If no match, or match does not start at specified index, return nil.
-  if(m == null || m.index[0] != index) return new VmNil();
+  if(m == null || m.index != index) return new VmNil();
   
-  return new VmInt(m[0].length);
+  return new VmInt(m.length);
 }
 

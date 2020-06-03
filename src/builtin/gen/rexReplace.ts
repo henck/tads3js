@@ -1,6 +1,7 @@
 import { VmData, VmInt, VmNil, VmObject, VmSstring, VmTrue, VmFuncPtr } from "../../types";
 import { MetaString, RexPattern, AnonFunc } from "../../metaimp";
 import { Vm } from "../../Vm";
+import { Match } from "../../regexp/RegExpPlus";
 
 const ReplaceAll        = 0x01;
 const ReplaceIgnoreCase = 0x02;
@@ -56,13 +57,13 @@ export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: 
     let count = 0;
     while(pos < str.length && count < limit) {
       // Run every pattern against the string at the current position.
-      let match: any = null;
+      let match: Match = null;
       let patIndex: number = 0;
       for(let i = 0; i < patterns.length; i++) {
-        let m: any = patterns[i].getRegExp().exec(str, pos);
+        let m: Match = patterns[i].getRegExp().exec(str, pos);
         if(m == null) continue;
         // Save match if it has a lower position than the current match.
-        if(match == null || m.index[0] < match.index[0]) {
+        if(match == null || m.index < match.index) {
           patIndex = i;
           match = m;
         }
@@ -73,10 +74,10 @@ export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: 
       // Set rexGroup register for the match we are processing.
       Vm.getInstance().match = match;
       let replace_str = getReplacement(str, patIndex, match, vmReplacement);
-      let left = str.substr(0, match.index[0]);
-      let right = str.substr(match.index[0] + match[0].length);
+      let left = str.substr(0, match.index);
+      let right = str.substr(match.index + match.length);
       str = left + replace_str + right;
-      pos = match.index[0] + replace_str.length;
+      pos = match.index + replace_str.length;
       count++;
     }
   }
@@ -89,7 +90,7 @@ export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: 
   return new VmObject(new MetaString(str));
 }
 
-function getReplacement(str: string, patIndex: number, match: any, vmReplacement: VmData): string {
+function getReplacement(str: string, patIndex: number, match: Match, vmReplacement: VmData): string {
   let replacements = vmReplacement.unpack();
 
   // Case: replacement is a function pointer:
@@ -98,8 +99,8 @@ function getReplacement(str: string, patIndex: number, match: any, vmReplacement
     // actually expects and send no more than that:
     let params = Vm.getInstance().getFuncInfo(vmReplacement.value).params;
     let args = [];
-    if(params >= 1) args.push(new VmSstring(match[0]));
-    if(params >= 2) args.push(new VmInt(match.index[0]));
+    if(params >= 1) args.push(new VmSstring(match.value));
+    if(params >= 2) args.push(new VmInt(match.index));
     if(params >= 3) args.push(new VmSstring(str));
     return vmReplacement.invoke(...args).unpack();
   }
@@ -108,7 +109,7 @@ function getReplacement(str: string, patIndex: number, match: any, vmReplacement
   if(vmReplacement instanceof VmObject && vmReplacement.getInstance() instanceof AnonFunc) {
     // For an AnonFunc, we do not need to check the number
     // of arguments.
-    return vmReplacement.invoke(new VmSstring(match[0]), new VmInt(match.index[0]), new VmSstring(str)).unpack();
+    return vmReplacement.invoke(new VmSstring(match.value), new VmInt(match.index), new VmSstring(str)).unpack();
   }
 
   // Case: replacements is an array.
@@ -126,8 +127,8 @@ function getReplacement(str: string, patIndex: number, match: any, vmReplacement
   // Case: replacements is a simple string
   if(typeof(replacements) == 'string') {
     // Perform replacements for %* and %1...%n:
-    replacements = replacements.replace('%*', match[0]);
-    replacements = replacements.replace(/%(\d+)/g, (m:any, p1:any) => match[parseInt(p1)] );
+    replacements = replacements.replace('%*', match.value);
+    replacements = replacements.replace(/%(\d+)/g, (m:any, p1:any) => match.groups[parseInt(p1)].value );
     return replacements;
   }
 
