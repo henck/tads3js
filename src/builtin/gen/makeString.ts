@@ -8,8 +8,8 @@ import { MetaString } from "../../metaimp";
  * @returns String
  * @throws Error if count < 0 or if vmVal is an unsupported type
  */
-
 export function builtin_makeString(vmVal: VmData, vmCount?: VmInt): VmData {
+  // Unpack count. Default to 1 if not proided.
   let count = vmCount ? vmCount.unpack() : 1;
   if(count < 0) throw('makeString: No negative count allowed.');
 
