@@ -8,28 +8,21 @@ const ReplaceFollowCase = 0x04;
 const ReplaceSerial     = 0x08;
 const ReplaceOnce       = 0x10;
 
-function toRexPatternList(vmData: VmData): RexPattern[] {
-  let patterns: RexPattern[] = [];
-
-  // Test is argument is a packed array. If not,
-  // treat argument as array of one element.
-  // Result: We have an array of VmData.
-  let arr: VmData[];
-  if(!Array.isArray(vmData.unpack())) {
-    arr = [vmData];
-  } 
-  // Otherwise, unpack array.
-  else {
-    arr = vmData.unpack();
-  }
-
-  // Unpack all array elements, then turn each element into a RexPattern.
-  patterns = arr
-    .map((a) => a.unpack())
-    .map((p: any) => typeof(p) == 'string' ? new RexPattern(new VmSstring(p)) : p);
-  return patterns;
-}
-
+/**
+ * Replaces one or more matches for the regular expression pattern pat within the subject string 
+ * str, starting at the character index given by index. replacement is a string giving the replacement 
+ * text, or a function (regular or anonymous) to be invoked for each match to compute the replacement text. 
+ * @param vmPat Pattern or list of patterns to match
+ * @param vmStr String to search
+ * @param vmReplacement Replacement or list of replacements
+ * @param vmFlags Flags
+ * @param vmIndex Index to start at
+ * @param vmLimit Max number of replacements to do
+ * @returns String with replacements performed
+ * @todo Support serial replacement
+ * @todo Support ReplaceIgnoreCase
+ * @todo Support ReplaceFollowCase
+ */
 export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: VmData, vmFlags?: VmInt, vmIndex?: VmInt, vmLimit?: VmInt): VmData {
   let patterns: RexPattern[] = toRexPatternList(vmPat);
   let str: string = vmStr.unpack();
@@ -49,11 +42,11 @@ export function builtin_rexReplace(vmPat: VmData, vmStr: VmData, vmReplacement: 
   if(isIgnoreCase) throw('rexReplace: No ReplaceIgnoreCase support');
 
   // By default, there is no limit.
-  let limit: number = 999;
+  let limit: number = Number.MAX_VALUE;
   // ReplaceOnce sets limit to 1.
   if(!isAll) limit = 1;
-  // If limit specified, use it:
-  if(vmLimit && vmLimit instanceof VmNil) limit = 999;
+  // If limit specified, use it and ignore ReplaceOnce/ReplaceAll flags:
+  if(vmLimit && vmLimit instanceof VmNil) limit = Number.MAX_VALUE;
   if(vmLimit && vmLimit instanceof VmInt) limit = vmLimit.unpack();
 
   if(!isSerial) {
@@ -138,5 +131,27 @@ function getReplacement(str: string, patIndex: number, match: any, vmReplacement
 
   // Any other case is not supported.
   return '';
+}
+
+function toRexPatternList(vmData: VmData): RexPattern[] {
+  let patterns: RexPattern[] = [];
+
+  // Test is argument is a packed array. If not,
+  // treat argument as array of one element.
+  // Result: We have an array of VmData.
+  let arr: VmData[];
+  if(!Array.isArray(vmData.unpack())) {
+    arr = [vmData];
+  } 
+  // Otherwise, unpack array.
+  else {
+    arr = vmData.unpack();
+  }
+
+  // Unpack all array elements, then turn each element into a RexPattern.
+  patterns = arr
+    .map((a) => a.unpack())
+    .map((p: any) => typeof(p) == 'string' ? new RexPattern(new VmSstring(p)) : p);
+  return patterns;
 }
 
