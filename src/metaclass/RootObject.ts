@@ -1,4 +1,4 @@
-import { VmData, VmObject, VmNil, VmTrue, VmList, VmProp, VmInt, VmNativeCode, VmFuncPtr, VmCodeOffset } from "../types";
+import { VmData, VmObject, VmNil, VmTrue, VmList, VmProp, VmInt, VmNativeCode, VmFuncPtr, VmCodeOffset, VmSstring } from "../types";
 import { SourceImage } from "../SourceImage";
 import { Pool } from "../Pool";
 import { Heap } from "../Heap";
@@ -6,6 +6,7 @@ import { MetaclassRegistry } from "./MetaclassRegistry";
 import { IFuncInfo } from "../IFuncInfo";
 import { VmType } from "../types/VmType";
 import { Vm } from "../Vm";
+import { Symbols } from "../Symbols";
 
 interface IPropLocation {
   object: VmObject;
@@ -297,6 +298,24 @@ class RootObject {
 
   funcinfo(): IFuncInfo {
     throw('NOT A FUNCTION');
+  }
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    // Is 'objToString' symbol defined?
+    let vmProp = Symbols.get('objToString');
+    if (vmProp != null) {
+      // Does this object define this property?
+      let propLocation = this.findProp(vmProp.value, false);
+      if(propLocation) {
+        // Call the property:
+        let res = Vm.getInstance().runContext(propLocation.prop.value, vmProp, new VmObject(this.id), new VmObject(propLocation.object.value), new VmObject(this.id), new VmNil()).unpack();
+        // Return the result if it's a string.
+        if(typeof(res) == 'string') return res;
+      }
+    } 
+
+    // If all else, fails, return generic conversion:
+    return `object#${this.id.toString()}`;
   }
 
   /*

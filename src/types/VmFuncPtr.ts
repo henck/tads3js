@@ -28,7 +28,7 @@ export class VmFuncPtr extends VmData {
   }    
 
   toStr(radix?: number, isSigned?: boolean): string {
-    return `funcptr#${this.value}`;
+    return `funcptr#${this.value.toString()}`;
   }   
 
   // ...

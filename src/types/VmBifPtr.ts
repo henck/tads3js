@@ -45,4 +45,8 @@ export class VmBifPtr extends VmData {
     if ((this.value as IBifPtr).index != (data.value as IBifPtr).index) return false;
     return true;
   }  
+
+  toStr(radix?: number, isSigned?: boolean): string {
+    return `${this.value.set.toString()},${this.value.index.toString()}`;
+  }
 }

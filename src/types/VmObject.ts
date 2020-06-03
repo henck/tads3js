@@ -232,8 +232,6 @@ export class VmObject extends VmData {
 
   toStr(radix?: number, isSigned?: boolean): string {
     let obj: RootObject = this.getInstance();
-    // Does class implement toStr? Then use it.
-    if((obj as any).toStr) return (obj as any).toStr(radix, isSigned);
-    return `object#${this.value}`;
+    return obj.toStr(radix, isSigned);
   }
 }

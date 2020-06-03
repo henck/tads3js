@@ -129,7 +129,7 @@ class RexPattern extends RootObject {
    */
 
   toStr(radix?: number, isSigned?: boolean): string {
-    return `${this.value} = ${this.parsedValue}`;
+    return this.value;
   }   
 
   /*

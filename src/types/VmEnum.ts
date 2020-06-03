@@ -30,7 +30,6 @@ export class VmEnum extends VmData {
   }
 
   toStr(radix?: number, isSigned?: boolean): string {
-    radix = radix ?? 10;
-    return this.value.toString(radix);
+    return `enum#${this.value.toString()}`;
   }
 }

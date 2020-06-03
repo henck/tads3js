@@ -26,6 +26,6 @@ export class VmProp extends VmData {
   }  
 
   toStr(radix?: number, isSigned?: boolean): string {
-    return `prop#${this.value}`;
+    return `prop#${this.value.toString()}`;
   }  
 }
