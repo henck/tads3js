@@ -24,10 +24,21 @@ function findNextObj(fromID: number, vmClass?: VmObject, vmFlags?: VmInt): VmDat
   return new VmObject(res.key);
 }
 
+/**
+ * Get the first object of class cls. 
+ * @param vmClass Ancestor class, or nil
+ * @param vmFlags Flags
+ */
 export function builtin_firstObj(vmClass?: VmObject, vmFlags?: VmInt): VmData {
   return findNextObj(null, vmClass, vmFlags);
 }
 
+/**
+ * Get the next object after obj of class cls. 
+ * @param vmObject Previous object
+ * @param vmClass Ancestor class, or nil
+ * @param vmFlags Flags
+ */
 export function builtin_nextObj(vmObject: VmObject, vmClass?: VmObject, vmFlags?: VmInt): VmData {
   return findNextObj(vmObject.value, vmClass, vmFlags);
 }
