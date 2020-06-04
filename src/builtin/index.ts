@@ -35,4 +35,5 @@ export { builtin_bannerSay } from './io/bannerSay'
 export { builtin_bannerSizeToContents } from './io/bannerSizeToContents'
 export { builtin_systemInfo } from './io/systemInfo'
 export { builtin_tadsSay } from './io/tadsSay'
+export { builtin_inputLineCancel } from './io/inputLineCancel'
 

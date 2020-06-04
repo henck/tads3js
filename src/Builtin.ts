@@ -68,7 +68,7 @@ export class Builtin {
       /* 15 */ null, // getLocalCharSet
       /* 16 */ null, // flushOutput
       /* 17 */ null, // inputLineTimeout
-      /* 18 */ null, // inputLineCancel
+      /* 18 */ B.builtin_inputLineCancel,
       /* 19 */ B.builtin_bannerCreate,
       /* 20 */ null, // bannerDelete
       /* 21 */ B.builtin_bannerClear,
