@@ -21,9 +21,6 @@ class RexPattern extends RootObject {
     let caseSensitive = true;
     this.parsedValue = this.value;
 
-    // Any backslashes need to be duplicated:
-    //parsedValue = parsedValue.replace('/\\/', '\\\\');
-
     // See if there's a <NoCase> in the string.
     this.parsedValue = this.parsedValue.replace(/<nocase>/ig, (x) => {
       caseSensitive = false;
@@ -91,11 +88,23 @@ class RexPattern extends RootObject {
       return `[${negate ? '^' : ''}${parts.join('')}]`;
     });
 
-    //console.log(parsedValue);
-    //let rx = new RegExp(parsedValue, 'g' + (!caseSensitive) ? 'i' : '');
-    //console.log(rx.exec('aa\vcc'));
+    this.regexp = new RegExpPlus(this.parsedValue, (!caseSensitive) ? 'i' : '');
+  }
 
-    this.regexp = new RegExpPlus(this.parsedValue, 'g' + (!caseSensitive) ? 'i' : '');
+  /**
+   * Create an escaped RexPattern, where it matches only the original string.
+   * All special characters are escaped.
+   * @param str String
+   * @returns RexPattern instance
+   */
+  static escape(str: string) {
+    // Escape any regex chars:
+    str = str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+    let pat = new RexPattern(new VmSstring(''));
+    pat.value = str;
+    pat.parsedValue = str;
+    pat.regexp = new RegExpPlus(str, '');
+    return pat;
   }
 
   static loadFromImage(image: SourceImage, dataPool: Pool, offset: number): RootObject { 
