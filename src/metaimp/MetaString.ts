@@ -102,6 +102,13 @@ class MetaString extends RootObject {
    * directly by other code, only when a property is evaluated.
    */
 
+  /**
+   * Compares this string to the second string str, returning an integer less than 0 
+   * if this string sorts before str, 0 if the two strings are identical, or greater 
+   * than 0 if this string sorts after str. 
+   * @param vmStr String to compare to
+   * @returns Comparison int
+   */
   private compareTo(vmStr: VmData) : VmInt {
     let str = vmStr.unpack();
     let res = 0;
@@ -110,6 +117,14 @@ class MetaString extends RootObject {
     return new VmInt(res);
   }
 
+  /**
+   * Compares this string to the second string str, ignoring differences in upper/lower case. 
+   * For example, "A" and "a" are treated as equal. Returns an integer less than 0 if this 
+   * string sorts before str, 0 if the two strings are identical, or greater than 0 if this 
+   * string sorts after str. 
+   * @param vmStr String to comapre to
+   * @returns Comparison int
+   */
   private compareIgnoreCase(vmStr: VmData) : VmInt {
     let str = vmStr.unpack().toUpperCase().toLowerCase();
     let me = this.value.toUpperCase().toLowerCase();
@@ -119,22 +134,44 @@ class MetaString extends RootObject {
     return new VmInt(res);
   }
 
+  /**
+   * Calculates the 128-bit RSA MD5 message digest of the string, returning a string of 
+   * 32 hex digits representing the digest value. 
+   * @returns Digest string
+   */
   private digestMD5(): VmObject {
     let hash = MD5(this.value).toString();
     return new VmObject(new MetaString(hash));
   }
 
+  /**
+   * Returns true if this string ends with str, nil if not. 
+   * @param vmStr String to test
+   * @returns True if string ends with str, nil if not.
+   */
   private endsWith(vmStr: VmData): VmData {
     let str = vmStr.unpack();
     return this.value.endsWith(str) ? new VmTrue() : new VmNil();
   }
 
+  /**
+   * Finds the substring or regular expression target within this string. 
+   * @param vmTarget Substring or RexPattern to search for
+   * @param vmIndex Start index of match, or nil if not found
+   */
   private find(vmTarget: VmData, vmIndex?: VmInt): VmInt | VmNil {
     let res = builtin_rexSearch(vmTarget, new VmObject(this.id), vmIndex);
     if(res instanceof VmNil) return res;
     return res.unpack()[0];
   }
 
+  /**
+   * Searches the subject string (self) for all occurrences of a given 
+   * substring or regular expression pattern, returning a list of matches. 
+   * @param vmTarget Substring or RexPattern to search for
+   * @param vmFunc Function to apply to each match
+   * @returns Match list
+   */
   private findAll(vmTarget: VmData, vmFunc?: VmData): VmObject {
     let target = vmTarget.unpack();
     let matches: Match[] = [];
@@ -187,6 +224,12 @@ class MetaString extends RootObject {
     return new VmObject(new List(results));
   }
 
+  /**
+   * Converts HTML markup-significant characters in the 
+   * string to appropriate HTML sequences, and returns the resulting string. 
+   * @param flags Flags
+   * @returns Converted string
+   */
   private htmlify(flags?: VmInt): VmData {
     // Replace & with &amp;
     // Replace < with &lt;
