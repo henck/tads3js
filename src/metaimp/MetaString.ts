@@ -303,6 +303,7 @@ class MetaString extends RootObject {
 
   private splice(vmindex: VmInt, vmdeleteLength: VmInt, vminsertString?: VmObject): VmObject {
     let index = this.unwrapIndex(vmindex);
+    
     // Decode arguments:
     let deleteLength = vmdeleteLength.unpack();
     let insertString = vminsertString ? vminsertString.unpack() : '';
@@ -387,7 +388,7 @@ class MetaString extends RootObject {
       start = this.value.length + start + 1;
     }
     // No length
-    if(!length) {
+    if(length === null) {
       out = this.value.substring(start);
     }
     // A positive length means number of characters to keep
