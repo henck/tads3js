@@ -4,7 +4,7 @@ const SHA256 = require("crypto-js/sha256");
 import { RootObject } from '../metaclass/RootObject';
 import { MetaclassRegistry } from '../metaclass/MetaclassRegistry'
 
-import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr, VmNativeCode, VmSstring } from "../types"
+import { VmData, VmInt, VmObject, VmNil, VmTrue, VmFuncPtr, VmNativeCode, VmSstring, VmList } from "../types"
 import { ByteArray } from "./ByteArray"
 import { RexPattern } from "./RexPattern"
 import { List } from "./List"
@@ -13,6 +13,7 @@ import { Pool } from "../Pool"
 import { VmType } from '../types/VmType'
 import { builtin_rexSearch } from '../builtin/gen/rexSearch'
 import { builtin_rexMatch } from '../builtin/gen/rexMatch'
+import { builtin_rexReplace } from '../builtin/gen/rexReplace'
 import { Match } from '../regexp/RegExpPlus'
 import { AnonFunc } from './AnonFunc'
 
@@ -160,6 +161,11 @@ class MetaString extends RootObject {
    * @param vmIndex Start index of match, or nil if not found
    */
   private find(vmTarget: VmData, vmIndex?: VmInt): VmInt | VmNil {
+    // If target is a regular string, turn it into an escape regexp
+    // that matches only the literal string.
+    let target = vmTarget.unpack();
+    if(typeof(target) == 'string') vmTarget = new VmObject(RexPattern.escape(target));
+
     let res = builtin_rexSearch(vmTarget, new VmObject(this.id), vmIndex);
     if(res instanceof VmNil) return res;
     return res.unpack()[0];
@@ -173,33 +179,21 @@ class MetaString extends RootObject {
    * @returns Match list
    */
   private findAll(vmTarget: VmData, vmFunc?: VmData): VmObject {
+    // If target is a regular string, convert it to an escaped RexPattern
+    // so we can use regexp functions.    
     let target = vmTarget.unpack();
+    if(typeof(target) == 'string') target = RexPattern.escape(target);
+    if(!(target instanceof RexPattern)) throw('String.findAll: unsupported argument');
+    
     let matches: Match[] = [];
 
-    // Perform search using a RexPattern:
-    if(target instanceof RexPattern) {
-      let pos = 0;
-      let m: Match = target.getRegExp().exec(this.value, pos);
-      while(m != null) {
-        matches.push(m);
-        pos = m.index + m.length;
-        m = target.getRegExp().exec(this.value, pos);
-      }
-    } 
-    // Perform search using a string:
-    else if(typeof(target) == 'string') {
-      let count = 0, pos = 0, idx = 0;
-      while((idx = this.value.indexOf(target, pos)) != -1) {
-        let m = new Match();
-        m.value = target;
-        m.length = target.length;
-        m.index = idx;
-        matches.push(m);
-        count++; pos = idx + target.length;
-      }
-    }
-    else {
-      throw('findAll: unsupported argument');
+    // Perform search:
+    let pos = 0;
+    let m: Match = target.getRegExp().exec(this.value, pos);
+    while(m != null) {
+      matches.push(m);
+      pos = m.index + m.length;
+      m = target.getRegExp().exec(this.value, pos);
     }
 
     // Create a result list:
@@ -222,6 +216,23 @@ class MetaString extends RootObject {
     });
 
     return new VmObject(new List(results));
+  }
+
+  protected findReplace(vmOldStr: VmData, vmNewStr: VmData, vmFlags?: VmInt, vmIndex?: VmInt, vmLimit?: VmInt): VmData {
+    // Argument may be simple string or a list containing simple strings.
+    // These simple strings must be converted to RexPatterns before rexReplace
+    // can be used.
+    let oldStr = vmOldStr.unpack(); // string, RexPattern or array
+    if(typeof(oldStr) == 'string') vmOldStr = new VmObject(RexPattern.escape(oldStr));
+    if(Array.isArray(oldStr)) {
+      vmOldStr = new VmList(oldStr.map((vmX) => {
+        let x = vmX.unpack();
+        if(typeof(x) == 'string') vmX = new VmObject(RexPattern.escape(x));
+        return vmX;
+      }));
+    }
+
+    return builtin_rexReplace(vmOldStr, new VmObject(this), vmNewStr, vmFlags, vmIndex, vmLimit);
   }
 
   /**
@@ -250,10 +261,20 @@ class MetaString extends RootObject {
     return new VmObject(new MetaString(str));
   }
 
+  /**
+   * Returns the number of characters in the string. 
+   * @returns Number
+   */
   private length(): VmData {
     return new VmInt(this.value.length);
   }
 
+  /**
+   * Creates a ByteArray object based on the contents of the string. 
+   * @param charset CharacterSet to use
+   * @returns ByteArray
+   * @todo CharacterSet support
+   */
   private mapToByteArray(charset?: VmInt): VmData {
     let b = new ByteArray(this.value);
     return new VmObject(b);
@@ -266,26 +287,13 @@ class MetaString extends RootObject {
    * @returns Length of match found, or nil for no match.
    */
   private match(vmTarget: VmData, vmIndex?: VmInt): VmInt | VmNil {
-    let index = vmIndex ? this.unwrapIndex(vmIndex) : 0;
-
+    // If target is a regular string, convert it to an escaped RexPattern
+    // so we can use regexp functions.
     let target = vmTarget.unpack();
+    if(typeof(target) == 'string') target = RexPattern.escape(target);
+    if(!(target instanceof RexPattern)) throw('String.match: unsupported argument');
 
-    // If a RexPattern is specified, use it:
-    if(target instanceof RexPattern) {
-      return builtin_rexMatch(vmTarget, new VmObject(this.id), vmIndex);
-    }
-    // A string is specified. Use it:
-    else if(typeof(target) == 'string') {
-      // Get position of match.
-      let pos = this.value.indexOf(target, index);
-      // If no match, or match not at start, return nil.
-      if(pos - index != 0) return new VmNil();
-      // Return length of match (always same as search string):
-      return new VmInt(target.length);
-    }
-    else { 
-      throw('String.match: unsupported argument');
-    }
+    return builtin_rexMatch(vmTarget, new VmObject(this.id), vmIndex);
   }  
   
   private sha256(): VmObject {
@@ -439,11 +447,6 @@ class MetaString extends RootObject {
 
   private urlEncode() {
     return new VmObject(new MetaString(encodeURIComponent(this.value)));
-  }
-
-  protected findReplace(vmOldStr: VmData, vmNewStr: VmData, vmFlags?: VmInt, vmIndex?: VmInt, vmLimit?: VmInt): VmData {
-    // TODO: Actually do something; currently just copies old str.
-    return new VmObject(new MetaString(this.value));
   }
 
   getValue() {
