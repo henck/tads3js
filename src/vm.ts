@@ -13,6 +13,7 @@ import { IFuncInfo } from './IFuncInfo'
 import { Symbols } from './Symbols'
 import { UTF8 } from './utf8'
 import { Match } from './regexp/RegExpPlus'
+import { stringify } from 'querystring'
 
 const fs = require('fs');
 
@@ -656,14 +657,52 @@ export class Vm {
       //this.stdout(`(${source})`, str.value);
       this.outputFunc.invoke(str);
     } else {
+      throw('No default display function defined.');
       this.stdout(`${source}`, str.value);
     }
   }
 
+  private capsFlag: boolean = false;
+  private noCapsFlag: boolean = false;
   public stdout(source: string, str: string) {
-    console.log(source.padEnd(12), str);
-    if(str == 'STOP') throw('STOPPED');
+    let out = '';
+    for(let i = 0; i < str.length; i++) {
+      let c = str.charCodeAt(i);
+      switch(c) {
+        case 0xa:
+          out += '<br/>';
+          break;
+        case 0x9:
+          out += '&nbsp;&nbsp;&nbsp;&nbsp;';
+          break;
+        case 0x0b:
+          out += '<br/><br/>';
+          break;
+        case 0x0e:
+          this.capsFlag = false;
+          this.noCapsFlag = true;
+          break;
+        case 0x0f:
+          this.capsFlag = true;
+          this.noCapsFlag = false;
+          break;
+        default:
+          let s = String.fromCharCode(c);
+          if(this.capsFlag) s = s.toUpperCase();
+          if(this.noCapsFlag) s = s.toLowerCase();
+          this.capsFlag = false; this.noCapsFlag = false;
+          out += s;
+          break;
+      }
+    }
+
+    if(out != '') console.log(source.padEnd(12), out);
+    if(str == 'STOP') {
+      throw('STOPPED');
+    }
   }
+
+
 
   dump() {
     console.info('=== VM DUMP ===');
@@ -672,6 +711,9 @@ export class Vm {
     else if(this.r0 instanceof VmNil) r0Value = 'VmNil';
     else r0Value = this.r0;
     console.info('IP:', this.ip, 'EP:', this.ep, 'R0:', r0Value);
+    console.log('=== MATCH ===');
+    console.log(this.match);
+    console.log('=== STACK ===');
     this.stack.dump();
     console.info('=== END ===');
 
