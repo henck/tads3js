@@ -13,7 +13,8 @@ _main(args)
   && 'abcdefghi'.substr(2, -2) == 'bcdefg'
   && 'abcdefghi'.substr(4, -2) == 'defg'
   && 'abcdefghi'.substr(4, -4) == 'de'
-  && 'abcdefghi'.substr(-4, -2) == 'fg';
+  && 'abcdefghi'.substr(-4, -2) == 'fg'
+  && 'abc'.substr(1, 0) == '';
 }
 
 
