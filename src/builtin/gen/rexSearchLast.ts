@@ -1,6 +1,8 @@
 import { VmData, VmInt, VmNil } from "../../types";
 
 /**
+ * Searches the string str backwards from the end for a match to the regular 
+ * expression pat, starting at the character position index.
  * rexSearchLast is not used by Adv3.
  * An implementation is not (yet) necessary.
  * @param vmPat Pattern to search for (string or RexPattern)
