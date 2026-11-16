@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "colors": "^1.4.0",
     "esbuild": "^0.24.0",
     "typescript": "^3.8.3"
   },
