@@ -1,0 +1,18 @@
+[3:'take' 1:obj->prop][3:'get' 3:'it'][3:'get' 1:obj->prop][badness 5: 4:enum-
+>prop][6:list2->prop 3:'all']
+props: 2 yes 1
+dict: yes yes 2 yes
+take red box: 1
+one[1-3]{1,n,n}(np(a)[2-3]{1,n,n}('red' np(n)[3-3]{1,n,n}('box')) nil)
+get it: 1
+one[1-2]{1,1}(nil nil)
+box all: 1
+new-alt[1-2]{n,1}('box')
+42: 1
+one[1-1]{n}(nil '42')
+[6:list2->prop 3:'all'] no yes
+[3:'drop' 1:obj->prop][3:'drop' 3:'it']
+[3:'drop' 1:obj->prop] yes
+[3:'drop' 1:obj->prop][3:'a'][3:'b'][]
+no
+errors: 2315 2015

@@ -1,0 +1,8 @@
+examine lantern: 1
+cmd(a)[1-2]{1,n}('lantern')
+EXAM lant: 1
+cmd(a)[1-2]{7,n}('lant')
+examined lanterns: 0
+Look AT lantern: 1
+cmd(b)[1-3]{3,3,n}('lantern')
+exa lantern: 0

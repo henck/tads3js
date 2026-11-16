@@ -1,0 +1,10 @@
+put box: 1
+a(box)
+put red: 1
+c()
+put in box: 1
+c()
+jump: 1
+c()
+zork: 1
+c()

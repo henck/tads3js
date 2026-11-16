@@ -1,0 +1,140 @@
+Welcome to the second test.
+
+Great Hall
+A great hall.  A kitchen lies north, and a cellar door is set into the floor.
+
+You see a wooden chest, a red ball, and a blue ball here.  On the table is a
+brass lamp.
+
+>look
+Great Hall
+A great hall.  A kitchen lies north, and a cellar door is set into the floor.
+
+You see a wooden chest, a red ball, and a blue ball here.  On the table is a
+brass lamp.
+
+>take ball
+Which ball do you mean, the blue ball, or the red ball?
+
+>red
+Taken.
+
+>take all
+brass lamp: Taken.
+wooden chest: Taken.
+blue ball: Taken.
+
+>i
+You are carrying a red ball, a brass lamp, a wooden chest, and a blue ball.
+
+>drop balls
+blue ball: Dropped.
+red ball: Dropped.
+
+>open chest
+Opening the wooden chest reveals a gold coin.
+
+>look in chest
+The wooden chest contains a gold coin.
+
+>take coin from chest
+Taken.
+
+>put coin on table
+Done.
+
+>x table
+An oak table.  On the table is a gold coin.
+
+>take lamp
+You are already carrying the brass lamp.
+
+>turn on lamp
+Okay, the brass lamp is now on.
+
+>open door
+Opened.
+
+>down
+Cellar
+A damp cellar.
+
+>look
+Cellar
+A damp cellar.
+
+>up
+Great Hall
+A great hall.  A kitchen lies north, and a cellar door is set into the floor.
+
+You see a blue ball and a red ball here.  On the table is a gold coin.
+
+>north
+Kitchen
+A kitchen.  The hall is south.
+
+You see a dial here.
+
+>turn dial to 7
+Okay, the dial is now set to 7.
+
+>x dial
+A dial from 1 to 10, set to 7.
+
+>set dial to twelve
+The dial has no such setting.
+
+>x dail
+The word “dail” is not necessary in this story.
+
+(If this was an accidental misspelling, you can correct it by typing OOPS
+followed by the corrected word now.  Any time the story points out an unknown
+word, you can correct a misspelling using OOPS as your next command.)
+
+>oops dial
+A dial from 1 to 10, set to 7.
+
+>south
+Great Hall
+A great hall.  A kitchen lies north, and a cellar door is set into the floor.
+
+You see a blue ball and a red ball here.  On the table is a gold coin.
+
+>again
+You can’t go that way.  Obvious exits lead north, back to the kitchen; and
+down, to the cellar.
+
+>undo
+Taking back one turn: “south”.
+
+Great Hall
+A great hall.  A kitchen lies north, and a cellar door is set into the floor.
+
+You see a blue ball and a red ball here.  On the table is a gold coin.
+
+>score
+In 22 moves, you have scored 0 points.
+
+(To see a detailed accounting of your score, type FULL SCORE.)
+
+>wait
+Time passes...
+
+>z
+Time passes...
+
+>save
+Save game to file >Failed; your computer might be running low on disk space, or you might not have
+the necessary permissions to write this file.
+
+>test-save
+The word “test-save” is not necessary in this story.
+
+>restore
+Restore game from file >Failed: the position could not be restored.
+
+>test-save
+The word “test-save” is not necessary in this story.
+
+>quit
+Do you really want to quit? (Y is affirmative) > y

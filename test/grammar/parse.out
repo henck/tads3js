@@ -1,0 +1,24 @@
+take book: 1
+cmd(take)[1-2]{1,n}(np(noun)[2-2]{1,n}('book'))
+take red book: 1
+cmd(take)[1-3]{1,n,n}(np(adj)[2-3]{1,n,n}('red' np(noun)[3-3]{1,n,n}('book')))
+take all: 1
+cmd(takeall)[1-2]{1,1}()
+take red: 1
+cmd(take)[1-2]{1,n}(np(noun)[2-2]{1,n}('red'))
+take book and box and 3: 2
+cmd(take)[1-6]{1,n,1,n,1,n}(np(list)[2-6]{1,n,1,n,1,n}(np(noun)[2-
+2]{1,n,1,n,1,n}('book') np(list)[4-6]{1,n,1,n,1,n}(np(noun)[4-
+4]{1,n,1,n,1,n}('box') np(num)[6-6]{1,n,1,n,1,n}('3'))))
+cmd(take)[1-6]{1,n,1,n,1,n}(np(list)[2-6]{1,n,1,n,1,n}(np(list)[2-
+4]{1,n,1,n,1,n}(np(noun)[2-2]{1,n,1,n,1,n}('book') np(noun)[4-
+4]{1,n,1,n,1,n}('box')) np(num)[6-6]{1,n,1,n,1,n}('3')))
+drop book now please: 1
+cmd(drop)[1-2]{1,n}(np(noun)[2-2]{1,n}('book'))
+TAKE BOOK: 0
+take: 0
+look: 1
+cmd2(t)[1-1]{1}(opt(e)[3-2]{1}())
+look x x: 1
+cmd2(t)[1-3]{1,1,1}(opt(x)[2-3]{1,1,1}(opt(x)[3-3]{1,1,1}(opt(e)[5-
+4]{1,1,1}())))

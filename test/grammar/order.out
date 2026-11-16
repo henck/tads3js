@@ -1,0 +1,34 @@
+put red box in box: 3
+a(a(red n(box)) n(box))
+b(a(red n(box)))
+b(n(red))
+put big red box: 3
+b(a(big a(red n(box))))
+b(a(big n(red)))
+c(1() a(big a(red n(box))))
+put in red: 1
+c(2() n(red))
+put key and box and red , key: 14
+b(l(n(key) l(n(box) l2(n(red) n(key)))))
+b(l(n(key) l2(l(n(box) n(red)) n(key))))
+b(l2(l(n(key) l(n(box) n(red))) n(key)))
+b(l(n(key) l(n(box) n(red))))
+b(l(l(n(key) n(box)) l2(n(red) n(key))))
+b(l2(l(l(n(key) n(box)) n(red)) n(key)))
+b(l(l(n(key) n(box)) n(red)))
+b(l(n(key) n(box)))
+b(n(key))
+c(1() l(n(key) l(n(box) l2(n(red) n(key)))))
+c(1() l(n(key) l2(l(n(box) n(red)) n(key))))
+c(1() l2(l(n(key) l(n(box) n(red))) n(key)))
+c(1() l(l(n(key) n(box)) l2(n(red) n(key))))
+c(1() l2(l(l(n(key) n(box)) n(red)) n(key)))
+put key of box and red: 6
+b(p(n(key) l(n(box) n(red))))
+b(l(p(n(key) n(box)) n(red)))
+b(p(n(key) n(box)))
+b(n(key))
+c(1() p(n(key) l(n(box) n(red))))
+c(1() l(p(n(key) n(box)) n(red)))
+red red box: 1
+a(red a(red n(box)))

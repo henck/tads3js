@@ -1,0 +1,39 @@
+Welcome to the test.
+
+Start Room
+This is the start room.  A door leads north.
+
+You see a small box here.
+
+>look
+Start Room
+This is the start room.  A door leads north.
+
+You see a small box here.
+
+>x box
+It's a small box.
+
+>take box
+Taken.
+
+>i
+You are carrying a small box.
+
+>open box
+That is not something you can open.
+
+>put box in box
+You can’t put the small box in itself.
+
+>north
+You can’t go that way.  There are no obvious exits.
+
+>undo
+Taking back one turn: “north”.
+
+Start Room
+This is the start room.  A door leads north.
+
+>quit
+Do you really want to quit? (Y is affirmative) > y

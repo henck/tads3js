@@ -1,0 +1,11 @@
+one two three
+leading and trailing
+quoted:   x
+  indented
+ a  b   c d
+x       y
+part one part two
+a   b
+[a b] [a b] [a b] [a b]
+[a  b] [a  b]
+[a     b] [a   b] [a   b]

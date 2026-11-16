@@ -1,0 +1,8 @@
+Prompt>hello there
+got [hello there]
+>world
+got [world] after
+trailing space 
+[]last
+[last]
+[nil]

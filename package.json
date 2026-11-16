@@ -1,0 +1,25 @@
+{
+  "name": "t3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "vm.js",
+  "scripts": {
+    "test": "tsc && node build/Test.js",
+    "run": "tsc && node build/Interpreter.js",
+    "games": "tsc && node build/GameTest.js",
+    "web": "tsc && node tools/build-web.js",
+    "serve": "node tools/serve.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/node": "^13.13.4",
+    "crypto-js": "^4.0.0",
+    "decimal.js": "^10.4.3",
+    "systemjs": "^6.3.1"
+  }
+}

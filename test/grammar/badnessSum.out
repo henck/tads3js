@@ -1,0 +1,7 @@
+tell bob i quit: 1
+b(n(bob) more(i w(quit)))
+tell zork i quit: 2
+b(any(zork w(i)) w(quit))
+a(any(zork more(i w(quit))))
+x: 1
+c(a())

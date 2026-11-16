@@ -1,0 +1,13 @@
+build
+obj
+node_modules
+*.t3
+*.sav
+actual.out
+*.t3o
+GameInfo.txt
+web/tads3js.js
+web/tads3js-worker.js
+web/*.map
+*.tmp
+test.log

@@ -1,0 +1,11 @@
+<eventscript>
+<line>first
+<line>second
+<key>k
+<key>[up]
+<line>third
+<key>x
+<key>[up]
+<dialog>2
+<dialog>3
+<file>save1.sav

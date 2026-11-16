@@ -1,0 +1,141 @@
+:root {
+  --bg: #fbfaf7;
+  --fg: #222;
+  --muted: #777;
+  --accent: #2a5d8f;
+  --bar-bg: #2b2b2b;
+  --bar-fg: #f2f2f2;
+  --panel: #fff;
+  --border: #ddd;
+  --error: #b00020;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1c1e;
+    --fg: #ddd;
+    --muted: #999;
+    --accent: #8cb8e8;
+    --bar-bg: #333539;
+    --bar-fg: #eee;
+    --panel: #26282b;
+    --border: #444;
+    --error: #ff7a8a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 18px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+}
+
+main {
+  max-width: 44em;
+  margin: 0 auto;
+  padding: 1.5em 16px 40vh;
+}
+
+#status {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.35em 16px;
+  background: var(--bar-bg);
+  color: var(--bar-fg);
+  font: 15px/1.4 system-ui, sans-serif;
+  z-index: 1;
+}
+#status[hidden] { display: none; }
+#status-left { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#status-right { white-space: nowrap; }
+
+#output {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  cursor: text;
+}
+
+#input {
+  font: inherit;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  width: 70%;
+  min-width: 10em;
+}
+
+.command { color: var(--accent); }
+.note { color: var(--muted); font-style: italic; }
+.error { color: var(--error); }
+
+button {
+  font: 15px system-ui, sans-serif;
+  padding: 0.4em 1em;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--fg);
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button[type=submit] { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+.more { color: var(--muted); font: 14px system-ui, sans-serif; margin: 0.8em 0; animation: pulse 1.6s ease-in-out infinite; cursor: pointer; }
+@keyframes pulse { 50% { opacity: 0.4; } }
+
+.restart { display: block; margin: 1.5em 0; }
+
+#start { text-align: center; padding-top: 15vh; font-family: system-ui, sans-serif; }
+
+dialog {
+  width: min(28em, calc(100vw - 32px));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--fg);
+  font: 15px/1.4 system-ui, sans-serif;
+  padding: 1.2em 1.4em;
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+dialog h2 { font-size: 1.15em; margin: 0 0 0.8em; }
+dialog [hidden] { display: none; }
+dialog label { display: block; margin: 0.6em 0; }
+
+.tads-file-list { list-style: none; margin: 0 0 1em; padding: 0; max-height: 40vh; overflow-y: auto; }
+.tads-file-list li { display: flex; gap: 0.4em; margin-bottom: 0.4em; }
+.tads-file-empty { color: var(--muted); }
+.tads-file-pick { flex: 1; display: flex; justify-content: space-between; gap: 1em; text-align: left; }
+.tads-file-pick small { color: var(--muted); }
+.tads-file-delete { padding: 0.4em 0.7em; }
+.tads-file-name input { font: inherit; width: 100%; padding: 0.4em; margin-top: 0.3em; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--fg); }
+.tads-file-buttons { display: flex; justify-content: flex-end; gap: 0.5em; margin-bottom: 0; }
+.tads-file-upload { margin-right: auto; }
+
+/* HTML mode: banner windows around the story */
+body.html-mode { overflow: hidden; }
+body.html-mode #status { display: none; }
+#frame { position: fixed; inset: 0; display: flex; }
+body.html-mode main { flex: 1 1 auto; min-width: 0; min-height: 0; overflow-y: auto; max-width: none; margin: 0; padding: 1em 16px 2em; }
+body.html-mode #story { max-width: 44em; margin: 0 auto; }
+.banner-rest { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; }
+.banner { overflow: auto; background: var(--panel); font: 15px/1.4 system-ui, sans-serif; }
+.banner-border { border: 0 solid var(--border); border-width: 1px; }
+.banner-content { padding: 0.3em 0.6em; flex: 1 1 auto; min-width: 0; }
+.banner [data-command] { color: var(--accent); cursor: pointer; text-decoration: none; }
+.banner [data-command]:hover { text-decoration: underline; }
+.banner img { vertical-align: bottom; }
+.banner table { border-collapse: collapse; }
+.tab-right { float: right; }
+.banner { display: flex; flex-direction: column; }
+.tab-center { text-align: center; }
+body.html-mode .more { position: fixed; right: 16px; bottom: 8px; z-index: 5; margin: 0; padding: 0.2em 0.7em; border-radius: 6px; background: var(--panel); border: 1px solid var(--border); }
+.banner [data-command].plain { color: inherit; }

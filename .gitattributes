@@ -1,0 +1,2 @@
+# Test resources are compared byte for byte (e.g. mixed line endings)
+test/**/*.res/** binary
